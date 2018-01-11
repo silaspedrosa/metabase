@@ -11,16 +11,23 @@ import { titleize, humanize } from 'metabase/lib/formatting';
 
 import _ from "underscore";
 
-export default class DataSelector extends Component {
+const DATABASE_STEP = 'DATABASE';
+const SCHEMA_STEP = 'SCHEMA';
+const TABLE_STEP = 'TABLE';
+const SEGMENT_STEP = 'SEGMENT';
+const SEGMENT_AND_DATABASE_STEP = 'SEGMENT_AND_DATABASE';
 
+export default class DataSelector extends Component {
     constructor(props) {
-        super()
+        super();
+
         this.state = {
+            activeStep: null,
+            stepHistory: [],
             databases: null,
             selectedSchema: null,
-            showTablePicker: true,
             showSegmentPicker: props.segments && props.segments.length > 0
-        }
+        };
     }
 
     static propTypes = {
@@ -33,7 +40,7 @@ export default class DataSelector extends Component {
         setDatabaseFn: PropTypes.func.isRequired,
         setSourceTableFn: PropTypes.func,
         setSourceSegmentFn: PropTypes.func,
-        isInitiallyOpen: PropTypes.bool
+        isInitiallyOpen: PropTypes.bool,
     };
 
     static defaultProps = {
@@ -78,8 +85,9 @@ export default class DataSelector extends Component {
         });
         this.setState({ databases });
         if (selectedSchema != undefined) {
-            this.setState({ selectedSchema,  })
+            this.setState({ selectedSchema })
         }
+        this.updateActiveStep();
     }
 
     onChangeTable = (item) => {
@@ -100,10 +108,7 @@ export default class DataSelector extends Component {
     }
 
     onChangeSchema = (schema) => {
-        this.setState({
-            selectedSchema: schema,
-            showTablePicker: true
-        });
+        this.stepChange({selectedSchema: schema});
     }
 
     onChangeSegmentSection = () => {
@@ -113,9 +118,11 @@ export default class DataSelector extends Component {
     }
 
     onBack = () => {
+        const newHistory = this.state.stepHistory.slice();
+        const previousStep = newHistory.pop();
         this.setState({
-            showTablePicker: false,
-            showSegmentPicker: false
+            activeStep: previousStep,
+            stepHistory: newHistory
         });
     }
 
@@ -129,10 +136,7 @@ export default class DataSelector extends Component {
                 tables: []
             };
         }
-        this.setState({
-            selectedSchema: schema,
-            showTablePicker: !!schema
-        });
+        this.stepChange({selectedSchema: schema});
     }
 
     getSegmentId() {
@@ -145,6 +149,40 @@ export default class DataSelector extends Component {
 
     getTableId() {
         return this.props.datasetQuery.query && this.props.datasetQuery.query.source_table;
+    }
+
+    stepChange(stateChange) {
+        this.setState(stateChange, this.updateActiveStep);
+    }
+
+    updateActiveStep() {
+        const stepHistory = [];
+        let activeStep = '';
+
+        if (!this.props.includeTables) {
+            activeStep = DATABASE_STEP;
+        } else {
+            activeStep = SCHEMA_STEP;
+
+            if (this.state.selectedSchema) {
+                stepHistory.push(activeStep);
+                activeStep = TABLE_STEP;
+            }
+
+            if (this.props.segments &&
+                    this.getSegmentId()) {
+                stepHistory.push(activeStep);
+                activeStep = SEGMENT_STEP;
+            }
+
+            if (this.props.segments &&
+                    !this.getSegmentId()) {
+                stepHistory.push(activeStep);
+                activeStep = SEGMENT_AND_DATABASE_STEP;
+            }
+        }
+
+        this.setState({ activeStep, stepHistory });
     }
 
     renderDatabasePicker = ({ maxHeight }) => {
@@ -384,15 +422,25 @@ export default class DataSelector extends Component {
         );
     }
 
+    renderActiveStep() {
+        switch(this.state.activeStep) {
+            case DATABASE_STEP:             return this.renderDatabasePicker;
+            case SCHEMA_STEP:               return this.renderDatabaseSchemaPicker;
+            case TABLE_STEP:                return this.renderTablePicker;
+            case SEGMENT_STEP:              return this.renderSegmentPicker;
+            case SEGMENT_AND_DATABASE_STEP: return this.renderSegmentAndDatabasePicker;
+        }
+    }
+
     render() {
         const { databases } = this.props;
 
-        let dbId = this.getDatabaseId();
-        let tableId = this.getTableId();
-        var database = _.find(databases, (db) => db.id === dbId);
-        var table = _.find(database && database.tables, (table) => table.id === tableId);
+        const dbId = this.getDatabaseId();
+        const tableId = this.getTableId();
+        const database = _.find(databases, (db) => db.id === dbId);
+        const table = _.find(database && database.tables, (table) => table.id === tableId);
 
-        var content;
+        let content;
         if (this.props.includeTables && this.props.segments) {
             const segmentId = this.getSegmentId();
             const segment = _.find(this.props.segments, (segment) => segment.id === segmentId);
@@ -417,7 +465,7 @@ export default class DataSelector extends Component {
             }
         }
 
-        var triggerElement = (
+        const triggerElement = (
             <span className={this.props.className || "px2 py2 text-bold cursor-pointer text-default"} style={this.props.style}>
                 {content}
                 <Icon className="ml1" name="chevrondown" size={this.props.triggerIconSize || 8}/>
@@ -433,16 +481,7 @@ export default class DataSelector extends Component {
                 triggerClasses="flex align-center"
                 horizontalAttachments={this.props.segments ? ["center", "left", "right"] : ["left"]}
             >
-                { !this.props.includeTables ?
-                    this.renderDatabasePicker :
-                    this.state.selectedSchema && this.state.showTablePicker ?
-                        this.renderTablePicker :
-                        this.props.segments ?
-                            this.state.showSegmentPicker ?
-                                this.renderSegmentPicker :
-                                this.renderSegmentAndDatabasePicker :
-                            this.renderDatabaseSchemaPicker
-                }
+                { this.renderActiveStep() }
             </PopoverWithTrigger>
         );
     }
