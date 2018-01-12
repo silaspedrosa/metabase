@@ -381,8 +381,8 @@ export default class Visualization extends Component {
         }
 
         if (!error) {
-            // $FlowFixMe
             noResults = _.every(
+                // $FlowFixMe
                 series,
                 s => s && s.data && datasetContainsNoResults(s.data)
             );

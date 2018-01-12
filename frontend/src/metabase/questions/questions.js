@@ -121,9 +121,7 @@ function createUndo(type, actions, collection) {
     return {
         type: type,
         count: actions.length,
-        message: (
-            undo
-        ) => (
+        message: undo => (
             <div className="flex flex-column">
                 <div>
                     {inflect(
