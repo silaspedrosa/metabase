@@ -18,7 +18,7 @@ export type Dashboard = {
     show_in_getting_started?: boolean,
     // incomplete
     parameters: Array<Parameter>
-}
+};
 
 // TODO Atte Keinänen 4/5/16: After upgrading Flow, use spread operator `...Dashboard`
 export type DashboardWithCards = {
@@ -27,7 +27,7 @@ export type DashboardWithCards = {
     description: ?string,
     ordered_cards: Array<DashCard>,
     // incomplete
-    parameters: Array<Parameter>,
+    parameters: Array<Parameter>
 };
 
 export type DashCardId = number;

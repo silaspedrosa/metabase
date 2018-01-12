@@ -3,10 +3,10 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { reduxForm } from "redux-form";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import S from "metabase/components/List.css";
 import R from "metabase/reference/Reference.css";
-import F from "metabase/reference/components/Field.css"
+import F from "metabase/reference/components/Field.css";
 
 import Field from "metabase/reference/components/Field.jsx";
 import List from "metabase/components/List.jsx";
@@ -28,26 +28,22 @@ import {
     getSegment
 } from "../selectors";
 
-import {
-    fieldsToFormFields
-} from '../utils';
+import { fieldsToFormFields } from "../utils";
 
 import { getIconForField } from "metabase/lib/schema_metadata";
 
 import * as metadataActions from "metabase/redux/metadata";
-import * as actions from 'metabase/reference/reference';
-
+import * as actions from "metabase/reference/reference";
 
 const emptyStateData = {
     message: t`Fields in this table will appear here as they're added`,
     icon: "fields"
-}
-
+};
 
 const mapStateToProps = (state, props) => {
     const data = getFieldsBySegment(state, props);
     return {
-        segment: getSegment(state,props),
+        segment: getSegment(state, props),
         entities: data,
         foreignKeys: getForeignKeys(state, props),
         loading: getLoading(state, props),
@@ -56,7 +52,7 @@ const mapStateToProps = (state, props) => {
         isEditing: getIsEditing(state, props),
         fields: fieldsToFormFields(data)
     };
-}
+};
 
 const mapDispatchToProps = {
     ...metadataActions,
@@ -65,11 +61,11 @@ const mapDispatchToProps = {
 
 const validate = (values, props) => {
     return {};
-}
+};
 
 @connect(mapStateToProps, mapDispatchToProps)
 @reduxForm({
-    form: 'fields',
+    form: "fields",
     validate
 })
 export default class SegmentFieldList extends Component {
@@ -113,66 +109,108 @@ export default class SegmentFieldList extends Component {
         } = this.props;
 
         return (
-            <form style={style} className="full"
-                onSubmit={handleSubmit(async (formFields) =>
-                    await actions.rUpdateFields(this.props.entities, formFields, this.props)
+            <form
+                style={style}
+                className="full"
+                onSubmit={handleSubmit(
+                    async formFields =>
+                        await actions.rUpdateFields(
+                            this.props.entities,
+                            formFields,
+                            this.props
+                        )
                 )}
             >
-                { isEditing &&
+                {isEditing && (
                     <EditHeader
                         hasRevisionHistory={false}
                         reinitializeForm={resetForm}
                         endEditing={endEditing}
                         submitting={submitting}
                     />
-                }
-                <EditableReferenceHeader 
+                )}
+                <EditableReferenceHeader
                     type="segment"
                     headerIcon="segment"
                     name={t`Fields in ${segment.name}`}
-                    user={user} 
-                    isEditing={isEditing} 
-                    startEditing={startEditing} 
+                    user={user}
+                    isEditing={isEditing}
+                    startEditing={startEditing}
                 />
-                <LoadingAndErrorWrapper loading={!loadingError && loading} error={loadingError}>
-                { () => Object.keys(entities).length > 0 ?
-                    <div className="wrapper wrapper--trim">
-                        <div className={S.item}>
-                            <div className={R.columnHeader}>
-                                <div className={cx(S.itemTitle, F.fieldNameTitle)}>
-                                    {t`Field name`}
+                <LoadingAndErrorWrapper
+                    loading={!loadingError && loading}
+                    error={loadingError}
+                >
+                    {() =>
+                        Object.keys(entities).length > 0 ? (
+                            <div className="wrapper wrapper--trim">
+                                <div className={S.item}>
+                                    <div className={R.columnHeader}>
+                                        <div
+                                            className={cx(
+                                                S.itemTitle,
+                                                F.fieldNameTitle
+                                            )}
+                                        >
+                                            {t`Field name`}
+                                        </div>
+                                        <div
+                                            className={cx(
+                                                S.itemTitle,
+                                                F.fieldType
+                                            )}
+                                        >
+                                            {t`Field type`}
+                                        </div>
+                                        <div
+                                            className={cx(
+                                                S.itemTitle,
+                                                F.fieldDataType
+                                            )}
+                                        >
+                                            {t`Data type`}
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className={cx(S.itemTitle, F.fieldType)}>
-                                    {t`Field type`}
-                                </div>
-                                <div className={cx(S.itemTitle, F.fieldDataType)}>
-                                    {t`Data type`}
-                                </div>
+                                <List>
+                                    {Object.values(entities).map(
+                                        entity =>
+                                            entity &&
+                                            entity.id &&
+                                            entity.name && (
+                                                <li
+                                                    className="relative"
+                                                    key={entity.id}
+                                                >
+                                                    <Field
+                                                        field={entity}
+                                                        foreignKeys={
+                                                            foreignKeys
+                                                        }
+                                                        url={`/reference/segments/${
+                                                            segment.id
+                                                        }/fields/${entity.id}`}
+                                                        icon={getIconForField(
+                                                            entity
+                                                        )}
+                                                        isEditing={isEditing}
+                                                        formField={
+                                                            fields[entity.id]
+                                                        }
+                                                    />
+                                                </li>
+                                            )
+                                    )}
+                                </List>
                             </div>
-                        </div>
-                        <List>
-                            { Object.values(entities).map(entity =>
-                                entity && entity.id && entity.name &&
-                                    <li className="relative" key={entity.id}>
-                                        <Field
-                                            field={entity}
-                                            foreignKeys={foreignKeys}
-                                            url={`/reference/segments/${segment.id}/fields/${entity.id}`}
-                                            icon={getIconForField(entity)}
-                                            isEditing={isEditing}
-                                            formField={fields[entity.id]}
-                                        />
-                                    </li>
-                            )}
-                        </List>
-                    </div>
-                    :
-                    <div className={S.empty}>
-                        <EmptyState {...emptyStateData}/>
-                    </div>
-                }
+                        ) : (
+                            <div className={S.empty}>
+                                <EmptyState {...emptyStateData} />
+                            </div>
+                        )
+                    }
                 </LoadingAndErrorWrapper>
             </form>
-        )
+        );
     }
 }

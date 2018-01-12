@@ -5,14 +5,17 @@ import React from "react";
 import ToggleLarge from "metabase/components/ToggleLarge";
 import Button from "metabase/components/Button";
 import ActionButton from "metabase/components/ActionButton";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import AdvancedSettingsPane from "./AdvancedSettingsPane";
 import PreviewPane from "./PreviewPane";
 import EmbedCodePane from "./EmbedCodePane";
 
 import type { Parameter, ParameterId } from "metabase/meta/types/Parameter";
 import type { Pane, EmbedType, DisplayOptions } from "./EmbedModalContent";
-import type { EmbeddableResource, EmbeddingParams } from "metabase/public/lib/types";
+import type {
+    EmbeddableResource,
+    EmbeddingParams
+} from "metabase/public/lib/types";
 
 import _ from "underscore";
 
@@ -24,7 +27,7 @@ type Props = {
 
     resourceType: string,
     resource: EmbeddableResource,
-    resourceParameters:  Parameter[],
+    resourceParameters: Parameter[],
 
     token: string,
     iframeUrl: string,
@@ -37,13 +40,13 @@ type Props = {
     parameterValues: { [id: ParameterId]: any },
     embeddingParams: EmbeddingParams,
 
-    onChangeDisplayOptions: (DisplayOptions) => void,
-    onChangeEmbeddingParameters: (EmbeddingParams) => void,
+    onChangeDisplayOptions: DisplayOptions => void,
+    onChangeEmbeddingParameters: EmbeddingParams => void,
     onChangeParameterValue: (id: ParameterId, value: any) => void,
     onChangePane: (pane: Pane) => void,
     onSave: () => Promise<void>,
     onUnpublish: () => Promise<void>,
-    onDiscard: () => void,
+    onDiscard: () => void
 };
 
 const AdvancedEmbedPane = ({
@@ -67,40 +70,55 @@ const AdvancedEmbedPane = ({
     onChangePane,
     onSave,
     onUnpublish,
-    onDiscard,
-}: Props) =>
+    onDiscard
+}: Props) => (
     <div className="full flex">
         <div className="flex-full p4 flex flex-column">
-            { !resource.enable_embedding || !_.isEqual(resource.embedding_params, embeddingParams) ?
+            {!resource.enable_embedding ||
+            !_.isEqual(resource.embedding_params, embeddingParams) ? (
                 <div className="mb2 p2 bordered rounded flex align-center flex-no-shrink">
                     <div className="flex-full mr1">
-                        { resource.enable_embedding ?
-                            t`You’ve made changes that need to be published before they will be reflected in your application embed.` :
-                            t`You will need to publish this ${resourceType} before you can embed it in another application.`
-                        }
+                        {resource.enable_embedding
+                            ? t`You’ve made changes that need to be published before they will be reflected in your application embed.`
+                            : t`You will need to publish this ${resourceType} before you can embed it in another application.`}
                     </div>
                     <div className="flex-no-shrink">
-                        { resource.enable_embedding && !_.isEqual(resource.embedding_params, embeddingParams) ?
-                            <Button className="ml1" medium onClick={onDiscard}>{t`Discard Changes`}</Button>
-                        : null }
-                        <ActionButton className="ml1" primary medium actionFn={onSave} activeText={t`Updating...`} successText={t`Updated`} failedText={t`Failed!`}>{t`Publish`}</ActionButton>
+                        {resource.enable_embedding &&
+                        !_.isEqual(
+                            resource.embedding_params,
+                            embeddingParams
+                        ) ? (
+                            <Button
+                                className="ml1"
+                                medium
+                                onClick={onDiscard}
+                            >{t`Discard Changes`}</Button>
+                        ) : null}
+                        <ActionButton
+                            className="ml1"
+                            primary
+                            medium
+                            actionFn={onSave}
+                            activeText={t`Updating...`}
+                            successText={t`Updated`}
+                            failedText={t`Failed!`}
+                        >{t`Publish`}</ActionButton>
                     </div>
                 </div>
-            : null }
+            ) : null}
             <ToggleLarge
                 className="mb2 flex-no-shrink"
                 style={{ width: 244, height: 34 }}
                 value={pane === "preview"}
                 textLeft={t`Preview`}
                 textRight={t`Code`}
-                onChange={() => onChangePane(pane === "preview" ? "code" : "preview")}
+                onChange={() =>
+                    onChangePane(pane === "preview" ? "code" : "preview")
+                }
             />
-            { pane === "preview" ?
-                <PreviewPane
-                    className="flex-full"
-                    previewUrl={iframeUrl}
-                />
-            : pane === "code" ?
+            {pane === "preview" ? (
+                <PreviewPane className="flex-full" previewUrl={iframeUrl} />
+            ) : pane === "code" ? (
                 <EmbedCodePane
                     className="flex-full"
                     embedType={embedType}
@@ -113,7 +131,7 @@ const AdvancedEmbedPane = ({
                     params={params}
                     displayOptions={displayOptions}
                 />
-            : null }
+            ) : null}
         </div>
         <AdvancedSettingsPane
             pane={pane}
@@ -131,6 +149,7 @@ const AdvancedEmbedPane = ({
             onChangeParameterValue={onChangeParameterValue}
             onUnpublish={onUnpublish}
         />
-    </div>;
+    </div>
+);
 
 export default AdvancedEmbedPane;

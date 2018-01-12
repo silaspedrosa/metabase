@@ -13,12 +13,12 @@ import screenfull from "screenfull";
 import type { LocationDescriptor } from "metabase/meta/types";
 
 type Props = {
-    dashboardId:            string,
-    fetchDashboard:         (dashboardId: string) => Promise<any>;
-    fetchDashboardCardData: () => void;
+    dashboardId: string,
+    fetchDashboard: (dashboardId: string) => Promise<any>,
+    fetchDashboardCardData: () => void,
 
-    location:               LocationDescriptor,
-    replace:                (location: LocationDescriptor) => void,
+    location: LocationDescriptor,
+    replace: (location: LocationDescriptor) => void
 };
 
 type State = {
@@ -36,7 +36,9 @@ const TICK_PERIOD = 0.25; // seconds
 export default (ComposedComponent: ReactClass<any>) =>
     connect(null, { replace })(
         class extends Component {
-            static displayName = "DashboardControls["+(ComposedComponent.displayName || ComposedComponent.name)+"]";
+            static displayName = "DashboardControls[" +
+                (ComposedComponent.displayName || ComposedComponent.name) +
+                "]";
 
             props: Props;
             state: State = {
@@ -163,9 +165,12 @@ export default (ComposedComponent: ReactClass<any>) =>
             };
 
             _tickRefreshClock = async () => {
-                let refreshElapsed = (this.state.refreshElapsed || 0) +
-                    TICK_PERIOD;
-                if (this.state.refreshPeriod && refreshElapsed >= this.state.refreshPeriod) {
+                let refreshElapsed =
+                    (this.state.refreshElapsed || 0) + TICK_PERIOD;
+                if (
+                    this.state.refreshPeriod &&
+                    refreshElapsed >= this.state.refreshPeriod
+                ) {
                     this.setState({ refreshElapsed: 0 });
                     await this.props.fetchDashboard(
                         this.props.dashboardId,

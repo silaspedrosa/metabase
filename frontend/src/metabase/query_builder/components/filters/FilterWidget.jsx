@@ -1,9 +1,9 @@
 /* @flow */
 
 import React, { Component } from "react";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import Icon from "metabase/components/Icon.jsx";
-import FieldName from '../FieldName.jsx';
+import FieldName from "../FieldName.jsx";
 import Popover from "metabase/components/Popover.jsx";
 import FilterPopover from "./FilterPopover.jsx";
 
@@ -23,10 +23,10 @@ type Props = {
     updateFilter?: (index: number, field: Filter) => void,
     removeFilter?: (index: number) => void,
     maxDisplayValues?: number
-}
+};
 type State = {
-    isOpen: bool
-}
+    isOpen: boolean
+};
 
 export default class FilterWidget extends Component {
     props: Props;
@@ -46,11 +46,11 @@ export default class FilterWidget extends Component {
 
     open = () => {
         this.setState({ isOpen: true });
-    }
+    };
 
     close = () => {
         this.setState({ isOpen: false });
-    }
+    };
 
     renderOperatorFilter() {
         const { query, filter, maxDisplayValues } = this.props;
@@ -71,9 +71,11 @@ export default class FilterWidget extends Component {
             formattedValues = generateTimeFilterValuesDescriptions(filter);
         } else {
             // TODO Atte Keinänen 7/16/17: Move formatValue to metabase-lib
-            formattedValues = values.filter(value => value !== undefined).map(value =>
-                formatValue(value, { column: dimension.field() })
-            )
+            formattedValues = values
+                .filter(value => value !== undefined)
+                .map(value =>
+                    formatValue(value, { column: dimension.field() })
+                );
         }
 
         return (
@@ -81,7 +83,15 @@ export default class FilterWidget extends Component {
                 className="flex flex-column justify-center"
                 onClick={this.open}
             >
-                <div className="flex align-center" style={{padding: "0.5em", paddingTop: "0.3em", paddingBottom: "0.3em", paddingLeft: 0}}>
+                <div
+                    className="flex align-center"
+                    style={{
+                        padding: "0.5em",
+                        paddingTop: "0.3em",
+                        paddingBottom: "0.3em",
+                        paddingLeft: 0
+                    }}
+                >
                     <FieldName
                         className="Filter-section Filter-section-field"
                         field={field}
@@ -89,39 +99,56 @@ export default class FilterWidget extends Component {
                     />
                     <div className="Filter-section Filter-section-operator">
                         &nbsp;
-                        <a className="QueryOption flex align-center">{operator && operator.moreVerboseName}</a>
+                        <a className="QueryOption flex align-center">
+                            {operator && operator.moreVerboseName}
+                        </a>
                     </div>
                 </div>
-                { formattedValues.length > 0 && (
+                {formattedValues.length > 0 && (
                     <div className="flex align-center flex-wrap">
-                        {formattedValues.map((formattedValue, valueIndex) =>
-                            <div key={valueIndex} className="Filter-section Filter-section-value">
-                                <span className="QueryOption">{formattedValue}</span>
+                        {formattedValues.map((formattedValue, valueIndex) => (
+                            <div
+                                key={valueIndex}
+                                className="Filter-section Filter-section-value"
+                            >
+                                <span className="QueryOption">
+                                    {formattedValue}
+                                </span>
                             </div>
-                        )}
+                        ))}
                     </div>
                 )}
             </div>
-        )
+        );
     }
 
     renderSegmentFilter() {
         const { query, filter } = this.props;
-        const segment = _.find(query.table().segments, (s) => s.id === filter[1]);
+        const segment = _.find(query.table().segments, s => s.id === filter[1]);
         return (
             <div onClick={this.open}>
-                <div className="flex align-center" style={{padding: "0.5em", paddingTop: "0.3em", paddingBottom: "0.3em", paddingLeft: 0}}>
+                <div
+                    className="flex align-center"
+                    style={{
+                        padding: "0.5em",
+                        paddingTop: "0.3em",
+                        paddingBottom: "0.3em",
+                        paddingLeft: 0
+                    }}
+                >
                     <div className="Filter-section Filter-section-field">
                         <span className="QueryOption">{t`Matches`}</span>
                     </div>
                 </div>
                 <div className="flex align-center flex-wrap">
                     <div className="Filter-section Filter-section-value">
-                        <span className="QueryOption">{segment && segment.name}</span>
+                        <span className="QueryOption">
+                            {segment && segment.name}
+                        </span>
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 
     renderPopover() {
@@ -140,7 +167,10 @@ export default class FilterWidget extends Component {
                     <FilterPopover
                         query={query}
                         filter={filter}
-                        onCommitFilter={(filter) => this.props.updateFilter && this.props.updateFilter(this.props.index, filter)}
+                        onCommitFilter={filter =>
+                            this.props.updateFilter &&
+                            this.props.updateFilter(this.props.index, filter)
+                        }
                         onClose={this.close}
                     />
                 </Popover>
@@ -151,20 +181,25 @@ export default class FilterWidget extends Component {
     render() {
         const { filter, index, removeFilter } = this.props;
         return (
-            <div className={cx("Query-filter p1 pl2", { "selected": this.state.isOpen })}>
+            <div
+                className={cx("Query-filter p1 pl2", {
+                    selected: this.state.isOpen
+                })}
+            >
                 <div className="flex justify-center">
-                    {filter[0] === "SEGMENT" ?
-                        this.renderSegmentFilter()
-                    :
-                        this.renderOperatorFilter()
-                    }
+                    {filter[0] === "SEGMENT"
+                        ? this.renderSegmentFilter()
+                        : this.renderOperatorFilter()}
                     {this.renderPopover()}
                 </div>
-                { removeFilter &&
-                    <a className="text-grey-2 no-decoration px1 flex align-center" onClick={() => removeFilter(index)}>
-                        <Icon name='close' size={14} />
+                {removeFilter && (
+                    <a
+                        className="text-grey-2 no-decoration px1 flex align-center"
+                        onClick={() => removeFilter(index)}
+                    >
+                        <Icon name="close" size={14} />
                     </a>
-                }
+                )}
             </div>
         );
     }

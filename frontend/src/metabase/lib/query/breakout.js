@@ -13,8 +13,13 @@ export function getBreakouts(breakouts: ?BreakoutClause): Breakout[] {
     return (breakouts || []).filter(b => b != null);
 }
 
-export function getBreakoutFields(breakouts: ?BreakoutClause, tableMetadata: TableMetadata): Field[] {
-    return getBreakouts(breakouts).map(breakout => (Q.getFieldTarget(breakout, tableMetadata) || {}).field);
+export function getBreakoutFields(
+    breakouts: ?BreakoutClause,
+    tableMetadata: TableMetadata
+): Field[] {
+    return getBreakouts(breakouts).map(
+        breakout => (Q.getFieldTarget(breakout, tableMetadata) || {}).field
+    );
 }
 
 // turns a list of Breakouts into the canonical BreakoutClause
@@ -27,13 +32,25 @@ export function getBreakoutClause(breakouts: Breakout[]): ?BreakoutClause {
     }
 }
 
-export function addBreakout(breakout: ?BreakoutClause, newBreakout: Breakout): ?BreakoutClause {
+export function addBreakout(
+    breakout: ?BreakoutClause,
+    newBreakout: Breakout
+): ?BreakoutClause {
     return getBreakoutClause(add(getBreakouts(breakout), newBreakout));
 }
-export function updateBreakout(breakout: ?BreakoutClause, index: number, updatedBreakout: Breakout): ?BreakoutClause {
-    return getBreakoutClause(update(getBreakouts(breakout), index, updatedBreakout));
+export function updateBreakout(
+    breakout: ?BreakoutClause,
+    index: number,
+    updatedBreakout: Breakout
+): ?BreakoutClause {
+    return getBreakoutClause(
+        update(getBreakouts(breakout), index, updatedBreakout)
+    );
 }
-export function removeBreakout(breakout: ?BreakoutClause, index: number): ?BreakoutClause {
+export function removeBreakout(
+    breakout: ?BreakoutClause,
+    index: number
+): ?BreakoutClause {
     return getBreakoutClause(remove(getBreakouts(breakout), index));
 }
 export function clearBreakouts(breakout: ?BreakoutClause): ?BreakoutClause {

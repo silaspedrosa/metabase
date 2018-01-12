@@ -1,6 +1,11 @@
 import _ from "underscore";
-import { t } from 'c-3po';
-import { isa, isFK as isTypeFK, isPK as isTypePK, TYPE } from "metabase/lib/types";
+import { t } from "c-3po";
+import {
+    isa,
+    isFK as isTypeFK,
+    isPK as isTypePK,
+    TYPE
+} from "metabase/lib/types";
 import { getFieldValues } from "metabase/lib/query/field";
 
 // primary field types used for picking operators, etc
@@ -81,12 +86,12 @@ export function isFieldType(type, field) {
     }
 
     // recursively check to see if it's NOT another field type:
-    for (const excludedType of (typeDefinition.exclude || [])) {
+    for (const excludedType of typeDefinition.exclude || []) {
         if (isFieldType(excludedType, field)) return false;
     }
 
     // recursively check to see if it's another field type:
-    for (const includedType of (typeDefinition.include || [])) {
+    for (const includedType of typeDefinition.include || []) {
         if (isFieldType(includedType, field)) return true;
     }
     return false;
@@ -94,7 +99,15 @@ export function isFieldType(type, field) {
 
 export function getFieldType(field) {
     // try more specific types first, then more generic types
-    for (const type of [DATE_TIME, LOCATION, COORDINATE, NUMBER, STRING, STRING_LIKE, BOOLEAN]) {
+    for (const type of [
+        DATE_TIME,
+        LOCATION,
+        COORDINATE,
+        NUMBER,
+        STRING,
+        STRING_LIKE,
+        BOOLEAN
+    ]) {
         if (isFieldType(type, field)) return type;
     }
 }
@@ -106,27 +119,37 @@ export const isString = isFieldType.bind(null, STRING);
 export const isSummable = isFieldType.bind(null, SUMMABLE);
 export const isCategory = isFieldType.bind(null, CATEGORY);
 
-export const isDimension = (col) => (col && col.source !== "aggregation");
-export const isMetric    = (col) => (col && col.source !== "breakout") && isSummable(col);
+export const isDimension = col => col && col.source !== "aggregation";
+export const isMetric = col =>
+    col && col.source !== "breakout" && isSummable(col);
 
-export const isFK = (field) => field && isTypeFK(field.special_type);
-export const isPK = (field) => field && isTypePK(field.special_type);
+export const isFK = field => field && isTypeFK(field.special_type);
+export const isPK = field => field && isTypePK(field.special_type);
 
-export const isAny = (col) => true;
+export const isAny = col => true;
 
-export const isNumericBaseType = (field) => isa(field && field.base_type, TYPE.Number);
+export const isNumericBaseType = field =>
+    isa(field && field.base_type, TYPE.Number);
 
 // ZipCode, ID, etc derive from Number but should not be formatted as numbers
-export const isNumber = (field) => field && isNumericBaseType(field) && (field.special_type == null || field.special_type === TYPE.Number);
+export const isNumber = field =>
+    field &&
+    isNumericBaseType(field) &&
+    (field.special_type == null || field.special_type === TYPE.Number);
 
-export const isAddress      = (field) => isa(field && field.special_type, TYPE.Address);
-export const isState        = (field) => isa(field && field.special_type, TYPE.State);
-export const isCountry      = (field) => isa(field && field.special_type, TYPE.Country);
-export const isCoordinate   = (field) => isa(field && field.special_type, TYPE.Coordinate);
-export const isLatitude     = (field) => isa(field && field.special_type, TYPE.Latitude);
-export const isLongitude    = (field) => isa(field && field.special_type, TYPE.Longitude);
+export const isAddress = field =>
+    isa(field && field.special_type, TYPE.Address);
+export const isState = field => isa(field && field.special_type, TYPE.State);
+export const isCountry = field =>
+    isa(field && field.special_type, TYPE.Country);
+export const isCoordinate = field =>
+    isa(field && field.special_type, TYPE.Coordinate);
+export const isLatitude = field =>
+    isa(field && field.special_type, TYPE.Latitude);
+export const isLongitude = field =>
+    isa(field && field.special_type, TYPE.Longitude);
 
-export const isID           = (field) => isFK(field) || isPK(field);
+export const isID = field => isFK(field) || isPK(field);
 
 // operator argument constructors:
 
@@ -141,7 +164,6 @@ function numberArgument(field, table) {
         type: "number"
     };
 }
-
 
 function comparableArgument(field, table) {
     if (isDate(field)) {
@@ -161,7 +183,6 @@ function comparableArgument(field, table) {
     };
 }
 
-
 function equivalentArgument(field, table) {
     if (isBoolean(field)) {
         return {
@@ -174,7 +195,7 @@ function equivalentArgument(field, table) {
     }
 
     if (isCategory(field)) {
-        const values = getFieldValues(field)
+        const values = getFieldValues(field);
         if (values && values.length > 0) {
             return {
                 type: "select",
@@ -185,7 +206,9 @@ function equivalentArgument(field, table) {
                         // NOTE Atte Keinänen 8/7/17: Similar logic as in getHumanReadableValue of lib/query/field
                         name: displayValue ? displayValue : String(value)
                     }))
-                    .sort((a, b) => a.key === b.key ? 0 : (a.key < b.key ? -1 : 1))
+                    .sort(
+                        (a, b) => (a.key === b.key ? 0 : a.key < b.key ? -1 : 1)
+                    )
             };
         }
     }
@@ -228,10 +251,10 @@ const OPERATORS = {
         validArgumentsFilters: [equivalentArgument],
         multi: true
     },
-    "IS_NULL": {
+    IS_NULL: {
         validArgumentsFilters: []
     },
-    "NOT_NULL": {
+    NOT_NULL: {
         validArgumentsFilters: []
     },
     "<": {
@@ -246,23 +269,35 @@ const OPERATORS = {
     ">=": {
         validArgumentsFilters: [comparableArgument]
     },
-    "INSIDE": {
-        validArgumentsFilters: [longitudeFieldSelectArgument, numberArgument, numberArgument, numberArgument, numberArgument],
-        placeholders: [t`Select longitude field`, t`Enter upper latitude`, t`Enter left longitude`, t`Enter lower latitude`, t`Enter right longitude`]
+    INSIDE: {
+        validArgumentsFilters: [
+            longitudeFieldSelectArgument,
+            numberArgument,
+            numberArgument,
+            numberArgument,
+            numberArgument
+        ],
+        placeholders: [
+            t`Select longitude field`,
+            t`Enter upper latitude`,
+            t`Enter left longitude`,
+            t`Enter lower latitude`,
+            t`Enter right longitude`
+        ]
     },
-    "BETWEEN": {
+    BETWEEN: {
         validArgumentsFilters: [comparableArgument, comparableArgument]
     },
-    "STARTS_WITH": {
+    STARTS_WITH: {
         validArgumentsFilters: [freeformArgument]
     },
-    "ENDS_WITH": {
+    ENDS_WITH: {
         validArgumentsFilters: [freeformArgument]
     },
-    "CONTAINS": {
+    CONTAINS: {
         validArgumentsFilters: [freeformArgument]
     },
-    "DOES_NOT_CONTAIN": {
+    DOES_NOT_CONTAIN: {
         validArgumentsFilters: [freeformArgument]
     }
 };
@@ -270,75 +305,79 @@ const OPERATORS = {
 // ordered list of operators and metadata per type
 const OPERATORS_BY_TYPE_ORDERED = {
     [NUMBER]: [
-        { name: "=",                verboseName: t`Equal` },
-        { name: "!=",               verboseName: t`Not equal` },
-        { name: ">",                verboseName: t`Greater than` },
-        { name: "<",                verboseName: t`Less than` },
-        { name: "BETWEEN",          verboseName: t`Between` },
-        { name: ">=",               verboseName: t`Greater than or equal to`, advanced: true },
-        { name: "<=",               verboseName: t`Less than or equal to`, advanced: true },
-        { name: "IS_NULL",          verboseName: t`Is empty`, advanced: true },
-        { name: "NOT_NULL",         verboseName: t`Not empty`, advanced: true }
+        { name: "=", verboseName: t`Equal` },
+        { name: "!=", verboseName: t`Not equal` },
+        { name: ">", verboseName: t`Greater than` },
+        { name: "<", verboseName: t`Less than` },
+        { name: "BETWEEN", verboseName: t`Between` },
+        {
+            name: ">=",
+            verboseName: t`Greater than or equal to`,
+            advanced: true
+        },
+        { name: "<=", verboseName: t`Less than or equal to`, advanced: true },
+        { name: "IS_NULL", verboseName: t`Is empty`, advanced: true },
+        { name: "NOT_NULL", verboseName: t`Not empty`, advanced: true }
     ],
     [STRING]: [
-        { name: "=",                verboseName: t`Is` },
-        { name: "!=",               verboseName: t`Is not` },
-        { name: "CONTAINS",         verboseName: t`Contains`},
-        { name: "DOES_NOT_CONTAIN", verboseName: t`Does not contain`},
-        { name: "IS_NULL",          verboseName: t`Is empty`, advanced: true },
-        { name: "NOT_NULL",         verboseName: t`Not empty`, advanced: true },
-        { name: "STARTS_WITH",      verboseName: t`Starts with`, advanced: true},
-        { name: "ENDS_WITH",        verboseName: t`Ends with`, advanced: true}
+        { name: "=", verboseName: t`Is` },
+        { name: "!=", verboseName: t`Is not` },
+        { name: "CONTAINS", verboseName: t`Contains` },
+        { name: "DOES_NOT_CONTAIN", verboseName: t`Does not contain` },
+        { name: "IS_NULL", verboseName: t`Is empty`, advanced: true },
+        { name: "NOT_NULL", verboseName: t`Not empty`, advanced: true },
+        { name: "STARTS_WITH", verboseName: t`Starts with`, advanced: true },
+        { name: "ENDS_WITH", verboseName: t`Ends with`, advanced: true }
     ],
     [STRING_LIKE]: [
-        { name: "=",                verboseName: t`Is` },
-        { name: "!=",               verboseName: t`Is not` },
-        { name: "IS_NULL",          verboseName: t`Is empty`, advanced: true },
-        { name: "NOT_NULL",         verboseName: t`Not empty`, advanced: true }
+        { name: "=", verboseName: t`Is` },
+        { name: "!=", verboseName: t`Is not` },
+        { name: "IS_NULL", verboseName: t`Is empty`, advanced: true },
+        { name: "NOT_NULL", verboseName: t`Not empty`, advanced: true }
     ],
     [DATE_TIME]: [
-        { name: "=",                verboseName: t`Is` },
-        { name: "<",                verboseName: t`Before` },
-        { name: ">",                verboseName: t`After` },
-        { name: "BETWEEN",          verboseName: t`Between` },
-        { name: "IS_NULL",          verboseName: t`Is empty`, advanced: true },
-        { name: "NOT_NULL",         verboseName: t`Not empty`, advanced: true }
+        { name: "=", verboseName: t`Is` },
+        { name: "<", verboseName: t`Before` },
+        { name: ">", verboseName: t`After` },
+        { name: "BETWEEN", verboseName: t`Between` },
+        { name: "IS_NULL", verboseName: t`Is empty`, advanced: true },
+        { name: "NOT_NULL", verboseName: t`Not empty`, advanced: true }
     ],
     [LOCATION]: [
-        { name: "=",                verboseName: t`Is` },
-        { name: "!=",               verboseName: t`Is not` },
-        { name: "IS_NULL",          verboseName: t`Is empty`, advanced: true },
-        { name: "NOT_NULL",         verboseName: t`Not empty`, advanced: true }
+        { name: "=", verboseName: t`Is` },
+        { name: "!=", verboseName: t`Is not` },
+        { name: "IS_NULL", verboseName: t`Is empty`, advanced: true },
+        { name: "NOT_NULL", verboseName: t`Not empty`, advanced: true }
     ],
     [COORDINATE]: [
-        { name: "=",                verboseName: t`Is` },
-        { name: "!=",               verboseName: t`Is no` },
-        { name: "INSIDE",           verboseName: t`Inside` }
+        { name: "=", verboseName: t`Is` },
+        { name: "!=", verboseName: t`Is no` },
+        { name: "INSIDE", verboseName: t`Inside` }
     ],
     [BOOLEAN]: [
-        { name: "=",                verboseName: t`Is`, multi: false, defaults: [true] },
-        { name: "IS_NULL",          verboseName: t`Is empty` },
-        { name: "NOT_NULL",         verboseName: t`Not empty` }
+        { name: "=", verboseName: t`Is`, multi: false, defaults: [true] },
+        { name: "IS_NULL", verboseName: t`Is empty` },
+        { name: "NOT_NULL", verboseName: t`Not empty` }
     ],
     [UNKNOWN]: [
-        { name: "=",                verboseName: t`Is` },
-        { name: "!=",               verboseName: t`Is not` },
-        { name: "IS_NULL",          verboseName: t`Is empty`, advanced: true },
-        { name: "NOT_NULL",         verboseName: t`Not empty`, advanced: true }
+        { name: "=", verboseName: t`Is` },
+        { name: "!=", verboseName: t`Is not` },
+        { name: "IS_NULL", verboseName: t`Is empty`, advanced: true },
+        { name: "NOT_NULL", verboseName: t`Not empty`, advanced: true }
     ]
 };
 
 const MORE_VERBOSE_NAMES = {
-    "equal": "is equal to",
+    equal: "is equal to",
     "not equal": "is not equal to",
-    "before": "is before",
-    "after": "is after",
+    before: "is before",
+    after: "is after",
     "not empty": "is not empty",
     "less than": "is less than",
     "greater than": "is greater than",
     "less than or equal to": "is less than or equal to",
     "greater than or equal to": "is greater than or equal to"
-}
+};
 
 export function getOperators(field, table) {
     const type = getFieldType(field) || UNKNOWN;
@@ -348,8 +387,11 @@ export function getOperators(field, table) {
         return {
             ...operator,
             ...operatorForType,
-            moreVerboseName: MORE_VERBOSE_NAMES[verboseNameLower] || verboseNameLower,
-            fields: operator.validArgumentsFilters.map(validArgumentsFilter => validArgumentsFilter(field, table))
+            moreVerboseName:
+                MORE_VERBOSE_NAMES[verboseNameLower] || verboseNameLower,
+            fields: operator.validArgumentsFilters.map(validArgumentsFilter =>
+                validArgumentsFilter(field, table)
+            )
         };
     });
 }
@@ -367,77 +409,88 @@ function dimensionFields(fields) {
     return _.filter(fields, isDimension);
 }
 
-var Aggregators = [{
-    name: t`Raw data`,
-    short: "rows",
-    description: t`Just a table with the rows in the answer, no additional operations.`,
-    validFieldsFilters: [],
-    requiresField: false,
-    requiredDriverFeature: "basic-aggregations"
-}, {
-    name: t`Count of rows`,
-    short: "count",
-    description: t`Total number of rows in the answer.`,
-    validFieldsFilters: [],
-    requiresField: false,
-    requiredDriverFeature: "basic-aggregations"
-}, {
-    name: t`Sum of ...`,
-    short: "sum",
-    description: t`Sum of all the values of a column.`,
-    validFieldsFilters: [summableFields],
-    requiresField: true,
-    requiredDriverFeature: "basic-aggregations"
-}, {
-    name: t`Average of ...`,
-    short: "avg",
-    description: t`Average of all the values of a column`,
-    validFieldsFilters: [summableFields],
-    requiresField: true,
-    requiredDriverFeature: "basic-aggregations"
-}, {
-    name: t`Number of distinct values of ...`,
-    short: "distinct",
-    description:  t`Number of unique values of a column among all the rows in the answer.`,
-    validFieldsFilters: [allFields],
-    requiresField: true,
-    requiredDriverFeature: "basic-aggregations"
-}, {
-    name: t`Cumulative sum of ...`,
-    short: "cum_sum",
-    description: t`Additive sum of all the values of a column.\ne.x. total revenue over time.`,
-    validFieldsFilters: [summableFields],
-    requiresField: true,
-    requiredDriverFeature: "basic-aggregations"
-}, {
-    name: t`Cumulative count of rows`,
-    short: "cum_count",
-    description: t`Additive count of the number of rows.\ne.x. total number of sales over time.`,
-    validFieldsFilters: [],
-    requiresField: false,
-    requiredDriverFeature: "basic-aggregations"
-}, {
-    name: t`Standard deviation of ...`,
-    short: "stddev",
-    description: t`Number which expresses how much the values of a column vary among all rows in the answer.`,
-    validFieldsFilters: [summableFields],
-    requiresField: true,
-    requiredDriverFeature: "standard-deviation-aggregations"
-}, {
-    name: t`Minimum of ...`,
-    short: "min",
-    description: t`Minimum value of a column`,
-    validFieldsFilters: [summableFields],
-    requiresField: true,
-    requiredDriverFeature: "basic-aggregations"
-}, {
-    name: t`Maximum of ...`,
-    short: "max",
-    description: t`Maximum value of a column`,
-    validFieldsFilters: [summableFields],
-    requiresField: true,
-    requiredDriverFeature: "basic-aggregations"
-}];
+var Aggregators = [
+    {
+        name: t`Raw data`,
+        short: "rows",
+        description: t`Just a table with the rows in the answer, no additional operations.`,
+        validFieldsFilters: [],
+        requiresField: false,
+        requiredDriverFeature: "basic-aggregations"
+    },
+    {
+        name: t`Count of rows`,
+        short: "count",
+        description: t`Total number of rows in the answer.`,
+        validFieldsFilters: [],
+        requiresField: false,
+        requiredDriverFeature: "basic-aggregations"
+    },
+    {
+        name: t`Sum of ...`,
+        short: "sum",
+        description: t`Sum of all the values of a column.`,
+        validFieldsFilters: [summableFields],
+        requiresField: true,
+        requiredDriverFeature: "basic-aggregations"
+    },
+    {
+        name: t`Average of ...`,
+        short: "avg",
+        description: t`Average of all the values of a column`,
+        validFieldsFilters: [summableFields],
+        requiresField: true,
+        requiredDriverFeature: "basic-aggregations"
+    },
+    {
+        name: t`Number of distinct values of ...`,
+        short: "distinct",
+        description: t`Number of unique values of a column among all the rows in the answer.`,
+        validFieldsFilters: [allFields],
+        requiresField: true,
+        requiredDriverFeature: "basic-aggregations"
+    },
+    {
+        name: t`Cumulative sum of ...`,
+        short: "cum_sum",
+        description: t`Additive sum of all the values of a column.\ne.x. total revenue over time.`,
+        validFieldsFilters: [summableFields],
+        requiresField: true,
+        requiredDriverFeature: "basic-aggregations"
+    },
+    {
+        name: t`Cumulative count of rows`,
+        short: "cum_count",
+        description: t`Additive count of the number of rows.\ne.x. total number of sales over time.`,
+        validFieldsFilters: [],
+        requiresField: false,
+        requiredDriverFeature: "basic-aggregations"
+    },
+    {
+        name: t`Standard deviation of ...`,
+        short: "stddev",
+        description: t`Number which expresses how much the values of a column vary among all rows in the answer.`,
+        validFieldsFilters: [summableFields],
+        requiresField: true,
+        requiredDriverFeature: "standard-deviation-aggregations"
+    },
+    {
+        name: t`Minimum of ...`,
+        short: "min",
+        description: t`Minimum value of a column`,
+        validFieldsFilters: [summableFields],
+        requiresField: true,
+        requiredDriverFeature: "basic-aggregations"
+    },
+    {
+        name: t`Maximum of ...`,
+        short: "max",
+        description: t`Maximum value of a column`,
+        validFieldsFilters: [summableFields],
+        requiresField: true,
+        requiredDriverFeature: "basic-aggregations"
+    }
+];
 
 var BreakoutAggregator = {
     name: t`Break out by dimension`,
@@ -449,9 +502,11 @@ function populateFields(aggregator, fields) {
     return {
         name: aggregator.name,
         short: aggregator.short,
-        description: aggregator.description || '',
+        description: aggregator.description || "",
         advanced: aggregator.advanced || false,
-        fields: _.map(aggregator.validFieldsFilters, function(validFieldsFilterFn) {
+        fields: _.map(aggregator.validFieldsFilters, function(
+            validFieldsFilterFn
+        ) {
             return validFieldsFilterFn(fields);
         }),
         validFieldsFilters: aggregator.validFieldsFilters,
@@ -462,8 +517,12 @@ function populateFields(aggregator, fields) {
 
 // TODO: unit test
 export function getAggregators(table) {
-    const supportedAggregations = Aggregators.filter(function (agg) {
-        return !(agg.requiredDriverFeature && table.db && !_.contains(table.db.features, agg.requiredDriverFeature));
+    const supportedAggregations = Aggregators.filter(function(agg) {
+        return !(
+            agg.requiredDriverFeature &&
+            table.db &&
+            !_.contains(table.db.features, agg.requiredDriverFeature)
+        );
     });
     return _.map(supportedAggregations, function(aggregator) {
         return populateFields(aggregator, table.fields);
@@ -471,8 +530,13 @@ export function getAggregators(table) {
 }
 
 export function getAggregatorsWithFields(table) {
-    return getAggregators(table).filter(aggregation =>
-        !aggregation.requiresField || aggregation.fields.reduce((ok, fields) => ok && fields.length > 0, true)
+    return getAggregators(table).filter(
+        aggregation =>
+            !aggregation.requiresField ||
+            aggregation.fields.reduce(
+                (ok, fields) => ok && fields.length > 0,
+                true
+            )
     );
 }
 
@@ -482,7 +546,7 @@ export function getAggregator(short) {
 }
 
 export const isCompatibleAggregatorForField = (aggregator, field) =>
-    aggregator.validFieldsFilters.every(filter => filter([field]).length === 1)
+    aggregator.validFieldsFilters.every(filter => filter([field]).length === 1);
 
 export function getBreakouts(fields) {
     var result = populateFields(BreakoutAggregator, fields);
@@ -519,27 +583,29 @@ export function foreignKeyCountsByOriginTable(fks) {
         return null;
     }
 
-    return fks.map(function(fk) {
-        return ('origin' in fk) ? fk.origin.table.id : null;
-    }).reduce(function(prev, curr, idx, array) {
-        if (curr in prev) {
-            prev[curr]++;
-        } else {
-            prev[curr] = 1;
-        }
+    return fks
+        .map(function(fk) {
+            return "origin" in fk ? fk.origin.table.id : null;
+        })
+        .reduce(function(prev, curr, idx, array) {
+            if (curr in prev) {
+                prev[curr]++;
+            } else {
+                prev[curr] = 1;
+            }
 
-        return prev;
-    }, {});
+            return prev;
+        }, {});
 }
 
 export const ICON_MAPPING = {
-    [DATE_TIME]:  'calendar',
-    [LOCATION]: 'location',
-    [COORDINATE]: 'location',
-    [STRING]: 'string',
-    [STRING_LIKE]: 'string',
-    [NUMBER]: 'int',
-    [BOOLEAN]: 'io'
+    [DATE_TIME]: "calendar",
+    [LOCATION]: "location",
+    [COORDINATE]: "location",
+    [STRING]: "string",
+    [STRING_LIKE]: "string",
+    [NUMBER]: "int",
+    [BOOLEAN]: "io"
 };
 
 export function getIconForField(field) {
@@ -551,7 +617,9 @@ export function computeMetadataStrength(table) {
     var completed = 0;
     function score(value) {
         total++;
-        if (value) { completed++; }
+        if (value) {
+            completed++;
+        }
     }
 
     score(table.description);
@@ -565,5 +633,5 @@ export function computeMetadataStrength(table) {
         });
     }
 
-    return (completed / total);
+    return completed / total;
 }

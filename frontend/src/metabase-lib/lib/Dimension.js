@@ -77,14 +77,16 @@ export default class Dimension {
      * Returns true if these two dimensions are identical to one another.
      */
     static isEqual(a: ?Dimension | ConcreteField, b: ?Dimension): boolean {
-        let dimensionA: ?Dimension = a instanceof Dimension
-            ? a
-            : // $FlowFixMe
-              Dimension.parseMBQL(a, this._metadata);
-        let dimensionB: ?Dimension = b instanceof Dimension
-            ? b
-            : // $FlowFixMe
-              Dimension.parseMBQL(b, this._metadata);
+        let dimensionA: ?Dimension =
+            a instanceof Dimension
+                ? a
+                : // $FlowFixMe
+                  Dimension.parseMBQL(a, this._metadata);
+        let dimensionB: ?Dimension =
+            b instanceof Dimension
+                ? b
+                : // $FlowFixMe
+                  Dimension.parseMBQL(b, this._metadata);
         return !!dimensionA && !!dimensionB && dimensionA.isEqual(dimensionB);
     }
 
@@ -116,11 +118,13 @@ export default class Dimension {
         const dimensionOptions = this.field().dimension_options;
         if (!DimensionTypes && dimensionOptions) {
             return dimensionOptions.map(option =>
-                this._dimensionForOption(option));
+                this._dimensionForOption(option)
+            );
         } else {
             return [].concat(
-                ...(DimensionTypes || [])
-                    .map(DimensionType => DimensionType.dimensions(this))
+                ...(DimensionTypes || []).map(DimensionType =>
+                    DimensionType.dimensions(this)
+                )
             );
         }
     }
@@ -171,9 +175,10 @@ export default class Dimension {
             return false;
         }
 
-        let otherDimension: ?Dimension = other instanceof Dimension
-            ? other
-            : Dimension.parseMBQL(other, this._metadata);
+        let otherDimension: ?Dimension =
+            other instanceof Dimension
+                ? other
+                : Dimension.parseMBQL(other, this._metadata);
         if (!otherDimension) {
             return false;
         }
@@ -204,16 +209,19 @@ export default class Dimension {
             return false;
         }
 
-        let otherDimension: ?Dimension = other instanceof Dimension
-            ? other
-            : Dimension.parseMBQL(other, this._metadata);
+        let otherDimension: ?Dimension =
+            other instanceof Dimension
+                ? other
+                : Dimension.parseMBQL(other, this._metadata);
 
         const baseDimensionA = this.baseDimension();
         const baseDimensionB = otherDimension && otherDimension.baseDimension();
 
-        return !!baseDimensionA &&
+        return (
+            !!baseDimensionA &&
             !!baseDimensionB &&
-            baseDimensionA.isEqual(baseDimensionB);
+            baseDimensionA.isEqual(baseDimensionB)
+        );
     }
 
     /**
@@ -350,8 +358,10 @@ export class FieldIDDimension extends FieldDimension {
     }
 
     field() {
-        return (this._metadata && this._metadata.fields[this._args[0]]) ||
-            new Field();
+        return (
+            (this._metadata && this._metadata.fields[this._args[0]]) ||
+            new Field()
+        );
     }
 }
 
@@ -388,8 +398,10 @@ export class FKDimension extends FieldDimension {
     }
 
     field() {
-        return (this._metadata && this._metadata.fields[this._args[0]]) ||
-            new Field();
+        return (
+            (this._metadata && this._metadata.fields[this._args[0]]) ||
+            new Field()
+        );
     }
 
     render() {

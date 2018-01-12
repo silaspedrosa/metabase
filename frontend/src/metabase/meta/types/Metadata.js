@@ -10,50 +10,50 @@ import type { Metric, MetricId } from "metabase/meta/types/Metric";
 
 export type Metadata = {
     databases: { [id: DatabaseId]: DatabaseMetadata },
-    tables:    { [id: TableId]:    TableMetadata },
-    fields:    { [id: FieldId]:    FieldMetadata },
-    metrics:   { [id: MetricId]:   MetricMetadata },
-    segments:  { [id: SegmentId]:  SegmentMetadata },
-}
+    tables: { [id: TableId]: TableMetadata },
+    fields: { [id: FieldId]: FieldMetadata },
+    metrics: { [id: MetricId]: MetricMetadata },
+    segments: { [id: SegmentId]: SegmentMetadata }
+};
 
 export type DatabaseMetadata = Database & {
-    tables:              TableMetadata[],
-    tables_lookup:       { [id: TableId]: TableMetadata },
-}
+    tables: TableMetadata[],
+    tables_lookup: { [id: TableId]: TableMetadata }
+};
 
 export type TableMetadata = Table & {
-    db:                  DatabaseMetadata,
+    db: DatabaseMetadata,
 
-    fields:              FieldMetadata[],
-    fields_lookup:       { [id: FieldId]: FieldMetadata },
+    fields: FieldMetadata[],
+    fields_lookup: { [id: FieldId]: FieldMetadata },
 
-    segments:            SegmentMetadata[],
-    metrics:             MetricMetadata[],
+    segments: SegmentMetadata[],
+    metrics: MetricMetadata[],
 
     aggregation_options: AggregationOption[],
-    breakout_options:    BreakoutOption,
-}
+    breakout_options: BreakoutOption
+};
 
 export type FieldMetadata = Field & {
-    table:              TableMetadata,
-    target:             FieldMetadata,
+    table: TableMetadata,
+    target: FieldMetadata,
 
-    operators:    Operator[],
-    operators_lookup:   { [key: OperatorName]: Operator }
-}
+    operators: Operator[],
+    operators_lookup: { [key: OperatorName]: Operator }
+};
 
 export type SegmentMetadata = Segment & {
-    table:              TableMetadata,
-}
+    table: TableMetadata
+};
 
 export type MetricMetadata = Metric & {
-    table:              TableMetadata,
-}
+    table: TableMetadata
+};
 
 export type FieldValue = {
     name: string,
     key: string
-}
+};
 
 export type OperatorName = string;
 
@@ -62,32 +62,32 @@ export type Operator = {
     verboseName: string,
     moreVerboseName: string,
     fields: OperatorField[],
-    multi: bool,
-    advanced: bool,
+    multi: boolean,
+    advanced: boolean,
     placeholders?: string[],
-    validArgumentsFilters: ValidArgumentsFilter[],
-}
+    validArgumentsFilters: ValidArgumentsFilter[]
+};
 
 export type OperatorField = {
     type: string,
     values: FieldValue[]
-}
+};
 
-export type ValidArgumentsFilter = (field: Field, table: Table) => bool;
+export type ValidArgumentsFilter = (field: Field, table: Table) => boolean;
 
 export type AggregationOption = {
     name: string,
     short: string,
     fields: Field[],
     validFieldsFilter: (fields: Field[]) => Field[]
-}
+};
 
 export type BreakoutOption = {
     name: string,
     short: string,
     fields: Field[],
     validFieldsFilter: (fields: Field[]) => Field[]
-}
+};
 
 export type FieldOptions = {
     count: number,

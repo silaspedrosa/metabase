@@ -21,10 +21,13 @@ export default class Logs extends Component {
         this._onScroll = () => {
             this.scrolling = true;
             this._onScrollDebounced();
-        }
+        };
         this._onScrollDebounced = _.debounce(() => {
             let elem = ReactDOM.findDOMNode(this).parentNode;
-            let scrollToBottom = Math.abs(elem.scrollTop - (elem.scrollHeight - elem.offsetHeight)) < 10;
+            let scrollToBottom =
+                Math.abs(
+                    elem.scrollTop - (elem.scrollHeight - elem.offsetHeight)
+                ) < 10;
             this.setState({ scrollToBottom }, () => {
                 this.scrolling = false;
             });
@@ -33,7 +36,7 @@ export default class Logs extends Component {
 
     async fetchLogs() {
         let logs = await UtilApi.logs();
-        this.setState({ logs: logs.reverse() })
+        this.setState({ logs: logs.reverse() });
     }
 
     componentWillMount() {
@@ -64,11 +67,19 @@ export default class Logs extends Component {
         let { logs } = this.state;
         return (
             <LoadingAndErrorWrapper loading={!logs || logs.length === 0}>
-                {() =>
-                    <div style={{ backgroundColor: "black", fontFamily: "monospace", fontSize: "14px", whiteSpace: "pre-line", padding: "0.5em" }}>
+                {() => (
+                    <div
+                        style={{
+                            backgroundColor: "black",
+                            fontFamily: "monospace",
+                            fontSize: "14px",
+                            whiteSpace: "pre-line",
+                            padding: "0.5em"
+                        }}
+                    >
                         {reactAnsiStyle(React, logs.join("\n"))}
                     </div>
-                }
+                )}
             </LoadingAndErrorWrapper>
         );
     }

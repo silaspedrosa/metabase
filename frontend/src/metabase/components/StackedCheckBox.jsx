@@ -3,7 +3,7 @@ import CheckBox from "metabase/components/CheckBox.jsx";
 
 const OFFSET = 4;
 
-const StackedCheckBox = (props) =>
+const StackedCheckBox = props => (
     <div className="relative">
         <span
             className="absolute"
@@ -17,5 +17,6 @@ const StackedCheckBox = (props) =>
         </span>
         <CheckBox {...props} />
     </div>
+);
 
 export default StackedCheckBox;

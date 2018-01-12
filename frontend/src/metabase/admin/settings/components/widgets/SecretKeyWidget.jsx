@@ -5,7 +5,7 @@ import React, { Component } from "react";
 import SettingInput from "./SettingInput";
 import Button from "metabase/components/Button";
 import Confirm from "metabase/components/Confirm";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import { UtilApi } from "metabase/services";
 
 type Props = {
@@ -20,24 +20,36 @@ export default class SecretKeyWidget extends Component {
         const { onChange } = this.props;
         const result = await UtilApi.random_token();
         onChange(result.token);
-    }
+    };
 
     render() {
         const { setting } = this.props;
         return (
-            <div className="p2 flex align-center full bordered rounded" style={{ maxWidth: 820 }}>
+            <div
+                className="p2 flex align-center full bordered rounded"
+                style={{ maxWidth: 820 }}
+            >
                 <SettingInput {...this.props} />
-                { setting.value ?
+                {setting.value ? (
                     <Confirm
                         title={t`Regenerate embedding key?`}
                         content={t`This will cause existing embeds to stop working until they are updated with the new key.`}
                         action={this._generateToken}
                     >
-                        <Button className="ml1" primary medium>{t`Regenerate key`}</Button>
+                        <Button
+                            className="ml1"
+                            primary
+                            medium
+                        >{t`Regenerate key`}</Button>
                     </Confirm>
-                :
-                    <Button className="ml1" primary medium onClick={this._generateToken}>{t`Generate Key`}</Button>
-                }
+                ) : (
+                    <Button
+                        className="ml1"
+                        primary
+                        medium
+                        onClick={this._generateToken}
+                    >{t`Generate Key`}</Button>
+                )}
             </div>
         );
     }

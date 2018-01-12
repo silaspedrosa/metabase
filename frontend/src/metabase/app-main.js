@@ -1,9 +1,8 @@
-
-import { push } from 'react-router-redux'
+import { push } from "react-router-redux";
 
 import { init } from "metabase/app";
 import { getRoutes } from "metabase/routes.jsx";
-import reducers from 'metabase/reducers-main';
+import reducers from "metabase/reducers-main";
 
 import api from "metabase/lib/api";
 
@@ -23,18 +22,18 @@ const WHITELIST_FORBIDDEN_URLS = [
     /api\/table\/\d+\/fks$/
 ];
 
-init(reducers, getRoutes, (store) => {
+init(reducers, getRoutes, store => {
     // received a 401 response
-    api.on("401", (url) => {
+    api.on("401", url => {
         if (url.indexOf("/api/user/current") >= 0) {
-            return
+            return;
         }
         store.dispatch(clearCurrentUser());
         store.dispatch(push("/auth/login"));
     });
 
     // received a 403 response
-    api.on("403", (url) => {
+    api.on("403", url => {
         if (url) {
             for (const regex of WHITELIST_FORBIDDEN_URLS) {
                 if (regex.test(url)) {
@@ -44,4 +43,4 @@ init(reducers, getRoutes, (store) => {
         }
         store.dispatch(setErrorPage({ status: 403 }));
     });
-})
+});

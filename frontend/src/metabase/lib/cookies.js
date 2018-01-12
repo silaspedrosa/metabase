@@ -1,17 +1,16 @@
-
 import { clearGoogleAuthCredentials } from "metabase/lib/auth";
 
 import Cookies from "js-cookie";
 
-export const METABASE_SESSION_COOKIE = 'metabase.SESSION_ID';
-export const METABASE_SEEN_ALERT_SPLASH_COOKIE = 'metabase.SEEN_ALERT_SPLASH'
+export const METABASE_SESSION_COOKIE = "metabase.SESSION_ID";
+export const METABASE_SEEN_ALERT_SPLASH_COOKIE = "metabase.SEEN_ALERT_SPLASH";
 
 // Handles management of Metabase cookie work
 var MetabaseCookies = {
     // set the session cookie.  if sessionId is null, clears the cookie
     setSessionCookie: function(sessionId) {
         const options = {
-            path: window.MetabaseRoot || '/',
+            path: window.MetabaseRoot || "/",
             expires: 14,
             secure: window.location.protocol === "https:"
         };
@@ -34,9 +33,9 @@ var MetabaseCookies = {
         }
     },
 
-    setHasSeenAlertSplash: (hasSeen) => {
+    setHasSeenAlertSplash: hasSeen => {
         const options = {
-            path: window.MetabaseRoot || '/',
+            path: window.MetabaseRoot || "/",
             expires: 365,
             secure: window.location.protocol === "https:"
         };
@@ -51,11 +50,11 @@ var MetabaseCookies = {
     getHasSeenAlertSplash: () => {
         try {
             return Cookies.get(METABASE_SEEN_ALERT_SPLASH_COOKIE) || false;
-        } catch(e) {
+        } catch (e) {
             console.error("getSeenAlertSplash:", e);
             return false;
         }
     }
-}
+};
 
 export default MetabaseCookies;

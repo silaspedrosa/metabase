@@ -1,21 +1,21 @@
 import React, { Component } from "react";
 
 class ExpandingContent extends Component {
-    constructor () {
+    constructor() {
         super();
         this.state = { open: false };
     }
-    render () {
+    render() {
         const { children, open } = this.props;
         return (
             <div
                 style={{
-                    maxHeight: open ? 'none' : 0,
-                    overflow: 'hidden',
-                    transition: 'max-height 0.3s ease'
+                    maxHeight: open ? "none" : 0,
+                    overflow: "hidden",
+                    transition: "max-height 0.3s ease"
                 }}
             >
-                { children }
+                {children}
             </div>
         );
     }

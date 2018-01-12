@@ -1,4 +1,3 @@
-
 import { mbqlEq } from "./util";
 
 import type { Field as FieldReference } from "metabase/meta/types/Query";
@@ -49,11 +48,19 @@ export function isBinningStrategy(field: FieldReference): boolean {
 }
 
 export function isFieldLiteral(field: FieldReference): boolean {
-    return Array.isArray(field) && field.length === 3 && mbqlEq(field[0], "field-literal");
+    return (
+        Array.isArray(field) &&
+        field.length === 3 &&
+        mbqlEq(field[0], "field-literal")
+    );
 }
 
 export function isExpressionField(field: FieldReference): boolean {
-    return Array.isArray(field) && field.length === 2 && mbqlEq(field[0], "expression");
+    return (
+        Array.isArray(field) &&
+        field.length === 2 &&
+        mbqlEq(field[0], "expression")
+    );
 }
 
 export function isAggregateField(field: FieldReference): boolean {
@@ -91,7 +98,12 @@ export function getFieldValues(field: ?Field): FieldValues {
     }
 }
 
-export function getHumanReadableValue(value: Value, fieldValues?: FieldValues = []) {
+export function getHumanReadableValue(
+    value: Value,
+    fieldValues?: FieldValues = []
+) {
     const fieldValue = _.findWhere(fieldValues, { [0]: value });
-    return fieldValue && fieldValue.length === 2 ? fieldValue[1] : String(value);
+    return fieldValue && fieldValue.length === 2
+        ? fieldValue[1]
+        : String(value);
 }

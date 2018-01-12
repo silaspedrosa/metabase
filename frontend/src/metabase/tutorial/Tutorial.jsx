@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import Modal from "metabase/components/Modal.jsx";
 import Popover from "metabase/components/Popover.jsx";
 
@@ -34,18 +34,34 @@ export default class Tutorial extends Component {
             bouncePageFlag: false
         };
 
-        _.bindAll(this, "close", "next", "back", "nextModal", "backModal", "mouseEventInterceptHandler");
+        _.bindAll(
+            this,
+            "close",
+            "next",
+            "back",
+            "nextModal",
+            "backModal",
+            "mouseEventInterceptHandler"
+        );
     }
 
     componentWillMount() {
-        ["mousedown", "mouseup", "mousemove", "click"].forEach((event) => {
-            document.addEventListener(event, this.mouseEventInterceptHandler, true);
+        ["mousedown", "mouseup", "mousemove", "click"].forEach(event => {
+            document.addEventListener(
+                event,
+                this.mouseEventInterceptHandler,
+                true
+            );
         });
     }
 
     componentWillUnmount() {
-        ["mousedown", "mouseup", "mousemove", "click"].forEach((event) => {
-            document.removeEventListener(event, this.mouseEventInterceptHandler, true);
+        ["mousedown", "mouseup", "mousemove", "click"].forEach(event => {
+            document.removeEventListener(
+                event,
+                this.mouseEventInterceptHandler,
+                true
+            );
         });
     }
 
@@ -77,8 +93,7 @@ export default class Tutorial extends Component {
                     }
                     return;
                 }
-            } catch (e) {
-            }
+            } catch (e) {}
         }
 
         if (e.type === "click" && this.refs.pageflag) {
@@ -93,7 +108,7 @@ export default class Tutorial extends Component {
     next() {
         if (this.state.step + 1 === this.props.steps.length) {
             this.close();
-            MetabaseAnalytics.trackEvent('QueryBuilder', 'Tutorial Finish');
+            MetabaseAnalytics.trackEvent("QueryBuilder", "Tutorial Finish");
         } else {
             this.setStep(this.state.step + 1);
         }
@@ -135,15 +150,18 @@ export default class Tutorial extends Component {
         this.setState({
             step,
             stepTimeout: setTimeout(() => {
-                this.setState({ stepTimeout: null })
+                this.setState({ stepTimeout: null });
             }, STEP_WARNING_TIMEOUT),
             skipTimeout: setTimeout(() => {
-                if (this.props.steps[step].optional && this.getTargets(this.props.steps[step]).missingTarget) {
+                if (
+                    this.props.steps[step].optional &&
+                    this.getTargets(this.props.steps[step]).missingTarget
+                ) {
                     this.next();
                 }
             }, STEP_SKIP_TIMEOUT)
         });
-        MetabaseAnalytics.trackEvent('QueryBuilder', 'Tutorial Step', step);
+        MetabaseAnalytics.trackEvent("QueryBuilder", "Tutorial Step", step);
     }
 
     close() {
@@ -155,7 +173,9 @@ export default class Tutorial extends Component {
 
         let pageFlagTarget;
         if (step.getPageFlagTarget) {
-            try { pageFlagTarget = step.getPageFlagTarget(); } catch (e) {}
+            try {
+                pageFlagTarget = step.getPageFlagTarget();
+            } catch (e) {}
             if (pageFlagTarget == undefined) {
                 missingTarget = missingTarget || true;
             }
@@ -163,7 +183,9 @@ export default class Tutorial extends Component {
 
         let portalTarget;
         if (step.getPortalTarget) {
-            try { portalTarget = step.getPortalTarget(); } catch (e) {}
+            try {
+                portalTarget = step.getPortalTarget();
+            } catch (e) {}
             if (portalTarget == undefined) {
                 missingTarget = missingTarget || true;
             }
@@ -171,7 +193,9 @@ export default class Tutorial extends Component {
 
         let modalTarget;
         if (step.getModalTarget) {
-            try { modalTarget = step.getModalTarget(); } catch (e) {}
+            try {
+                modalTarget = step.getModalTarget();
+            } catch (e) {}
             if (modalTarget == undefined) {
                 missingTarget = missingTarget || true;
             }
@@ -205,19 +229,24 @@ export default class Tutorial extends Component {
             return null;
         }
 
-        const { missingTarget, pageFlagTarget, portalTarget, modalTarget } = this.getTargets(step);
+        const {
+            missingTarget,
+            pageFlagTarget,
+            portalTarget,
+            modalTarget
+        } = this.getTargets(step);
 
         if (missingTarget && this.state.stepTimeout === null) {
             return (
                 <Modal className="Modal TutorialModal">
-                    <TutorialModal
-                        onBack={this.backModal}
-                        onClose={this.close}
-                    >
+                    <TutorialModal onBack={this.backModal} onClose={this.close}>
                         <div className="text-centered">
                             <h2>{t`Whoops!`}</h2>
                             <p className="my2">{t`Sorry, it looks like something went wrong. Please try restarting the tutorial in a minute.`}</p>
-                            <button className="Button Button--primary" onClick={this.close}>{t`Okay`}</button>
+                            <button
+                                className="Button Button--primary"
+                                onClick={this.close}
+                            >{t`Okay`}</button>
                         </div>
                     </TutorialModal>
                 </Modal>
@@ -226,7 +255,7 @@ export default class Tutorial extends Component {
 
         let modal;
         if (step.getModal) {
-            let modalSteps = this.props.steps.filter((s) => !!s.getModal);
+            let modalSteps = this.props.steps.filter(s => !!s.getModal);
             let modalStepIndex = modalSteps.indexOf(step);
             modal = (
                 <TutorialModal
@@ -240,7 +269,7 @@ export default class Tutorial extends Component {
                         onClose: this.close
                     })}
                 </TutorialModal>
-            )
+            );
         }
 
         let pageFlagText;
@@ -256,12 +285,33 @@ export default class Tutorial extends Component {
 
         return (
             <div>
-                <PageFlag ref="pageflag" className="z5" target={pageFlagTarget} text={pageFlagText} bounce={this.state.bouncePageFlag} />
-                { portalTarget &&
+                <PageFlag
+                    ref="pageflag"
+                    className="z5"
+                    target={pageFlagTarget}
+                    text={pageFlagText}
+                    bounce={this.state.bouncePageFlag}
+                />
+                {portalTarget && (
                     <Portal className="z2" target={portalTarget} />
-                }
-                <Modal isOpen={!!(modal && !step.getModalTarget)} style={{ backgroundColor: "transparent" }} className="Modal TutorialModal" onClose={onClose}>{modal}</Modal>
-                <Popover isOpen={!!(modal && step.getModalTarget && modalTarget)} target={step.getModalTarget} targetOffsetY={25} onClose={onClose} className="TutorialModal">{modal}</Popover>
+                )}
+                <Modal
+                    isOpen={!!(modal && !step.getModalTarget)}
+                    style={{ backgroundColor: "transparent" }}
+                    className="Modal TutorialModal"
+                    onClose={onClose}
+                >
+                    {modal}
+                </Modal>
+                <Popover
+                    isOpen={!!(modal && step.getModalTarget && modalTarget)}
+                    target={step.getModalTarget}
+                    targetOffsetY={25}
+                    onClose={onClose}
+                    className="TutorialModal"
+                >
+                    {modal}
+                </Popover>
             </div>
         );
     }

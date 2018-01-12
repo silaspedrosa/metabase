@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import ReactDOM from "react-dom";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 
 export default class SearchBar extends React.Component {
     constructor(props, context) {
@@ -15,12 +15,21 @@ export default class SearchBar extends React.Component {
     };
 
     handleInputChange() {
-        this.props.onFilter(ReactDOM.findDOMNode(this.refs.filterTextInput).value);
+        this.props.onFilter(
+            ReactDOM.findDOMNode(this.refs.filterTextInput).value
+        );
     }
 
     render() {
         return (
-            <input className="SearchBar" type="text" ref="filterTextInput" value={this.props.filter} placeholder={t`Search for`} onChange={this.handleInputChange}/>
+            <input
+                className="SearchBar"
+                type="text"
+                ref="filterTextInput"
+                value={this.props.filter}
+                placeholder={t`Search for`}
+                onChange={this.handleInputChange}
+            />
         );
     }
 }

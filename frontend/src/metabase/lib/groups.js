@@ -1,4 +1,3 @@
-
 export function isDefaultGroup(group) {
     return group.name === "All Users";
 }
@@ -20,9 +19,7 @@ export function canEditMembership(group) {
 }
 
 export function getGroupColor(group) {
-    return (
-        isAdminGroup(group) ? "text-purple" :
-        isDefaultGroup(group) ? "text-grey-4" :
-        "text-brand"
-    );
+    return isAdminGroup(group)
+        ? "text-purple"
+        : isDefaultGroup(group) ? "text-grey-4" : "text-brand";
 }

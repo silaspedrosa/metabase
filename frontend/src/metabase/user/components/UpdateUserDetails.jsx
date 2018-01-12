@@ -2,7 +2,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import ReactDOM from "react-dom";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import FormField from "metabase/components/form/FormField.jsx";
 import FormLabel from "metabase/components/form/FormLabel.jsx";
 import FormMessage from "metabase/components/form/FormMessage.jsx";
@@ -13,10 +13,9 @@ import _ from "underscore";
 import cx from "classnames";
 
 export default class UpdateUserDetails extends Component {
-
     constructor(props, context) {
         super(props, context);
-        this.state = { formError: null, valid: false }
+        this.state = { formError: null, valid: false };
     }
 
     static propTypes = {
@@ -36,12 +35,13 @@ export default class UpdateUserDetails extends Component {
         // required: first_name, last_name, email
         for (var fieldName in this.refs) {
             let node = ReactDOM.findDOMNode(this.refs[fieldName]);
-            if (node.required && MetabaseUtils.isEmpty(node.value)) isValid = false;
+            if (node.required && MetabaseUtils.isEmpty(node.value))
+                isValid = false;
         }
 
-        if(isValid !== valid) {
+        if (isValid !== valid) {
             this.setState({
-                'valid': isValid
+                valid: isValid
             });
         }
     }
@@ -57,10 +57,14 @@ export default class UpdateUserDetails extends Component {
             formError: null
         });
 
-        let formErrors = {data:{errors:{}}};
+        let formErrors = { data: { errors: {} } };
 
         // validate email address
-        if (!MetabaseUtils.validEmail(ReactDOM.findDOMNode(this.refs.email).value)) {
+        if (
+            !MetabaseUtils.validEmail(
+                ReactDOM.findDOMNode(this.refs.email).value
+            )
+        ) {
             formErrors.data.errors.email = t`Not a valid formatted email address`;
         }
 
@@ -71,7 +75,7 @@ export default class UpdateUserDetails extends Component {
             return;
         }
 
-        let user = (this.props.user) ? _.clone(this.props.user) : {};
+        let user = this.props.user ? _.clone(this.props.user) : {};
 
         user.first_name = ReactDOM.findDOMNode(this.refs.firstName).value;
         user.last_name = ReactDOM.findDOMNode(this.refs.lastName).value;
@@ -87,44 +91,93 @@ export default class UpdateUserDetails extends Component {
 
         return (
             <div>
-                <form className="Form-new bordered rounded shadowed" onSubmit={this.formSubmitted.bind(this)} noValidate>
+                <form
+                    className="Form-new bordered rounded shadowed"
+                    onSubmit={this.formSubmitted.bind(this)}
+                    noValidate
+                >
                     <FormField fieldName="first_name" formError={formError}>
-                        <FormLabel title={t`First name`} fieldName="first_name" formError={formError}></FormLabel>
-                        <input ref="firstName" className="Form-input Form-offset full" name="name" defaultValue={(user) ? user.first_name : null} placeholder="Johnny" onChange={this.onChange.bind(this)} />
-                        <span className="Form-charm"></span>
+                        <FormLabel
+                            title={t`First name`}
+                            fieldName="first_name"
+                            formError={formError}
+                        />
+                        <input
+                            ref="firstName"
+                            className="Form-input Form-offset full"
+                            name="name"
+                            defaultValue={user ? user.first_name : null}
+                            placeholder="Johnny"
+                            onChange={this.onChange.bind(this)}
+                        />
+                        <span className="Form-charm" />
                     </FormField>
 
                     <FormField fieldName="last_name" formError={formError}>
-                        <FormLabel title={t`Last name`} fieldName="last_name" formError={formError} ></FormLabel>
-                        <input ref="lastName" className="Form-input Form-offset full" name="name" defaultValue={(user) ? user.last_name : null} placeholder="Appleseed" required onChange={this.onChange.bind(this)} />
-                        <span className="Form-charm"></span>
+                        <FormLabel
+                            title={t`Last name`}
+                            fieldName="last_name"
+                            formError={formError}
+                        />
+                        <input
+                            ref="lastName"
+                            className="Form-input Form-offset full"
+                            name="name"
+                            defaultValue={user ? user.last_name : null}
+                            placeholder="Appleseed"
+                            required
+                            onChange={this.onChange.bind(this)}
+                        />
+                        <span className="Form-charm" />
                     </FormField>
 
                     <FormField fieldName="email" formError={formError}>
-                        <FormLabel title={ user.google_auth ? t`Sign in with Google Email address` : t`Email address`} fieldName="email" formError={formError} ></FormLabel>
+                        <FormLabel
+                            title={
+                                user.google_auth
+                                    ? t`Sign in with Google Email address`
+                                    : t`Email address`
+                            }
+                            fieldName="email"
+                            formError={formError}
+                        />
                         <input
                             ref="email"
-                            className={
-                              cx("Form-offset full", {
-                                "Form-input" : !managed,
+                            className={cx("Form-offset full", {
+                                "Form-input": !managed,
                                 "text-grey-2 h1 borderless mt1": managed
-                              })
-                            }
+                            })}
                             name="email"
-                            defaultValue={(user) ? user.email : null}
+                            defaultValue={user ? user.email : null}
                             placeholder="youlooknicetoday@email.com"
                             required
                             onChange={this.onChange.bind(this)}
                             disabled={managed}
                         />
-                        { !managed && <span className="Form-charm"></span>}
+                        {!managed && <span className="Form-charm" />}
                     </FormField>
 
                     <div className="Form-actions">
-                        <button className={cx("Button", {"Button--primary": valid})} disabled={!valid}>
+                        <button
+                            className={cx("Button", {
+                                "Button--primary": valid
+                            })}
+                            disabled={!valid}
+                        >
                             {t`Save`}
                         </button>
-                        <FormMessage formError={(updateUserResult && !updateUserResult.success) ? updateUserResult : undefined} formSuccess={(updateUserResult && updateUserResult.success) ? updateUserResult : undefined} />
+                        <FormMessage
+                            formError={
+                                updateUserResult && !updateUserResult.success
+                                    ? updateUserResult
+                                    : undefined
+                            }
+                            formSuccess={
+                                updateUserResult && updateUserResult.success
+                                    ? updateUserResult
+                                    : undefined
+                            }
+                        />
                     </div>
                 </form>
             </div>

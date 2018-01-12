@@ -6,12 +6,13 @@ import Select from "metabase/components/Select.jsx";
 
 import Settings from "metabase/lib/settings";
 import { capitalize } from "metabase/lib/formatting";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import _ from "underscore";
 
-export const HOUR_OPTIONS = _.times(12, (n) => (
-    { name: (n === 0 ? 12 : n)+":00", value: n }
-));
+export const HOUR_OPTIONS = _.times(12, n => ({
+    name: (n === 0 ? 12 : n) + ":00",
+    value: n
+}));
 
 export const AM_PM_OPTIONS = [
     { name: "AM", value: 0 },
@@ -52,7 +53,7 @@ export default class SchedulePicker extends Component {
         textBeforeInterval: PropTypes.string,
         // text prepended to "12:00 PM PST, your Metabase timezone"
         textBeforeSendTime: PropTypes.string,
-        onScheduleChange: PropTypes.func.isRequired,
+        onScheduleChange: PropTypes.func.isRequired
     };
 
     onPropertyChange(name, value) {
@@ -64,38 +65,57 @@ export default class SchedulePicker extends Component {
         if (name === "schedule_type") {
             // clear out other values than schedule_type for hourly schedule
             if (value === "hourly") {
-                newSchedule = { ...newSchedule, "schedule_day": null, "schedule_frame": null, "schedule_hour": null };
+                newSchedule = {
+                    ...newSchedule,
+                    schedule_day: null,
+                    schedule_frame: null,
+                    schedule_hour: null
+                };
             }
 
             // default to midnight for all schedules other than hourly
             if (value !== "hourly") {
-                newSchedule = { ...newSchedule, "schedule_hour": newSchedule.schedule_hour || 0 }
+                newSchedule = {
+                    ...newSchedule,
+                    schedule_hour: newSchedule.schedule_hour || 0
+                };
             }
 
             // clear out other values than schedule_type and schedule_day for daily schedule
             if (value === "daily") {
-                newSchedule = { ...newSchedule, "schedule_day": null, "schedule_frame": null };
+                newSchedule = {
+                    ...newSchedule,
+                    schedule_day: null,
+                    schedule_frame: null
+                };
             }
 
             // default to Monday when user wants a weekly schedule + clear out schedule_frame
             if (value === "weekly") {
-                newSchedule = { ...newSchedule, "schedule_day": "mon", "schedule_frame": null };
+                newSchedule = {
+                    ...newSchedule,
+                    schedule_day: "mon",
+                    schedule_frame: null
+                };
             }
 
             // default to First, Monday when user wants a monthly schedule
             if (value === "monthly") {
-                newSchedule = { ...newSchedule, "schedule_frame": "first", "schedule_day": "mon" };
+                newSchedule = {
+                    ...newSchedule,
+                    schedule_frame: "first",
+                    schedule_day: "mon"
+                };
             }
-        }
-        else if (name === "schedule_frame") {
+        } else if (name === "schedule_frame") {
             // when the monthly schedule frame is the 15th, clear out the schedule_day
             if (value === "mid") {
-                newSchedule = { ...newSchedule, "schedule_day": null };
+                newSchedule = { ...newSchedule, schedule_day: null };
             }
         }
 
         const changedProp = { name, value };
-        this.props.onScheduleChange(newSchedule, changedProp)
+        this.props.onScheduleChange(newSchedule, changedProp);
     }
 
     renderMonthlyPicker() {
@@ -108,25 +128,33 @@ export default class SchedulePicker extends Component {
             <span className="mt1">
                 <span className="h4 text-bold mx1">on the</span>
                 <Select
-                    value={_.find(MONTH_DAY_OPTIONS, (o) => o.value === schedule.schedule_frame)}
+                    value={_.find(
+                        MONTH_DAY_OPTIONS,
+                        o => o.value === schedule.schedule_frame
+                    )}
                     options={MONTH_DAY_OPTIONS}
                     optionNameFn={o => o.name}
                     className="h4 text-bold bg-white"
                     optionValueFn={o => o.value}
-                    onChange={(o) => this.onPropertyChange("schedule_frame", o) }
+                    onChange={o => this.onPropertyChange("schedule_frame", o)}
                 />
-                { schedule.schedule_frame !== "mid" &&
+                {schedule.schedule_frame !== "mid" && (
                     <span className="mt1 mx1">
                         <Select
-                            value={_.find(DAY_OPTIONS, (o) => o.value === schedule.schedule_day)}
+                            value={_.find(
+                                DAY_OPTIONS,
+                                o => o.value === schedule.schedule_day
+                            )}
                             options={DAY_OPTIONS}
                             optionNameFn={o => o.name}
                             optionValueFn={o => o.value}
                             className="h4 text-bold bg-white"
-                            onChange={(o) => this.onPropertyChange("schedule_day", o) }
+                            onChange={o =>
+                                this.onPropertyChange("schedule_day", o)
+                            }
                         />
                     </span>
-                }
+                )}
             </span>
         );
     }
@@ -138,12 +166,15 @@ export default class SchedulePicker extends Component {
             <span className="mt1">
                 <span className="h4 text-bold mx1">on</span>
                 <Select
-                    value={_.find(DAY_OF_WEEK_OPTIONS, (o) => o.value === schedule.schedule_day)}
+                    value={_.find(
+                        DAY_OF_WEEK_OPTIONS,
+                        o => o.value === schedule.schedule_day
+                    )}
                     options={DAY_OF_WEEK_OPTIONS}
                     optionNameFn={o => o.name}
                     optionValueFn={o => o.value}
                     className="h4 text-bold bg-white"
-                    onChange={(o) => this.onPropertyChange("schedule_day", o) }
+                    onChange={o => this.onPropertyChange("schedule_day", o)}
                 />
             </span>
         );
@@ -152,7 +183,9 @@ export default class SchedulePicker extends Component {
     renderHourPicker() {
         let { schedule, textBeforeSendTime } = this.props;
 
-        let hourOfDay = isNaN(schedule.schedule_hour) ? 8 : schedule.schedule_hour;
+        let hourOfDay = isNaN(schedule.schedule_hour)
+            ? 8
+            : schedule.schedule_hour;
         let hour = hourOfDay % 12;
         let amPm = hourOfDay >= 12 ? 1 : 0;
         let timezone = Settings.get("timezone_short");
@@ -161,25 +194,31 @@ export default class SchedulePicker extends Component {
                 <span className="h4 text-bold mr1">at</span>
                 <Select
                     className="mr1 h4 text-bold bg-white"
-                    value={_.find(HOUR_OPTIONS, (o) => o.value === hour)}
+                    value={_.find(HOUR_OPTIONS, o => o.value === hour)}
                     options={HOUR_OPTIONS}
                     optionNameFn={o => o.name}
                     optionValueFn={o => o.value}
-                    onChange={(o) => this.onPropertyChange("schedule_hour", o + amPm * 12) }
+                    onChange={o =>
+                        this.onPropertyChange("schedule_hour", o + amPm * 12)
+                    }
                 />
                 <Select
-                    value={_.find(AM_PM_OPTIONS, (o) => o.value === amPm)}
+                    value={_.find(AM_PM_OPTIONS, o => o.value === amPm)}
                     options={AM_PM_OPTIONS}
                     optionNameFn={o => o.name}
                     optionValueFn={o => o.value}
-                    onChange={(o) => this.onPropertyChange("schedule_hour", hour + o * 12) }
+                    onChange={o =>
+                        this.onPropertyChange("schedule_hour", hour + o * 12)
+                    }
                     className="h4 text-bold bg-white"
                 />
-                { textBeforeSendTime &&
+                {textBeforeSendTime && (
                     <div className="mt2 h4 text-bold text-grey-3 border-top pt2">
-                        {textBeforeSendTime} {hour === 0 ? 12 : hour}:00 {amPm ? "PM" : "AM"} {timezone}, {t`your Metabase timezone`}.
+                        {textBeforeSendTime} {hour === 0 ? 12 : hour}:00{" "}
+                        {amPm ? "PM" : "AM"} {timezone},{" "}
+                        {t`your Metabase timezone`}.
                     </div>
-                }
+                )}
             </div>
         );
     }
@@ -191,24 +230,21 @@ export default class SchedulePicker extends Component {
 
         return (
             <div className="mt1">
-                <span className="h4 text-bold mr1">{ textBeforeInterval }</span>
+                <span className="h4 text-bold mr1">{textBeforeInterval}</span>
                 <Select
                     className="h4 text-bold bg-white"
                     value={scheduleType}
                     options={scheduleOptions}
                     optionNameFn={o => capitalize(o)}
                     optionValueFn={o => o}
-                    onChange={(o) => this.onPropertyChange("schedule_type", o)}
+                    onChange={o => this.onPropertyChange("schedule_type", o)}
                 />
-                { scheduleType === "monthly" &&
-                    this.renderMonthlyPicker()
-                }
-                { scheduleType === "weekly" &&
-                    this.renderDayPicker()
-                }
-                { (scheduleType === "daily" || scheduleType === "weekly" || scheduleType === "monthly") &&
-                    this.renderHourPicker()
-                }
+                {scheduleType === "monthly" && this.renderMonthlyPicker()}
+                {scheduleType === "weekly" && this.renderDayPicker()}
+                {(scheduleType === "daily" ||
+                    scheduleType === "weekly" ||
+                    scheduleType === "monthly") &&
+                    this.renderHourPicker()}
             </div>
         );
     }

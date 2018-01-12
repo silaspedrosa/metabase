@@ -26,8 +26,10 @@ export const lineAddons = _chart => {
                 var end = extent[1];
                 const isSelected = d => {
                     if (moment.isDate(start)) {
-                        return !(moment(d.x).isBefore(start) ||
-                            moment(d.x).isAfter(end));
+                        return !(
+                            moment(d.x).isBefore(start) ||
+                            moment(d.x).isAfter(end)
+                        );
                     } else {
                         return !(d.x < start || d.x >= end);
                     }

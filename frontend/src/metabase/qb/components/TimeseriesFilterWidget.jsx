@@ -2,8 +2,7 @@
 
 import React, { Component } from "react";
 import { t } from "c-3po";
-import DatePicker
-    from "metabase/query_builder/components/filters/pickers/DatePicker";
+import DatePicker from "metabase/query_builder/components/filters/pickers/DatePicker";
 import PopoverWithTrigger from "metabase/components/PopoverWithTrigger";
 import { SelectButton } from "metabase/components/Select";
 import Button from "metabase/components/Button";
@@ -78,7 +77,7 @@ export default class TimeseriesFilterWidget extends Component {
 
             let filter, currentFilter;
             if (filterIndex >= 0) {
-                filter = (currentFilter = filters[filterIndex]);
+                filter = currentFilter = filters[filterIndex];
             } else {
                 filter = ["time-interval", timeField, -30, "day"];
             }
@@ -89,12 +88,7 @@ export default class TimeseriesFilterWidget extends Component {
     }
 
     render() {
-        const {
-            className,
-            card,
-            tableMetadata,
-            setDatasetQuery
-        } = this.props;
+        const { className, card, tableMetadata, setDatasetQuery } = this.props;
         const { filter, filterIndex, currentFilter } = this.state;
         let currentDescription;
 
@@ -118,12 +112,10 @@ export default class TimeseriesFilterWidget extends Component {
         return (
             <PopoverWithTrigger
                 triggerElement={
-                    <SelectButton hasValue>
-                        {currentDescription}
-                    </SelectButton>
+                    <SelectButton hasValue>{currentDescription}</SelectButton>
                 }
                 triggerClasses={cx(className, "my2")}
-                ref={ref => this._popover = ref}
+                ref={ref => (this._popover = ref)}
                 sizeToFit
                 // accomodate dual calendar size
                 autoWidth={true}

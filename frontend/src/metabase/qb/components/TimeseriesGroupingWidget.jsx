@@ -2,8 +2,7 @@
 
 import React, { Component } from "react";
 
-import TimeGroupingPopover
-    from "metabase/query_builder/components/TimeGroupingPopover";
+import TimeGroupingPopover from "metabase/query_builder/components/TimeGroupingPopover";
 import PopoverWithTrigger from "metabase/components/PopoverWithTrigger";
 import { SelectButton } from "metabase/components/Select";
 
@@ -49,7 +48,7 @@ export default class TimeseriesGroupingWidget extends Component {
                         </SelectButton>
                     }
                     triggerClasses="my2"
-                    ref={ref => this._popover = ref}
+                    ref={ref => (this._popover = ref)}
                 >
                     <TimeGroupingPopover
                         className="text-brand"

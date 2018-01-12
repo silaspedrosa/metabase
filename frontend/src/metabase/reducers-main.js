@@ -2,7 +2,7 @@
 
 // Reducers needed for main application
 
-import { combineReducers } from 'redux';
+import { combineReducers } from "redux";
 
 import commonReducers from "./reducers-common";
 
@@ -39,7 +39,6 @@ import * as pulse from "metabase/pulse/reducers";
 /* xrays */
 import xray from "metabase/xray/xray";
 
-
 export default {
     ...commonReducers,
 
@@ -58,5 +57,5 @@ export default {
     xray,
     setup: combineReducers(setup),
     user: combineReducers(user),
-    admin,
+    admin
 };

@@ -54,19 +54,25 @@ export default ({ question, clicked }: ClickActionProps): ClickAction[] => {
                 action
             ])
             .filter(([aggregator]) =>
-                isCompatibleAggregatorForField(aggregator, column))
+                isCompatibleAggregatorForField(aggregator, column)
+            )
             // $FlowFixMe
-            .map(([aggregator, action]: [any, {
-                section: string,
-                title: string
-            }]) => ({
-                name: action.title.toLowerCase(),
-                ...action,
-                question: () =>
-                    question.summarize([
-                        aggregator.short,
-                        getFieldRefFromColumn(column)
-                    ])
-            }))
+            .map(
+                ([aggregator, action]: [
+                    any,
+                    {
+                        section: string,
+                        title: string
+                    }
+                ]) => ({
+                    name: action.title.toLowerCase(),
+                    ...action,
+                    question: () =>
+                        question.summarize([
+                            aggregator.short,
+                            getFieldRefFromColumn(column)
+                        ])
+                })
+            )
     );
 };

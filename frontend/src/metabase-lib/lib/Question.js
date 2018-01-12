@@ -93,20 +93,18 @@ export default class Question {
      * TODO Atte Keinänen 6/13/17: Discussed with Tom that we could use the default Question constructor instead,
      * but it would require changing the constructor signature so that `card` is an optional parameter and has a default value
      */
-    static create(
-        {
-            databaseId,
-            tableId,
-            metadata,
-            parameterValues,
-            ...cardProps
-        }: {
-            databaseId?: DatabaseId,
-            tableId?: TableId,
-            metadata: Metadata,
-            parameterValues?: ParameterValues
-        } = {}
-    ) {
+    static create({
+        databaseId,
+        tableId,
+        metadata,
+        parameterValues,
+        ...cardProps
+    }: {
+        databaseId?: DatabaseId,
+        tableId?: TableId,
+        metadata: Metadata,
+        parameterValues?: ParameterValues
+    } = {}) {
         // $FlowFixMe
         const card: Card = {
             name: cardProps.name || null,
@@ -153,7 +151,8 @@ export default class Question {
      *
      * This is just a wrapper object, the data is stored in `this._card.dataset_query` in a format specific to the query type.
      */
-    @memoize query(): Query {
+    @memoize
+    query(): Query {
         const datasetQuery = this._card.dataset_query;
 
         for (const QueryClass of [StructuredQuery, NativeQuery]) {
@@ -357,8 +356,8 @@ export default class Question {
     }
 
     getUrl(originalQuestion?: Question): string {
-        const isDirty = !originalQuestion ||
-            this.isDirtyComparedTo(originalQuestion);
+        const isDirty =
+            !originalQuestion || this.isDirtyComparedTo(originalQuestion);
 
         return isDirty
             ? Urls.question(null, this._serializeForUrl())
@@ -371,9 +370,11 @@ export default class Question {
      * If we have a saved and clean single-query question, we use `CardApi.query` instead of a ad-hoc dataset query.
      * This way we benefit from caching and query optimizations done by Metabase backend.
      */
-    async getResults(
-        { cancelDeferred, isDirty = false, ignoreCache = false } = {}
-    ): Promise<[Dataset]> {
+    async getResults({
+        cancelDeferred,
+        isDirty = false,
+        ignoreCache = false
+    } = {}): Promise<[Dataset]> {
         // TODO Atte Keinänen 7/5/17: Should we clean this query with Query.cleanQuery(query) before executing it?
 
         const canUseCardApiEndpoint = !isDirty && this.isSaved();
@@ -410,7 +411,8 @@ export default class Question {
             };
 
             const datasetQueries = this.atomicQueries().map(query =>
-                query.datasetQuery());
+                query.datasetQuery()
+            );
             return Promise.all(datasetQueries.map(getDatasetQueryResult));
         }
     }

@@ -1,24 +1,24 @@
 /* @flow */
 
-import React, {Component} from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
-import AutosizeTextarea from 'react-textarea-autosize';
-import { t } from 'c-3po';
+import AutosizeTextarea from "react-textarea-autosize";
+import { t } from "c-3po";
 import cx from "classnames";
 import _ from "underscore";
 
 type Props = {
-    values: Array<string|null>,
+    values: Array<string | null>,
     onValuesChange: (values: any[]) => void,
-    validations: bool[],
+    validations: boolean[],
     placeholder?: string,
-    multi?: bool,
-    onCommit: () => void,
+    multi?: boolean,
+    onCommit: () => void
 };
 
 type State = {
-    fieldString: string,
-}
+    fieldString: string
+};
 
 export default class TextPicker extends Component {
     props: Props;
@@ -30,7 +30,7 @@ export default class TextPicker extends Component {
         placeholder: PropTypes.string,
         validations: PropTypes.array,
         multi: PropTypes.bool,
-        onCommit: PropTypes.func,
+        onCommit: PropTypes.func
     };
 
     static defaultProps = {
@@ -41,7 +41,7 @@ export default class TextPicker extends Component {
     constructor(props: Props) {
         super(props);
         this.state = {
-            fieldString: props.values.join(', ')
+            fieldString: props.values.join(", ")
         };
     }
 
@@ -49,12 +49,15 @@ export default class TextPicker extends Component {
         if (fieldString != null) {
             // Only strip newlines from field string to not interfere with copy-pasting
             const newLineRegex = /\r?\n|\r/g;
-            const newFieldString = fieldString.replace(newLineRegex,'');
-            this.setState({fieldString: newFieldString});
+            const newFieldString = fieldString.replace(newLineRegex, "");
+            this.setState({ fieldString: newFieldString });
 
             // Construct the values array for real-time validation
             // Trim values to prevent confusing problems with leading/trailing whitespaces
-            const newValues = newFieldString.split(',').map((v) => v.trim()).filter((v) => v !== "");
+            const newValues = newFieldString
+                .split(",")
+                .map(v => v.trim())
+                .filter(v => v !== "");
             this.props.onValuesChange(newValues);
         } else {
             this.props.onValuesChange([]);
@@ -62,10 +65,10 @@ export default class TextPicker extends Component {
     }
 
     render() {
-        let {validations, multi, onCommit} = this.props;
-        const hasInvalidValues = _.some(validations, (v) => v === false);
+        let { validations, multi, onCommit } = this.props;
+        const hasInvalidValues = _.some(validations, v => v === false);
 
-        const commitOnEnter = (e) => {
+        const commitOnEnter = e => {
             if (e.key === "Enter" && onCommit) {
                 onCommit();
             }
@@ -75,23 +78,25 @@ export default class TextPicker extends Component {
             <div>
                 <div className="FilterInput px1 pt1 relative">
                     <AutosizeTextarea
-                        className={cx("input block full border-purple", { "border-error": hasInvalidValues })}
+                        className={cx("input block full border-purple", {
+                            "border-error": hasInvalidValues
+                        })}
                         type="text"
                         value={this.state.fieldString}
-                        onChange={(e) => this.setValue(e.target.value)}
+                        onChange={e => this.setValue(e.target.value)}
                         onKeyPress={commitOnEnter}
                         placeholder={this.props.placeholder}
                         autoFocus={true}
-                        style={{resize: "none"}}
+                        style={{ resize: "none" }}
                         maxRows={8}
                     />
                 </div>
 
-                { multi ?
+                {multi ? (
                     <div className="p1 text-small">
                         {t`You can enter multiple values separated by commas`}
                     </div>
-                    : null }
+                ) : null}
             </div>
         );
     }

@@ -17,9 +17,14 @@ export default class GridLayout extends Component {
             placeholderLayout: null
         };
 
-        _.bindAll(this,
-            "onDrag", "onDragStart", "onDragStop",
-            "onResize", "onResizeStart", "onResizeStop"
+        _.bindAll(
+            this,
+            "onDrag",
+            "onDragStart",
+            "onDragStop",
+            "onResize",
+            "onResizeStart",
+            "onResizeStop"
         );
     }
 
@@ -47,10 +52,10 @@ export default class GridLayout extends Component {
 
     layoutsOverlap(a, b) {
         return (
-            a.x < (b.x + b.w) &&
-            b.x < (a.x + a.w) &&
-            a.y < (b.y + b.h) &&
-            b.y < (a.y + a.h)
+            a.x < b.x + b.w &&
+            b.x < a.x + a.w &&
+            a.y < b.y + b.h &&
+            b.y < a.y + a.h
         );
     }
 
@@ -58,7 +63,7 @@ export default class GridLayout extends Component {
         let placeholderLayout = {
             ...this.computeDraggedLayout(i, position),
             i: "placeholder"
-        }
+        };
         this.setState({ dragging: true, placeholderLayout: placeholderLayout });
         this.props.onDrag();
     }
@@ -68,9 +73,8 @@ export default class GridLayout extends Component {
         let newLayout;
         if (placeholderLayout) {
             let { x, y, w, h } = placeholderLayout;
-            newLayout = this.state.layout.map(l => l.i === i ?
-                { ...l, x, y, w, h } :
-                l
+            newLayout = this.state.layout.map(
+                l => (l.i === i ? { ...l, x, y, w, h } : l)
             );
         }
         this.setState({ dragging: false, placeholderLayout: null });
@@ -93,12 +97,21 @@ export default class GridLayout extends Component {
         let targetLayout = {
             w: originalLayout.w,
             h: originalLayout.h,
-            x: Math.min(maxX, Math.max(0, Math.round(pos.left / cellSize.width))),
-            y: Math.min(maxY, Math.max(0, Math.round(pos.top / cellSize.height)))
+            x: Math.min(
+                maxX,
+                Math.max(0, Math.round(pos.left / cellSize.width))
+            ),
+            y: Math.min(
+                maxY,
+                Math.max(0, Math.round(pos.top / cellSize.height))
+            )
         };
         let proposedLayout = targetLayout;
         for (let otherLayout of this.state.layout) {
-            if (originalLayout !== otherLayout && this.layoutsOverlap(proposedLayout, otherLayout)) {
+            if (
+                originalLayout !== otherLayout &&
+                this.layoutsOverlap(proposedLayout, otherLayout)
+            ) {
                 return this.state.placeholderLayout || originalLayout;
             }
         }
@@ -119,9 +132,8 @@ export default class GridLayout extends Component {
 
     onResizeStop(i, { size }) {
         let { x, y, w, h } = this.state.placeholderLayout;
-        let newLayout = this.state.layout.map(l => l.i === i ?
-            { ...l, x, y, w, h } :
-            l
+        let newLayout = this.state.layout.map(
+            l => (l.i === i ? { ...l, x, y, w, h } : l)
         );
         this.setState({ resizing: false, placeholderLayout: null }, () =>
             this.props.onLayoutChange(newLayout)
@@ -137,15 +149,24 @@ export default class GridLayout extends Component {
         let maxW = this.props.cols - originalLayout.x;
         let maxH = Infinity;
         let targetLayout = {
-            w: Math.min(maxW, Math.max(minW, Math.round(size.width / cellSize.width))),
-            h: Math.min(maxH, Math.max(minH, Math.round(size.height / cellSize.height))),
+            w: Math.min(
+                maxW,
+                Math.max(minW, Math.round(size.width / cellSize.width))
+            ),
+            h: Math.min(
+                maxH,
+                Math.max(minH, Math.round(size.height / cellSize.height))
+            ),
             x: originalLayout.x,
             y: originalLayout.y
         };
 
         let proposedLayout = targetLayout;
         for (let otherLayout of this.state.layout) {
-            if (originalLayout !== otherLayout && this.layoutsOverlap(proposedLayout, otherLayout)) {
+            if (
+                originalLayout !== otherLayout &&
+                this.layoutsOverlap(proposedLayout, otherLayout)
+            ) {
                 return this.state.placeholderLayout || originalLayout;
             }
         }
@@ -171,7 +192,7 @@ export default class GridLayout extends Component {
         return {
             width: cellSize.width * l.minSize.width - margin,
             height: cellSize.height * l.minSize.height - margin
-        }
+        };
     }
 
     getStyleForLayout(l) {
@@ -203,16 +224,19 @@ export default class GridLayout extends Component {
             >
                 {child}
             </GridItem>
-        )
+        );
     }
 
     renderPlaceholder() {
         if (this.state.placeholderLayout) {
             let style = {
                 ...this.getStyleForLayout(this.state.placeholderLayout)
-            }
+            };
             return (
-                <div className="react-grid-placeholder absolute" style={style}></div>
+                <div
+                    className="react-grid-placeholder absolute"
+                    style={style}
+                />
             );
         }
     }
@@ -221,9 +245,18 @@ export default class GridLayout extends Component {
         let { margin, cols } = this.props;
         let cellSize = this.getCellSize();
         return (
-            `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='${cellSize.width * cols}' height='${cellSize.height}'>`+
-                _(cols).times((i) =>
-                    `<rect stroke='rgba(0, 0, 0, 0.117647)' stroke-width='1' fill='none' x='${Math.round(margin / 2 + i * cellSize.width) + 1.5}' y='${margin / 2 + 1.5}' width='${Math.round(cellSize.width - margin - 3)}' height='${cellSize.height - margin - 3}'/>`).join("") +
+            `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='${cellSize.width *
+                cols}' height='${cellSize.height}'>` +
+            _(cols)
+                .times(
+                    i =>
+                        `<rect stroke='rgba(0, 0, 0, 0.117647)' stroke-width='1' fill='none' x='${Math.round(
+                            margin / 2 + i * cellSize.width
+                        ) + 1.5}' y='${margin / 2 + 1.5}' width='${Math.round(
+                            cellSize.width - margin - 3
+                        )}' height='${cellSize.height - margin - 3}'/>`
+                )
+                .join("") +
             `</svg>")`
         );
     }
@@ -237,7 +270,7 @@ export default class GridLayout extends Component {
         let backgroundImage;
         if (isEditing) {
             // render grid as a background image:
-            backgroundImage  = this.getGridBackground();
+            backgroundImage = this.getGridBackground();
             // add one vertical screen worth of rows to ensure the grid fills the screen
             bottom += Math.ceil(window.innerHeight / cellSize.height);
         }
@@ -247,10 +280,18 @@ export default class GridLayout extends Component {
 
         // subtract half of a margin to ensure it lines up with the edges
         return (
-            <div className={className} style={{ position: "relative", width, height, backgroundImage, marginLeft: -margin / 2, marginRight: -margin / 2 }}>
-                {this.props.children.map(child =>
-                    this.renderChild(child)
-                )}
+            <div
+                className={className}
+                style={{
+                    position: "relative",
+                    width,
+                    height,
+                    backgroundImage,
+                    marginLeft: -margin / 2,
+                    marginRight: -margin / 2
+                }}
+            >
+                {this.props.children.map(child => this.renderChild(child))}
                 {this.renderPlaceholder()}
             </div>
         );

@@ -1,9 +1,5 @@
-import type {
-    Aggregation as AggregationObject
-} from "metabase/meta/types/Query";
-import {
-    AggregationClause as AggregationClause_DEPRECATED
-} from "metabase/lib/query";
+import type { Aggregation as AggregationObject } from "metabase/meta/types/Query";
+import { AggregationClause as AggregationClause_DEPRECATED } from "metabase/lib/query";
 import { MetricId } from "metabase/meta/types/Metric";
 import { AggregationOption, Operator } from "metabase/meta/types/Metadata";
 import { FieldId } from "metabase/meta/types/Field";

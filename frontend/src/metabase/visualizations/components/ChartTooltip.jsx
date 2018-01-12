@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-import TooltipPopover from "metabase/components/TooltipPopover.jsx"
+import TooltipPopover from "metabase/components/TooltipPopover.jsx";
 import Value from "metabase/components/Value.jsx";
 
 import { getFriendlyName } from "metabase/visualizations/lib/utils";
@@ -20,12 +20,14 @@ export default class ChartTooltip extends Component {
         // Array of key, value, col: { data: [{ key, value, col }], element, event }
         if (Array.isArray(hovered.data)) {
             return hovered.data;
-        }
-        // ClickObject: { value, column, dimensions: [{ value, column }], element, event }
-        else if (hovered.value !== undefined || hovered.dimensions) {
+        } else if (hovered.value !== undefined || hovered.dimensions) {
+            // ClickObject: { value, column, dimensions: [{ value, column }], element, event }
             const dimensions = [];
             if (hovered.value !== undefined) {
-                dimensions.push({ value: hovered.value, column: hovered.column });
+                dimensions.push({
+                    value: hovered.value,
+                    column: hovered.column
+                });
             }
             if (hovered.dimensions) {
                 dimensions.push(...hovered.dimensions);
@@ -34,11 +36,13 @@ export default class ChartTooltip extends Component {
                 key: getFriendlyName(column),
                 value: value,
                 col: column
-            }))
-        }
-        // DEPRECATED: { key, value }
-        else if (hovered.data) {
-            console.warn("hovered should be a ClickObject or hovered.data should be an array of { key, value, col }", hovered.data);
+            }));
+        } else if (hovered.data) {
+            // DEPRECATED: { key, value }
+            console.warn(
+                "hovered should be a ClickObject or hovered.data should be an array of { key, value, col }",
+                hovered.data
+            );
             let s = series[hovered.index] || series[0];
             return [
                 {
@@ -50,8 +54,8 @@ export default class ChartTooltip extends Component {
                     key: getFriendlyName(s.data.cols[1]),
                     value: hovered.data.value,
                     col: s.data.cols[1]
-                },
-            ]
+                }
+            ];
         }
         return [];
     }
@@ -59,7 +63,10 @@ export default class ChartTooltip extends Component {
     render() {
         const { hovered } = this.props;
         const rows = this._getRows();
-        const hasEventOrElement = hovered && ((hovered.element && document.contains(hovered.element)) || hovered.event);
+        const hasEventOrElement =
+            hovered &&
+            ((hovered.element && document.contains(hovered.element)) ||
+                hovered.event);
         const isOpen = rows.length > 0 && !!hasEventOrElement;
         return (
             <TooltipPopover
@@ -70,14 +77,14 @@ export default class ChartTooltip extends Component {
             >
                 <table className="py1 px2">
                     <tbody>
-                        { rows.map(({ key, value, col }, index) =>
+                        {rows.map(({ key, value, col }, index) => (
                             <TooltipRow
                                 key={index}
                                 name={key}
                                 value={value}
                                 column={col}
                             />
-                        ) }
+                        ))}
                     </tbody>
                 </table>
             </TooltipPopover>
@@ -85,19 +92,20 @@ export default class ChartTooltip extends Component {
     }
 }
 
-const TooltipRow = ({ name, value, column }) =>
+const TooltipRow = ({ name, value, column }) => (
     <tr>
         <td className="text-light text-right">{name}:</td>
         <td className="pl1 text-bold text-left">
-            { React.isValidElement(value) ?
+            {React.isValidElement(value) ? (
                 value
-            :
+            ) : (
                 <Value
                     type="tooltip"
                     value={value}
                     column={column}
                     majorWidth={0}
                 />
-            }
+            )}
         </td>
     </tr>
+);

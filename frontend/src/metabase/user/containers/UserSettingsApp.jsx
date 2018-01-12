@@ -11,8 +11,8 @@ const mapStateToProps = (state, props) => {
     return {
         ...selectors(state),
         user: state.currentUser
-    }
-}
+    };
+};
 
 const mapDispatchToProps = {
     setTab,

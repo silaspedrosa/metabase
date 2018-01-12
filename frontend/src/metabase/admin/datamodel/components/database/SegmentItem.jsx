@@ -15,15 +15,23 @@ export default class SegmentItem extends Component {
     render() {
         let { segment, tableMetadata } = this.props;
 
-        let description = Query.generateQueryDescription(tableMetadata, segment.definition, { sections: ["filter"], jsx: true });
+        let description = Query.generateQueryDescription(
+            tableMetadata,
+            segment.definition,
+            { sections: ["filter"], jsx: true }
+        );
 
         return (
             <tr className="mt1 mb3">
-                <td className="px1">
-                    {segment.name}
-                </td>
+                <td className="px1">{segment.name}</td>
                 <td className="px1 text-ellipsis">
-                    <div style={{maxWidth: 400, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <div
+                        style={{
+                            maxWidth: 400,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis"
+                        }}
+                    >
                         {description}
                     </div>
                 </td>
@@ -35,6 +43,6 @@ export default class SegmentItem extends Component {
                     />
                 </td>
             </tr>
-        )
+        );
     }
 }

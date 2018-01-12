@@ -1,6 +1,10 @@
 /* @flow */
 
-import { getTemplateTagParameters, getParameterTargetFieldId, parameterToMBQLFilter } from "metabase/meta/Parameter";
+import {
+    getTemplateTagParameters,
+    getParameterTargetFieldId,
+    parameterToMBQLFilter
+} from "metabase/meta/Parameter";
 
 import * as Query from "metabase/lib/query/query";
 import Q from "metabase/lib/query"; // legacy
@@ -10,13 +14,26 @@ import * as Urls from "metabase/lib/urls";
 import _ from "underscore";
 import { assoc, updateIn } from "icepick";
 
-import type { StructuredQuery, NativeQuery, TemplateTag } from "metabase/meta/types/Query";
-import type { Card, DatasetQuery, StructuredDatasetQuery, NativeDatasetQuery } from "metabase/meta/types/Card";
-import type { Parameter, ParameterMapping, ParameterValues } from "metabase/meta/types/Parameter";
+import type {
+    StructuredQuery,
+    NativeQuery,
+    TemplateTag
+} from "metabase/meta/types/Query";
+import type {
+    Card,
+    DatasetQuery,
+    StructuredDatasetQuery,
+    NativeDatasetQuery
+} from "metabase/meta/types/Card";
+import type {
+    Parameter,
+    ParameterMapping,
+    ParameterValues
+} from "metabase/meta/types/Parameter";
 import type { Metadata, TableMetadata } from "metabase/meta/types/Metadata";
 
 declare class Object {
-    static values<T>(object: { [key:string]: T }): Array<T>;
+    static values<T>(object: { [key: string]: T }): Array<T>;
 }
 
 // TODO Atte Keinänen 6/5/17 Should these be moved to corresponding metabase-lib classes?
@@ -42,29 +59,45 @@ export const NATIVE_QUERY_TEMPLATE: NativeDatasetQuery = {
     }
 };
 
-export function isStructured(card: Card): bool {
+export function isStructured(card: Card): boolean {
     return card.dataset_query.type === "query";
 }
 
-export function isNative(card: Card): bool {
+export function isNative(card: Card): boolean {
     return card.dataset_query.type === "native";
 }
 
-export function canRun(card: Card): bool {
+export function canRun(card: Card): boolean {
     if (card.dataset_query.type === "query") {
         const query = getQuery(card);
-        return query != null && query.source_table != undefined && Query.hasValidAggregation(query);
+        return (
+            query != null &&
+            query.source_table != undefined &&
+            Query.hasValidAggregation(query)
+        );
     } else if (card.dataset_query.type === "native") {
-        const native : NativeQuery = card.dataset_query.native;
-        return native && card.dataset_query.database != undefined && native.query !== "";
+        const native: NativeQuery = card.dataset_query.native;
+        return (
+            native &&
+            card.dataset_query.database != undefined &&
+            native.query !== ""
+        );
     } else {
         return false;
     }
 }
 
 export function cardIsEquivalent(cardA: Card, cardB: Card): boolean {
-    cardA = updateIn(cardA, ["dataset_query", "parameters"], parameters => parameters || []);
-    cardB = updateIn(cardB, ["dataset_query", "parameters"], parameters => parameters || []);
+    cardA = updateIn(
+        cardA,
+        ["dataset_query", "parameters"],
+        parameters => parameters || []
+    );
+    cardB = updateIn(
+        cardB,
+        ["dataset_query", "parameters"],
+        parameters => parameters || []
+    );
     cardA = _.pick(cardA, "dataset_query", "display", "visualization_settings");
     cardB = _.pick(cardB, "dataset_query", "display", "visualization_settings");
     return _.isEqual(cardA, cardB);
@@ -78,7 +111,10 @@ export function getQuery(card: Card): ?StructuredQuery {
     }
 }
 
-export function getTableMetadata(card: Card, metadata: Metadata): ?TableMetadata {
+export function getTableMetadata(
+    card: Card,
+    metadata: Metadata
+): ?TableMetadata {
     const query = getQuery(card);
     if (query && query.source_table != null) {
         return metadata.tables[query.source_table] || null;
@@ -87,9 +123,12 @@ export function getTableMetadata(card: Card, metadata: Metadata): ?TableMetadata
 }
 
 export function getTemplateTags(card: ?Card): Array<TemplateTag> {
-    return card && card.dataset_query && card.dataset_query.type === "native" && card.dataset_query.native.template_tags ?
-        Object.values(card.dataset_query.native.template_tags) :
-        [];
+    return card &&
+        card.dataset_query &&
+        card.dataset_query.type === "native" &&
+        card.dataset_query.native.template_tags
+        ? Object.values(card.dataset_query.native.template_tags)
+        : [];
 }
 
 export function getParameters(card: ?Card): Parameter[] {
@@ -101,19 +140,29 @@ export function getParameters(card: ?Card): Parameter[] {
     return getTemplateTagParameters(tags);
 }
 
-export function getParametersWithExtras(card: Card, parameterValues?: ParameterValues): Parameter[] {
+export function getParametersWithExtras(
+    card: Card,
+    parameterValues?: ParameterValues
+): Parameter[] {
     return getParameters(card).map(parameter => {
         // if we have a parameter value for this parameter, set "value"
         if (parameterValues && parameter.id in parameterValues) {
-            parameter = assoc(parameter, "value", parameterValues[parameter.id]);
+            parameter = assoc(
+                parameter,
+                "value",
+                parameterValues[parameter.id]
+            );
         }
         // if we have a field id for this parameter, set "field_id"
-        const fieldId = getParameterTargetFieldId(parameter.target, card.dataset_query);
+        const fieldId = getParameterTargetFieldId(
+            parameter.target,
+            card.dataset_query
+        );
         if (fieldId != null) {
             parameter = assoc(parameter, "field_id", fieldId);
         }
         return parameter;
-    })
+    });
 }
 
 // NOTE Atte Keinänen 7/5/17: Still used in dashboards and public questions.
@@ -184,14 +233,19 @@ export function questionUrlWithParameters(
     );
 
     // If we have a clean question without parameters applied, don't add the dataset query hash
-    if (!cardIsDirty && datasetQuery.parameters && datasetQuery.parameters.length === 0) {
+    if (
+        !cardIsDirty &&
+        datasetQuery.parameters &&
+        datasetQuery.parameters.length === 0
+    ) {
         return Urls.question(card.id);
     }
 
     const query = {};
     for (const datasetParameter of datasetQuery.parameters || []) {
         const cardParameter = _.find(cardParameters, p =>
-            Utils.equals(p.target, datasetParameter.target));
+            Utils.equals(p.target, datasetParameter.target)
+        );
         if (cardParameter) {
             // if the card has a real parameter we can use, use that
             query[cardParameter.slug] = datasetParameter.value;
@@ -200,7 +254,8 @@ export function questionUrlWithParameters(
             const filter = parameterToMBQLFilter(datasetParameter, metadata);
             if (filter) {
                 card = updateIn(card, ["dataset_query", "query"], query =>
-                    Query.addFilter(query, filter));
+                    Query.addFilter(query, filter)
+                );
             } else {
                 console.warn("UNHANDLED PARAMETER", datasetParameter);
             }

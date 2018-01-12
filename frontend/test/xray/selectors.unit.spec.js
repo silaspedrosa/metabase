@@ -1,28 +1,26 @@
-import {
-    getComparisonContributors
-} from 'metabase/xray/selectors'
+import { getComparisonContributors } from "metabase/xray/selectors";
 
-describe('xray selectors', () => {
-    describe('getComparisonContributors', () => {
-        it('should return the top contributors for a comparison', () => {
+describe("xray selectors", () => {
+    describe("getComparisonContributors", () => {
+        it("should return the top contributors for a comparison", () => {
             const GOOD_FIELD = {
                 field: {
-                    display_name: 'good'
+                    display_name: "good"
                 },
                 histogram: {
                     label: "Distribution",
                     value: {}
                 }
-            }
+            };
 
             const OTHER_FIELD = {
                 field: {
-                    display_name: 'other'
+                    display_name: "other"
                 },
                 histogram: {
-                    label: "Distribution",
+                    label: "Distribution"
                 }
-            }
+            };
 
             const state = {
                 xray: {
@@ -32,7 +30,7 @@ describe('xray selectors', () => {
                                 constituents: {
                                     GOOD_FIELD,
                                     OTHER_FIELD
-                                },
+                                }
                             },
                             {
                                 constituents: {
@@ -41,21 +39,21 @@ describe('xray selectors', () => {
                                 }
                             }
                         ],
-                        'top-contributors': [
+                        "top-contributors": [
                             {
-                                field: 'GOOD_FIELD',
-                                feature: 'histogram'
-                            },
+                                field: "GOOD_FIELD",
+                                feature: "histogram"
+                            }
                         ]
                     }
                 }
-            }
+            };
 
             const expected = [
                 {
                     feature: {
                         label: "Distribution",
-                        type: 'histogram',
+                        type: "histogram",
                         value: {
                             a: {},
                             b: {}
@@ -63,8 +61,8 @@ describe('xray selectors', () => {
                     },
                     field: GOOD_FIELD
                 }
-            ]
-            expect(getComparisonContributors(state)).toEqual(expected)
-        })
-    })
-})
+            ];
+            expect(getComparisonContributors(state)).toEqual(expected);
+        });
+    });
+});

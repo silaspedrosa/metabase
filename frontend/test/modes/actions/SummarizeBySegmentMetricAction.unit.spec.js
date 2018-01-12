@@ -5,7 +5,7 @@ import {
     ORDERS_TABLE_ID,
     metadata
 } from "__support__/sample_dataset_fixture";
-import { click } from "__support__/enzyme_utils"
+import { click } from "__support__/enzyme_utils";
 import Question from "metabase-lib/lib/Question";
 import SummarizeBySegmentMetricAction from "metabase/qb/components/actions/SummarizeBySegmentMetricAction";
 import { mount } from "enzyme";
@@ -20,9 +20,8 @@ describe("SummarizeBySegmentMetricAction", () => {
     describe("aggregation options", () => {
         it("should show only a subset of all query aggregations", () => {
             const hasAggregationOption = (popover, optionName) =>
-                popover.find(
-                    `.List-item-title[children="${optionName}"]`
-                ).length === 1;
+                popover.find(`.List-item-title[children="${optionName}"]`)
+                    .length === 1;
 
             const action = SummarizeBySegmentMetricAction({ question })[0];
             const popover = mount(
@@ -56,7 +55,9 @@ describe("SummarizeBySegmentMetricAction", () => {
                 });
 
                 const component = mount(popover);
-                click(component.find('.List-item-title[children="Count of rows"]'));
+                click(
+                    component.find('.List-item-title[children="Count of rows"]')
+                );
             });
         });
 
@@ -73,7 +74,9 @@ describe("SummarizeBySegmentMetricAction", () => {
                 });
 
                 const component = mount(popover);
-                click(component.find('.List-item-title[children="Sum of ..."]'));
+                click(
+                    component.find('.List-item-title[children="Sum of ..."]')
+                );
 
                 click(component.find('.List-item-title[children="Subtotal"]'));
             });

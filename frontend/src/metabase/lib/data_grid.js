@@ -49,10 +49,10 @@ export function pivot(data) {
             column: data.cols[normalCol]
         };
         return row;
-    })
+    });
 
     // fill it up with the data
-    for (var j=0; j < data.rows.length; j++) {
+    for (var j = 0; j < data.rows.length; j++) {
         var normalColIdx = normalColValues.lastIndexOf(data.rows[j][normalCol]);
         var pivotColIdx = pivotColValues.lastIndexOf(data.rows[j][pivotCol]);
 
@@ -69,7 +69,8 @@ export function pivot(data) {
         }
 
         var colDef = _.clone(data.cols[cellCol]);
-        colDef.name = colDef.display_name = formatValue(value, { column: data.cols[pivotCol] }) || "";
+        colDef.name = colDef.display_name =
+            formatValue(value, { column: data.cols[pivotCol] }) || "";
         // for onVisualizationClick:
         colDef._dimension = {
             value: value,
@@ -91,7 +92,9 @@ export function distinctValues(data, colIdx) {
         return r[colIdx];
     });
 
-    return vals.filter(function(v, i) { return i==vals.lastIndexOf(v); });
+    return vals.filter(function(v, i) {
+        return i == vals.lastIndexOf(v);
+    });
 }
 
 export function cardinality(data, colIdx) {

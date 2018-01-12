@@ -1,20 +1,16 @@
 /* eslint "react/prop-types": "warn" */
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { connect } from 'react-redux';
+import { connect } from "react-redux";
 
-import BaseSidebar from 'metabase/reference/guide/BaseSidebar.jsx';
-import SidebarLayout from 'metabase/components/SidebarLayout.jsx';
-import SegmentList from "metabase/reference/segments/SegmentList.jsx"
+import BaseSidebar from "metabase/reference/guide/BaseSidebar.jsx";
+import SidebarLayout from "metabase/components/SidebarLayout.jsx";
+import SegmentList from "metabase/reference/segments/SegmentList.jsx";
 
-import * as metadataActions from 'metabase/redux/metadata';
-import * as actions from 'metabase/reference/reference';
+import * as metadataActions from "metabase/redux/metadata";
+import * as actions from "metabase/reference/reference";
 
-import {
-    getDatabaseId,
-    getIsEditing
-} from '../selectors';
-
+import { getDatabaseId, getIsEditing } from "../selectors";
 
 const mapStateToProps = (state, props) => ({
     databaseId: getDatabaseId(state, props),
@@ -35,33 +31,30 @@ export default class SegmentListContainer extends Component {
         isEditing: PropTypes.bool
     };
 
-    async fetchContainerData(){
+    async fetchContainerData() {
         await actions.wrappedFetchSegments(this.props);
     }
 
     componentWillMount() {
-        this.fetchContainerData()
+        this.fetchContainerData();
     }
-
 
     componentWillReceiveProps(newProps) {
         if (this.props.location.pathname === newProps.location.pathname) {
             return;
         }
 
-        actions.clearState(newProps)
+        actions.clearState(newProps);
     }
 
     render() {
-        const {
-            isEditing
-        } = this.props;
+        const { isEditing } = this.props;
 
         return (
             <SidebarLayout
                 className="flex-full relative"
-                style={ isEditing ? { paddingTop: '43px' } : {}}
-                sidebar={<BaseSidebar/>}
+                style={isEditing ? { paddingTop: "43px" } : {}}
+                sidebar={<BaseSidebar />}
             >
                 <SegmentList {...this.props} />
             </SidebarLayout>

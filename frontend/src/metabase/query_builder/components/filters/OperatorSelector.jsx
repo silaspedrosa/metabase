@@ -5,12 +5,12 @@ import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
 import cx from "classnames";
 import _ from "underscore";
-import { t } from 'c-3po';
-import {forceRedraw} from "metabase/lib/dom";
+import { t } from "c-3po";
+import { forceRedraw } from "metabase/lib/dom";
 
 import Icon from "metabase/components/Icon.jsx";
 
-import type { Operator, OperatorName } from "metabase/meta/types/Metadata"
+import type { Operator, OperatorName } from "metabase/meta/types/Metadata";
 
 type Props = {
     operator: string,
@@ -19,7 +19,7 @@ type Props = {
 };
 
 type State = {
-    expanded: bool
+    expanded: boolean
 };
 
 export default class OperatorSelector extends Component {
@@ -61,24 +61,36 @@ export default class OperatorSelector extends Component {
         }
 
         return (
-            <div id="OperatorSelector" className="border-bottom p1" style={{
-                maxWidth: 300
-            }}>
-                { visibleOperators.map(o =>
+            <div
+                id="OperatorSelector"
+                className="border-bottom p1"
+                style={{
+                    maxWidth: 300
+                }}
+            >
+                {visibleOperators.map(o => (
                     <button
                         key={o.name}
-                        className={cx("Button Button-normal Button--medium mr1 mb1", { "Button--purple": o.name === operator })}
+                        className={cx(
+                            "Button Button-normal Button--medium mr1 mb1",
+                            {
+                                "Button--purple": o.name === operator
+                            }
+                        )}
                         onClick={() => this.props.onOperatorChange(o.name)}
                     >
                         {o.verboseName}
                     </button>
-                )}
-                { !expanded && expandedOperators.length > 0 ?
-                    <div className="text-grey-3 text-purple-hover transition-color cursor-pointer" onClick={this.expandOperators}>
+                ))}
+                {!expanded && expandedOperators.length > 0 ? (
+                    <div
+                        className="text-grey-3 text-purple-hover transition-color cursor-pointer"
+                        onClick={this.expandOperators}
+                    >
                         <Icon className="px1" name="chevrondown" size={14} />
                         {t`More Options`}
                     </div>
-                : null }
+                ) : null}
             </div>
         );
     }

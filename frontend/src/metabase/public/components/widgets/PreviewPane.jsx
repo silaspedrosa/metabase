@@ -1,4 +1,3 @@
-
 import React, { Component } from "react";
 
 import cx from "classnames";
@@ -14,14 +13,17 @@ export default class PreviewPane extends Component {
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.previewUrl !== this.props.previewUrl) {
-            this.setState({ loading: true })
+            this.setState({ loading: true });
         }
     }
 
     render() {
         const { className, previewUrl } = this.props;
         return (
-            <div className={cx(className, "flex relative")} style={{ minHeight: 280 }}>
+            <div
+                className={cx(className, "flex relative")}
+                style={{ minHeight: 280 }}
+            >
                 <iframe
                     className="flex-full"
                     src={previewUrl}

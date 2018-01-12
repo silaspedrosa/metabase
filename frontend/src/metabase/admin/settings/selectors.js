@@ -1,7 +1,7 @@
 import _ from "underscore";
 import { createSelector } from "reselect";
 import MetabaseSettings from "metabase/lib/settings";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import { slugify } from "metabase/lib/formatting";
 import CustomGeoJSONWidget from "./components/widgets/CustomGeoJSONWidget.jsx";
 import {
@@ -46,7 +46,7 @@ const SECTIONS = [
                 type: "select",
                 options: [
                     { name: t`Database Default`, value: "" },
-                    ...MetabaseSettings.get('timezones')
+                    ...MetabaseSettings.get("timezones")
                 ],
                 placeholder: t`Select a timezone`,
                 note: t`Not all databases support timezones, in which case this setting won't take effect.`,
@@ -56,9 +56,12 @@ const SECTIONS = [
                 key: "site-locale",
                 display_name: t`Language`,
                 type: "select",
-                options:  (MetabaseSettings.get("available_locales") || []).map(([value, name]) => ({ name, value })),
+                options: (MetabaseSettings.get("available_locales") || []).map(
+                    ([value, name]) => ({ name, value })
+                ),
                 placeholder: t`Select a language`,
-                getHidden: () => MetabaseSettings.get("available_locales").length < 2
+                getHidden: () =>
+                    MetabaseSettings.get("available_locales").length < 2
             },
             {
                 key: "anon-tracking-enabled",
@@ -111,8 +114,13 @@ const SECTIONS = [
                 display_name: t`SMTP Security`,
                 description: null,
                 type: "radio",
-                options: { none: "None", ssl: "SSL", tls: "TLS", starttls: "STARTTLS" },
-                defaultValue: 'none'
+                options: {
+                    none: "None",
+                    ssl: "SSL",
+                    tls: "TLS",
+                    starttls: "STARTTLS"
+                },
+                defaultValue: "none"
             },
             {
                 key: "email-smtp-username",
@@ -158,7 +166,7 @@ const SECTIONS = [
                 defaultValue: false,
                 required: true,
                 autoFocus: false
-            },
+            }
         ]
     },
     {
@@ -255,7 +263,7 @@ const SECTIONS = [
             },
             {
                 key: "ldap-group-base",
-                display_name:t`"Group search base`,
+                display_name: t`"Group search base`,
                 type: "string"
             },
             {
@@ -293,13 +301,13 @@ const SECTIONS = [
                 key: "-public-sharing-dashboards",
                 display_name: t`Shared Dashboards`,
                 widget: PublicLinksDashboardListing,
-                getHidden: (settings) => !settings["enable-public-sharing"]
+                getHidden: settings => !settings["enable-public-sharing"]
             },
             {
                 key: "-public-sharing-questions",
                 display_name: t`Shared Questions`,
                 widget: PublicLinksQuestionListing,
-                getHidden: (settings) => !settings["enable-public-sharing"]
+                getHidden: settings => !settings["enable-public-sharing"]
             }
         ]
     },
@@ -310,41 +318,54 @@ const SECTIONS = [
                 key: "enable-embedding",
                 description: null,
                 widget: EmbeddingLegalese,
-                getHidden: (settings) => settings["enable-embedding"],
-                onChanged: async (oldValue, newValue, settingsValues, onChangeSetting) => {
+                getHidden: settings => settings["enable-embedding"],
+                onChanged: async (
+                    oldValue,
+                    newValue,
+                    settingsValues,
+                    onChangeSetting
+                ) => {
                     // Generate a secret key if none already exists
-                    if (!oldValue && newValue && !settingsValues["embedding-secret-key"]) {
+                    if (
+                        !oldValue &&
+                        newValue &&
+                        !settingsValues["embedding-secret-key"]
+                    ) {
                         let result = await UtilApi.random_token();
-                        await onChangeSetting("embedding-secret-key", result.token);
+                        await onChangeSetting(
+                            "embedding-secret-key",
+                            result.token
+                        );
                     }
                 }
-            }, {
+            },
+            {
                 key: "enable-embedding",
                 display_name: t`Enable Embedding Metabase in other Applications`,
                 type: "boolean",
-                getHidden: (settings) => !settings["enable-embedding"]
+                getHidden: settings => !settings["enable-embedding"]
             },
             {
                 widget: EmbeddingLevel,
-                getHidden: (settings) => !settings["enable-embedding"]
+                getHidden: settings => !settings["enable-embedding"]
             },
             {
                 key: "embedding-secret-key",
                 display_name: t`Embedding secret key`,
                 widget: SecretKeyWidget,
-                getHidden: (settings) => !settings["enable-embedding"]
+                getHidden: settings => !settings["enable-embedding"]
             },
             {
                 key: "-embedded-dashboards",
                 display_name: t`Embedded Dashboards`,
                 widget: EmbeddedDashboardListing,
-                getHidden: (settings) => !settings["enable-embedding"]
+                getHidden: settings => !settings["enable-embedding"]
             },
             {
                 key: "-embedded-questions",
                 display_name: t`Embedded Questions`,
                 widget: EmbeddedQuestionListing,
-                getHidden: (settings) => !settings["enable-embedding"]
+                getHidden: settings => !settings["enable-embedding"]
             }
         ]
     },
@@ -360,21 +381,21 @@ const SECTIONS = [
                 key: "query-caching-min-ttl",
                 display_name: t`Minimum Query Duration`,
                 type: "number",
-                getHidden: (settings) => !settings["enable-query-caching"],
+                getHidden: settings => !settings["enable-query-caching"],
                 allowValueCollection: true
             },
             {
                 key: "query-caching-ttl-ratio",
                 display_name: t`Cache Time-To-Live (TTL) multiplier`,
                 type: "number",
-                getHidden: (settings) => !settings["enable-query-caching"],
+                getHidden: settings => !settings["enable-query-caching"],
                 allowValueCollection: true
             },
             {
                 key: "query-caching-max-kb",
                 display_name: t`Max Cache Entry Size`,
                 type: "number",
-                getHidden: (settings) => !settings["enable-query-caching"],
+                getHidden: settings => !settings["enable-query-caching"],
                 allowValueCollection: true
             }
         ]
@@ -392,10 +413,9 @@ const SECTIONS = [
                 key: "xray-max-cost",
                 type: "string",
                 allowValueCollection: true
-
             }
         ]
-    },
+    }
     /*
     {
         name: "Premium Embedding",
@@ -417,60 +437,54 @@ export const getSettings = createSelector(
     state => state.settings.settings,
     state => state.admin.settings.warnings,
     (settings, warnings) =>
-        settings.map(setting => warnings[setting.key] ?
-            { ...setting, warning: warnings[setting.key] } :
-            setting
+        settings.map(
+            setting =>
+                warnings[setting.key]
+                    ? { ...setting, warning: warnings[setting.key] }
+                    : setting
         )
-)
-
-export const getSettingValues = createSelector(
-    getSettings,
-    (settings) => {
-        const settingValues = {};
-        for (const setting of settings) {
-            settingValues[setting.key] = setting.value;
-        }
-        return settingValues;
-    }
-)
-
-export const getNewVersionAvailable = createSelector(
-    getSettings,
-    (settings) => {
-        return MetabaseSettings.newVersionAvailable(settings);
-    }
 );
 
-export const getSections = createSelector(
-    getSettings,
-    (settings) => {
-        if (!settings || _.isEmpty(settings)) {
-            return [];
-        }
+export const getSettingValues = createSelector(getSettings, settings => {
+    const settingValues = {};
+    for (const setting of settings) {
+        settingValues[setting.key] = setting.value;
+    }
+    return settingValues;
+});
 
-        let settingsByKey = _.groupBy(settings, 'key');
-        return SECTIONS.map(function(section) {
-            let sectionSettings = section.settings.map(function(setting) {
-                const apiSetting = settingsByKey[setting.key] && settingsByKey[setting.key][0];
-                if (apiSetting) {
-                    return {
-                        placeholder: apiSetting.default,
-                        ...apiSetting,
-                        ...setting
-                    };
-                } else {
-                    return setting;
-                }
-            });
-            return {
-                ...section,
-                settings: sectionSettings
-            };
+export const getNewVersionAvailable = createSelector(getSettings, settings => {
+    return MetabaseSettings.newVersionAvailable(settings);
+});
+
+export const getSections = createSelector(getSettings, settings => {
+    if (!settings || _.isEmpty(settings)) {
+        return [];
+    }
+
+    let settingsByKey = _.groupBy(settings, "key");
+    return SECTIONS.map(function(section) {
+        let sectionSettings = section.settings.map(function(setting) {
+            const apiSetting =
+                settingsByKey[setting.key] && settingsByKey[setting.key][0];
+            if (apiSetting) {
+                return {
+                    placeholder: apiSetting.default,
+                    ...apiSetting,
+                    ...setting
+                };
+            } else {
+                return setting;
+            }
         });
-    }
-);
+        return {
+            ...section,
+            settings: sectionSettings
+        };
+    });
+});
 
-export const getActiveSectionName = (state, props) => props.params.section
+export const getActiveSectionName = (state, props) => props.params.section;
 
 export const getActiveSection = createSelector(
     getActiveSectionName,

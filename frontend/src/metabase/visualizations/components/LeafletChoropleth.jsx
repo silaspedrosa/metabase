@@ -16,8 +16,8 @@ const LeafletChoropleth = ({
     minimalBounds = computeMinimalBounds(geoJson.features),
     getColor = () => normal.blue,
     onHoverFeature = () => {},
-    onClickFeature = () => {},
-}) =>
+    onClickFeature = () => {}
+}) => (
     <CardRenderer
         series={series}
         className="spread"
@@ -38,14 +38,14 @@ const LeafletChoropleth = ({
                 doubleClickZoom: false,
                 scrollWheelZoom: false,
                 boxZoom: false,
-                keyboard: false,
+                keyboard: false
             });
 
             // L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
             //     attribution: 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
             // }).addTo(map);
 
-            const style = (feature) => ({
+            const style = feature => ({
                 fillColor: getColor(feature),
                 weight: 1,
                 opacity: 1,
@@ -55,23 +55,23 @@ const LeafletChoropleth = ({
 
             const onEachFeature = (feature, layer) => {
                 layer.on({
-                    mousemove: (e) => {
+                    mousemove: e => {
                         onHoverFeature({
                             feature: feature,
                             event: e.originalEvent
-                        })
+                        });
                     },
-                    mouseout: (e) => {
-                        onHoverFeature(null)
+                    mouseout: e => {
+                        onHoverFeature(null);
                     },
-                    click: (e) => {
+                    click: e => {
                         onClickFeature({
                             feature: feature,
                             event: e.originalEvent
-                        })
-                    },
+                        });
+                    }
                 });
-            }
+            };
 
             // main layer
             L.featureGroup([
@@ -86,12 +86,14 @@ const LeafletChoropleth = ({
                 L.geoJson(geoJson, {
                     style: style,
                     onEachFeature: onEachFeature,
-                    coordsToLatLng: ([longitude, latitude]) => L.latLng(latitude, longitude - 360)
+                    coordsToLatLng: ([longitude, latitude]) =>
+                        L.latLng(latitude, longitude - 360)
                 }),
                 L.geoJson(geoJson, {
                     style: style,
                     onEachFeature: onEachFeature,
-                    coordsToLatLng: ([longitude, latitude]) => L.latLng(latitude, longitude + 360)
+                    coordsToLatLng: ([longitude, latitude]) =>
+                        L.latLng(latitude, longitude + 360)
                 })
             ]).addTo(map);
 
@@ -99,5 +101,6 @@ const LeafletChoropleth = ({
             // map.fitBounds(geoFeatureGroup.getBounds());
         }}
     />
+);
 
 export default LeafletChoropleth;

@@ -4,14 +4,16 @@ import {
 } from "__support__/integrated_tests";
 import { click } from "__support__/enzyme_utils";
 
-import React from 'react';
+import React from "react";
 import { mount } from "enzyme";
 
 import {
-    INITIALIZE_QB, QUERY_COMPLETED, setQuerySourceTable,
+    INITIALIZE_QB,
+    QUERY_COMPLETED,
+    setQuerySourceTable,
     TOGGLE_DATA_REFERENCE
 } from "metabase/query_builder/actions";
-import { delay } from "metabase/lib/promise"
+import { delay } from "metabase/lib/promise";
 
 import QueryBuilder from "metabase/query_builder/containers/QueryBuilder";
 import DataReference from "metabase/query_builder/components/dataref/DataReference";
@@ -28,12 +30,12 @@ describe("FieldPane", () => {
 
     beforeAll(async () => {
         useSharedAdminLogin();
-        store = await createTestStore()
+        store = await createTestStore();
 
         store.pushPath(Urls.plainQuestion());
         queryBuilder = mount(store.connectContainer(<QueryBuilder />));
         await store.waitForActions([INITIALIZE_QB]);
-    })
+    });
 
     // NOTE: These test cases are intentionally stateful
     // (doing the whole app rendering thing in every single test case would probably slow things down)
@@ -50,19 +52,20 @@ describe("FieldPane", () => {
 
         // TODO: Refactor TablePane so that it uses redux/metadata actions instead of doing inlined API calls
         // then we can replace this with `store.waitForActions([FETCH_TABLE_FOREIGN_KEYS])` or similar
-        await delay(3000)
+        await delay(3000);
 
-        click(dataReference.find(`a[children="Created At"]`).first())
+        click(dataReference.find(`a[children="Created At"]`).first());
 
         await store.waitForActions([FETCH_TABLE_METADATA]);
     });
 
     it("lets you group by Created At", async () => {
-        const getUseForButton = () => queryBuilder.find(DataReference).find(UseForButton);
+        const getUseForButton = () =>
+            queryBuilder.find(DataReference).find(UseForButton);
 
         expect(getUseForButton().length).toBe(0);
 
-        await store.dispatch(setQuerySourceTable(1))
+        await store.dispatch(setQuerySourceTable(1));
         // eslint-disable-line react/no-irregular-whitespace
         expect(getUseForButton().text()).toMatch(/Group by/);
 
@@ -71,20 +74,23 @@ describe("FieldPane", () => {
 
         // after the breakout has been applied, the button shouldn't be visible anymore
         expect(getUseForButton().length).toBe(0);
-    })
+    });
 
     it("lets you see all distinct values of Created At", async () => {
-        const distinctValuesButton = queryBuilder.find(DataReference).find(QueryButton).at(0);
+        const distinctValuesButton = queryBuilder
+            .find(DataReference)
+            .find(QueryButton)
+            .at(0);
 
         try {
             click(distinctValuesButton.children().first());
-        } catch(e) {
+        } catch (e) {
             // QueryButton uses react-router Link which always throws an error if it's called without a parent Router object
             // Now we are just using the onClick handler of Link so we don't have to care about that
         }
 
         await store.waitForActions([QUERY_COMPLETED]);
 
-        expect(queryBuilder.find(Table).length).toBe(1)
+        expect(queryBuilder.find(Table).length).toBe(1);
     });
 });

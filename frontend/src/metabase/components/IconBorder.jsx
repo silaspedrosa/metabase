@@ -13,7 +13,6 @@ import cx from "classnames";
  */
 
 export default class IconBorder extends Component {
-
     static propTypes = {
         borderWidth: PropTypes.string,
         borderStyle: PropTypes.string,
@@ -24,16 +23,25 @@ export default class IconBorder extends Component {
     };
 
     static defaultProps = {
-        borderWidth: '1px',
-        borderStyle: 'solid',
-        borderColor: 'currentcolor',
-        borderRadius: '99px',
-        style: {},
+        borderWidth: "1px",
+        borderStyle: "solid",
+        borderColor: "currentcolor",
+        borderRadius: "99px",
+        style: {}
     };
 
     render() {
-        const { borderWidth, borderStyle, borderColor, borderRadius, className, style, children } = this.props;
-        const size = parseInt(children.props.size || children.props.width, 10) * 2
+        const {
+            borderWidth,
+            borderStyle,
+            borderColor,
+            borderRadius,
+            className,
+            style,
+            children
+        } = this.props;
+        const size =
+            parseInt(children.props.size || children.props.width, 10) * 2;
         const styles = {
             width: size,
             height: size,
@@ -42,10 +50,13 @@ export default class IconBorder extends Component {
             borderColor: borderColor,
             borderRadius: borderRadius,
             ...style
-        }
+        };
 
         return (
-            <div className={cx('flex layout-centered', className)} style={styles}>
+            <div
+                className={cx("flex layout-centered", className)}
+                style={styles}
+            >
                 {children}
             </div>
         );

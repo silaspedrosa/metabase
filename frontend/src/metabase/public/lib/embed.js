@@ -1,10 +1,15 @@
-
 import querystring from "querystring";
 
 // using jsrsasign because jsonwebtoken doesn't work on the web :-/
 import KJUR from "jsrsasign";
 
-export function getSignedToken(resourceType, resourceId, params = {}, secretKey, previewEmbeddingParams) {
+export function getSignedToken(
+    resourceType,
+    resourceId,
+    params = {},
+    secretKey,
+    previewEmbeddingParams
+) {
     const unsignedToken = {
         resource: { [resourceType]: resourceId },
         params: params,
@@ -14,16 +19,46 @@ export function getSignedToken(resourceType, resourceId, params = {}, secretKey,
     if (previewEmbeddingParams) {
         unsignedToken._embedding_params = previewEmbeddingParams;
     }
-    return KJUR.jws.JWS.sign(null, { alg: "HS256", typ: "JWT" }, unsignedToken, { utf8: secretKey });
+    return KJUR.jws.JWS.sign(
+        null,
+        { alg: "HS256", typ: "JWT" },
+        unsignedToken,
+        {
+            utf8: secretKey
+        }
+    );
 }
 
-export function getSignedPreviewUrl(siteUrl, resourceType, resourceId, params = {}, options, secretKey, previewEmbeddingParams) {
-    const token = getSignedToken(resourceType, resourceId, params, secretKey, previewEmbeddingParams);
-    return `${siteUrl}/embed/${resourceType}/${token}${optionsToHashParams(options)}`;
+export function getSignedPreviewUrl(
+    siteUrl,
+    resourceType,
+    resourceId,
+    params = {},
+    options,
+    secretKey,
+    previewEmbeddingParams
+) {
+    const token = getSignedToken(
+        resourceType,
+        resourceId,
+        params,
+        secretKey,
+        previewEmbeddingParams
+    );
+    return `${siteUrl}/embed/${resourceType}/${token}${optionsToHashParams(
+        options
+    )}`;
 }
 
-export function getUnsignedPreviewUrl(siteUrl, resourceType, resourceId, options) {
-    return `${siteUrl}/public/${resourceType}/${resourceId}${optionsToHashParams(options)}`
+export function getUnsignedPreviewUrl(
+    siteUrl,
+    resourceType,
+    resourceId,
+    options
+) {
+    return `${siteUrl}/public/${resourceType}/${resourceId}${optionsToHashParams(
+        options
+    )}`;
 }
 
 export function optionsToHashParams(options = {}) {
@@ -35,5 +70,5 @@ export function optionsToHashParams(options = {}) {
         }
     }
     const query = querystring.stringify(options);
-    return query ? `#${query}` : ``
+    return query ? `#${query}` : ``;
 }

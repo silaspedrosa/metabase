@@ -9,7 +9,7 @@ export default function ChartSettingInputGroup({ value: values, onChange }) {
             key={i}
             className="input block full mb1"
             value={str}
-            onBlurChange={(e) => {
+            onBlurChange={e => {
                 const newStr = e.target.value.trim();
                 if (!newStr || !newStr.length) return;
                 // clone the original values array. It's read-only so we can't just replace the one value we want
@@ -20,9 +20,5 @@ export default function ChartSettingInputGroup({ value: values, onChange }) {
         />
     ));
 
-    return (
-        <div>
-            {inputs}
-        </div>
-    );
+    return <div>{inputs}</div>;
 }

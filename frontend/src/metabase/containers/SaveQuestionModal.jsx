@@ -12,12 +12,11 @@ import CollectionList from "metabase/questions/containers/CollectionList";
 
 import Query from "metabase/lib/query";
 import { cancelable } from "metabase/lib/promise";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import "./SaveQuestionModal.css";
 import ButtonWithStatus from "metabase/components/ButtonWithStatus";
 
 export default class SaveQuestionModal extends Component {
-
     constructor(props, context) {
         super(props, context);
 
@@ -27,8 +26,14 @@ export default class SaveQuestionModal extends Component {
             error: null,
             valid: false,
             details: {
-                name: props.card.name || isStructured ? Query.generateQueryDescription(props.tableMetadata, props.card.dataset_query.query) : "",
-                description: props.card.description || '',
+                name:
+                    props.card.name || isStructured
+                        ? Query.generateQueryDescription(
+                              props.tableMetadata,
+                              props.card.dataset_query.query
+                          )
+                        : "",
+                description: props.card.description || "",
                 collection_id: props.card.collection_id || null,
                 saveType: props.originalCard ? "overwrite" : "create"
             }
@@ -43,7 +48,7 @@ export default class SaveQuestionModal extends Component {
         saveFn: PropTypes.func.isRequired,
         onClose: PropTypes.func.isRequired,
         multiStep: PropTypes.bool
-    }
+    };
 
     componentDidMount() {
         this.validateForm();
@@ -75,10 +80,15 @@ export default class SaveQuestionModal extends Component {
     }
 
     onChange(fieldName, fieldValue) {
-        this.setState({ details: { ...this.state.details, [fieldName]: fieldValue ? fieldValue : null }});
+        this.setState({
+            details: {
+                ...this.state.details,
+                [fieldName]: fieldValue ? fieldValue : null
+            }
+        });
     }
 
-    formSubmitted = async (e) => {
+    formSubmitted = async e => {
         try {
             if (e) {
                 e.preventDefault();
@@ -89,16 +99,21 @@ export default class SaveQuestionModal extends Component {
 
             card = {
                 ...card,
-                name: details.saveType === "overwrite" ?
-                    originalCard.name :
-                    details.name.trim(),
+                name:
+                    details.saveType === "overwrite"
+                        ? originalCard.name
+                        : details.name.trim(),
                 // since description is optional, it can be null, so check for a description before trimming it
-                description: details.saveType === "overwrite" ?
-                    originalCard.description :
-                    details.description ? details.description.trim() : null,
-                collection_id: details.saveType === "overwrite" ?
-                    originalCard.collection_id :
-                    details.collection_id
+                description:
+                    details.saveType === "overwrite"
+                        ? originalCard.description
+                        : details.description
+                          ? details.description.trim()
+                          : null,
+                collection_id:
+                    details.saveType === "overwrite"
+                        ? originalCard.collection_id
+                        : details.collection_id
             };
 
             if (details.saveType === "create") {
@@ -119,7 +134,7 @@ export default class SaveQuestionModal extends Component {
             // Throw error for ButtonWithStatus
             throw error;
         }
-    }
+    };
 
     render() {
         let { error, details } = this.state;
@@ -155,10 +170,15 @@ export default class SaveQuestionModal extends Component {
                 >
                     <Radio
                         value={this.state.details.saveType}
-                        onChange={(value) => this.onChange("saveType", value)}
+                        onChange={value => this.onChange("saveType", value)}
                         options={[
-                            { name: t`Replace original question, "${this.props.originalCard.name}"`, value: "overwrite" },
-                            { name: t`Save as new question`, value: "create" },
+                            {
+                                name: t`Replace original question, "${
+                                    this.props.originalCard.name
+                                }"`,
+                                value: "overwrite"
+                            },
+                            { name: t`Save as new question`, value: "create" }
                         ]}
                         isVertical
                     />
@@ -166,21 +186,21 @@ export default class SaveQuestionModal extends Component {
             );
         }
 
-        let title = this.props.multiStep ? t`First, save your question` : t`Save question`;
+        let title = this.props.multiStep
+            ? t`First, save your question`
+            : t`Save question`;
 
         return (
             <ModalContent
                 id="SaveQuestionModal"
                 title={title}
                 footer={[
-                        formError,
-                        <Button onClick={this.props.onClose}>
-                            {t`Cancel`}
-                        </Button>,
-                        <ButtonWithStatus
-                            disabled={!this.state.valid}
-                            onClickOperation={this.formSubmitted}
-                        />
+                    formError,
+                    <Button onClick={this.props.onClose}>{t`Cancel`}</Button>,
+                    <ButtonWithStatus
+                        disabled={!this.state.valid}
+                        onClickOperation={this.formSubmitted}
+                    />
                 ]}
                 onClose={this.props.onClose}
             >
@@ -191,8 +211,11 @@ export default class SaveQuestionModal extends Component {
                         transitionEnterTimeout={500}
                         transitionLeaveTimeout={500}
                     >
-                        { details.saveType === "create" &&
-                            <div key="saveQuestionModalFields" className="saveQuestionModalFields">
+                        {details.saveType === "create" && (
+                            <div
+                                key="saveQuestionModalFields"
+                                className="saveQuestionModalFields"
+                            >
                                 <FormField
                                     displayName={t`Name`}
                                     fieldName="name"
@@ -200,9 +223,15 @@ export default class SaveQuestionModal extends Component {
                                 >
                                     <input
                                         className="Form-input full"
-                                        name="name" placeholder={t`What is the name of your card?`}
+                                        name="name"
+                                        placeholder={t`What is the name of your card?`}
                                         value={this.state.details.name}
-                                        onChange={(e) => this.onChange("name", e.target.value)}
+                                        onChange={e =>
+                                            this.onChange(
+                                                "name",
+                                                e.target.value
+                                            )
+                                        }
                                         autoFocus
                                     />
                                 </FormField>
@@ -216,40 +245,78 @@ export default class SaveQuestionModal extends Component {
                                         name="description"
                                         placeholder={t`It's optional but oh, so helpful`}
                                         value={this.state.details.description}
-                                        onChange={(e) => this.onChange("description", e.target.value)}
+                                        onChange={e =>
+                                            this.onChange(
+                                                "description",
+                                                e.target.value
+                                            )
+                                        }
                                     />
                                 </FormField>
                                 <CollectionList writable>
-                                { (collections) => collections.length > 0 &&
-                                    <FormField
-                                        displayName={t`Which collection should this go in?`}
-                                        fieldName="collection_id"
-                                        errors={this.state.errors}
-                                    >
-                                        <Select
-                                            className="block"
-                                            value={this.state.details.collection_id}
-                                            onChange={e => this.onChange("collection_id", e.target.value)}
-                                        >
-                                            {[{ name: t`None`, id: null }]
-                                            .concat(collections)
-                                            .map((collection, index) =>
-                                                <Option
-                                                    key={index}
-                                                    value={collection.id}
-                                                    icon={collection.id != null ? "collection" : null}
-                                                    iconColor={collection.color}
-                                                    iconSize={18}
+                                    {collections =>
+                                        collections.length > 0 && (
+                                            <FormField
+                                                displayName={t`Which collection should this go in?`}
+                                                fieldName="collection_id"
+                                                errors={this.state.errors}
+                                            >
+                                                <Select
+                                                    className="block"
+                                                    value={
+                                                        this.state.details
+                                                            .collection_id
+                                                    }
+                                                    onChange={e =>
+                                                        this.onChange(
+                                                            "collection_id",
+                                                            e.target.value
+                                                        )
+                                                    }
                                                 >
-                                                    {collection.name}
-                                                </Option>
-                                            )}
-                                        </Select>
-                                    </FormField>
-                                }
+                                                    {[
+                                                        {
+                                                            name: t`None`,
+                                                            id: null
+                                                        }
+                                                    ]
+                                                        .concat(collections)
+                                                        .map(
+                                                            (
+                                                                collection,
+                                                                index
+                                                            ) => (
+                                                                <Option
+                                                                    key={index}
+                                                                    value={
+                                                                        collection.id
+                                                                    }
+                                                                    icon={
+                                                                        collection.id !=
+                                                                        null
+                                                                            ? "collection"
+                                                                            : null
+                                                                    }
+                                                                    iconColor={
+                                                                        collection.color
+                                                                    }
+                                                                    iconSize={
+                                                                        18
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        collection.name
+                                                                    }
+                                                                </Option>
+                                                            )
+                                                        )}
+                                                </Select>
+                                            </FormField>
+                                        )
+                                    }
                                 </CollectionList>
                             </div>
-                        }
+                        )}
                     </ReactCSSTransitionGroup>
                 </form>
             </ModalContent>

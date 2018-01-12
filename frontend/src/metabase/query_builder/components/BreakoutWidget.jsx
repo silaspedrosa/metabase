@@ -7,7 +7,6 @@ import Popover from "metabase/components/Popover.jsx";
 
 import _ from "underscore";
 
-
 export default class BreakoutWidget extends Component {
     constructor(props, context) {
         super(props, context);

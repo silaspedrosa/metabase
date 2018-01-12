@@ -6,7 +6,7 @@ import _ from "underscore";
 
 import Icon from "metabase/components/Icon.jsx";
 import ListSearchField from "metabase/components/ListSearchField.jsx";
-import { List, CellMeasurer, CellMeasurerCache } from 'react-virtualized';
+import { List, CellMeasurer, CellMeasurerCache } from "react-virtualized";
 
 export default class AccordianList extends Component {
     constructor(props, context) {
@@ -19,7 +19,9 @@ export default class AccordianList extends Component {
         }
         // otherwise try to find the selected section, if any
         if (openSection === undefined) {
-            openSection = _.findIndex(props.sections, (section, index) => this.sectionIsSelected(section, index));
+            openSection = _.findIndex(props.sections, (section, index) =>
+                this.sectionIsSelected(section, index)
+            );
             if (openSection === -1) {
                 openSection = undefined;
             }
@@ -36,7 +38,7 @@ export default class AccordianList extends Component {
 
         this._cache = new CellMeasurerCache({
             fixedWidth: true,
-            minHeight: 10,
+            minHeight: 10
         });
     }
 
@@ -55,16 +57,16 @@ export default class AccordianList extends Component {
         getItemClasses: PropTypes.func,
         alwaysTogglable: PropTypes.bool,
         alwaysExpanded: PropTypes.bool,
-        hideSingleSectionTitle: PropTypes.bool,
+        hideSingleSectionTitle: PropTypes.bool
     };
 
     static defaultProps = {
         style: {},
         width: 300,
-        searchable: (section) => section.items && section.items.length > 10,
+        searchable: section => section.items && section.items.length > 10,
         alwaysTogglable: false,
         alwaysExpanded: false,
-        hideSingleSectionTitle: false,
+        hideSingleSectionTitle: false
     };
 
     componentDidMount() {
@@ -83,8 +85,11 @@ export default class AccordianList extends Component {
 
     componentDidUpdate(prevProps, prevState) {
         // if anything changes that affects the selected rows we need to clear the row height cache
-        if (this.state.openSection !== prevState.openSection || this.state.searchText !== prevState.searchText) {
-            this._clearRowHeightCache()
+        if (
+            this.state.openSection !== prevState.openSection ||
+            this.state.searchText !== prevState.searchText
+        ) {
+            this._clearRowHeightCache();
         }
     }
 
@@ -103,7 +108,7 @@ export default class AccordianList extends Component {
         this._forceUpdateTimeout = setTimeout(() => {
             this._forceUpdateTimeout = null;
             this._forceUpdateList();
-        })
+        });
     }
 
     _forceUpdateList() {
@@ -113,7 +118,7 @@ export default class AccordianList extends Component {
             rowIndex: 0
         });
         this._list.forceUpdateGrid();
-        this.forceUpdate()
+        this.forceUpdate();
     }
 
     toggleSection(sectionIndex) {
@@ -128,7 +133,6 @@ export default class AccordianList extends Component {
             sectionIndex = null;
         }
         this.setState({ openSection: sectionIndex });
-
     }
 
     getOpenSection() {
@@ -152,7 +156,7 @@ export default class AccordianList extends Component {
         let { sections } = this.props;
         let selectedSection = null;
         for (let i = 0; i < sections.length; i++) {
-            if (_.some(sections[i].items, (item) => this.itemIsSelected(item))) {
+            if (_.some(sections[i].items, item => this.itemIsSelected(item))) {
                 selectedSection = i;
                 break;
             }
@@ -200,83 +204,154 @@ export default class AccordianList extends Component {
 
     renderSectionIcon(section, sectionIndex) {
         if (this.props.renderSectionIcon) {
-            return <span className="List-section-icon mr2">{this.props.renderSectionIcon(section, sectionIndex)}</span>;
+            return (
+                <span className="List-section-icon mr2">
+                    {this.props.renderSectionIcon(section, sectionIndex)}
+                </span>
+            );
         } else {
             return null;
         }
     }
 
     getItemClasses(item, itemIndex) {
-        return this.props.getItemClasses && this.props.getItemClasses(item, itemIndex);
+        return (
+            this.props.getItemClasses &&
+            this.props.getItemClasses(item, itemIndex)
+        );
     }
 
     render() {
-        const { id, style, searchable, searchPlaceholder, sections, showItemArrows, alwaysTogglable, alwaysExpanded, hideSingleSectionTitle,  } = this.props;
+        const {
+            id,
+            style,
+            searchable,
+            searchPlaceholder,
+            sections,
+            showItemArrows,
+            alwaysTogglable,
+            alwaysExpanded,
+            hideSingleSectionTitle
+        } = this.props;
         const { searchText } = this.state;
 
         const openSection = this.getOpenSection();
-        const sectionIsExpanded = (sectionIndex) =>
+        const sectionIsExpanded = sectionIndex =>
             alwaysExpanded || openSection === sectionIndex;
-        const sectionIsSearchable = (sectionIndex) =>
-            searchable && (typeof searchable !== "function" || searchable(sections[sectionIndex]));
-        const sectionIsTogglable  = (sectionIndex) =>
+        const sectionIsSearchable = sectionIndex =>
+            searchable &&
+            (typeof searchable !== "function" ||
+                searchable(sections[sectionIndex]));
+        const sectionIsTogglable = sectionIndex =>
             alwaysTogglable || sections.length > 1;
 
-        const rows = []
+        const rows = [];
         for (const [sectionIndex, section] of sections.entries()) {
             const isLastSection = sectionIndex === sections.length - 1;
-            if (section.name && (!hideSingleSectionTitle || sections.length > 1 || alwaysTogglable)) {
-                rows.push({ type: "header", section, sectionIndex, isLastSection })
+            if (
+                section.name &&
+                (!hideSingleSectionTitle ||
+                    sections.length > 1 ||
+                    alwaysTogglable)
+            ) {
+                rows.push({
+                    type: "header",
+                    section,
+                    sectionIndex,
+                    isLastSection
+                });
             } else {
-                rows.push({ type: "header-hidden", section, sectionIndex, isLastSection })
+                rows.push({
+                    type: "header-hidden",
+                    section,
+                    sectionIndex,
+                    isLastSection
+                });
             }
-            if (sectionIsSearchable(sectionIndex) && sectionIsExpanded(sectionIndex) && section.items && section.items.length > 0) {
-                rows.push({ type: "search", section, sectionIndex, isLastSection })
+            if (
+                sectionIsSearchable(sectionIndex) &&
+                sectionIsExpanded(sectionIndex) &&
+                section.items &&
+                section.items.length > 0
+            ) {
+                rows.push({
+                    type: "search",
+                    section,
+                    sectionIndex,
+                    isLastSection
+                });
             }
-            if (sectionIsExpanded(sectionIndex) && section.items && section.items.length > 0) {
+            if (
+                sectionIsExpanded(sectionIndex) &&
+                section.items &&
+                section.items.length > 0
+            ) {
                 for (const [itemIndex, item] of section.items.entries()) {
-                    if (!searchText || item.name.toLowerCase().includes(searchText.toLowerCase())) {
-                        const isLastItem = itemIndex === section.items.length - 1;
+                    if (
+                        !searchText ||
+                        item.name
+                            .toLowerCase()
+                            .includes(searchText.toLowerCase())
+                    ) {
+                        const isLastItem =
+                            itemIndex === section.items.length - 1;
                         if (this.itemIsSelected(item)) {
                             this._initialSelectedRowIndex = rows.length;
                         }
-                        rows.push({ type: "item", section, sectionIndex, isLastSection, item, itemIndex, isLastItem });
+                        rows.push({
+                            type: "item",
+                            section,
+                            sectionIndex,
+                            isLastSection,
+                            item,
+                            itemIndex,
+                            isLastItem
+                        });
                     }
                 }
             }
         }
 
-        const maxHeight = (this.props.maxHeight > 0 && this.props.maxHeight < Infinity) ?
-            this.props.maxHeight :
-            window.innerHeight;
+        const maxHeight =
+            this.props.maxHeight > 0 && this.props.maxHeight < Infinity
+                ? this.props.maxHeight
+                : window.innerHeight;
 
         const width = this.props.width;
-        const height = Math.min(maxHeight, rows.reduce((height, row, index) =>
-            height + this._cache.rowHeight({ index })
-        , 0));
+        const height = Math.min(
+            maxHeight,
+            rows.reduce(
+                (height, row, index) =>
+                    height + this._cache.rowHeight({ index }),
+                0
+            )
+        );
 
         return (
             <List
                 id={id}
-                ref={list => this._list = list}
+                ref={list => (this._list = list)}
                 className={this.props.className}
                 style={style}
                 width={width}
                 height={height}
                 rowCount={rows.length}
-
                 deferredMeasurementCache={this._cache}
                 rowHeight={this._cache.rowHeight}
-
                 // HACK: needs to be large enough to render enough rows to fill the screen since we used
                 // the CellMeasurerCache to calculate the height
                 overscanRowCount={100}
-
                 // ensure `scrollToRow` scrolls the row to the top of the list
                 scrollToAlignment="start"
-
                 rowRenderer={({ key, index, parent, style }) => {
-                    const { type, section, sectionIndex, item, itemIndex, isLastItem } = rows[index];
+                    const {
+                        type,
+                        section,
+                        sectionIndex,
+                        item,
+                        itemIndex,
+                        isLastItem
+                    } = rows[index];
                     return (
                         <CellMeasurer
                             cache={this._cache}
@@ -285,74 +360,162 @@ export default class AccordianList extends Component {
                             rowIndex={index}
                             parent={parent}
                         >
-                            {({ measure }) =>
+                            {({ measure }) => (
                                 <div
                                     style={style}
-                                    className={cx("List-section", section.className, {
-                                        "List-section--expanded": sectionIsExpanded(sectionIndex),
-                                        "List-section--togglable": sectionIsTogglable(sectionIndex)
-                                    })}
+                                    className={cx(
+                                        "List-section",
+                                        section.className,
+                                        {
+                                            "List-section--expanded": sectionIsExpanded(
+                                                sectionIndex
+                                            ),
+                                            "List-section--togglable": sectionIsTogglable(
+                                                sectionIndex
+                                            )
+                                        }
+                                    )}
                                 >
-                                    { type === "header" ? (
-                                        alwaysExpanded ?
+                                    {type === "header" ? (
+                                        alwaysExpanded ? (
                                             <div className="px2 pt2 pb1 h6 text-grey-2 text-uppercase text-bold">
                                                 {section.name}
                                             </div>
-                                        :
+                                        ) : (
                                             <div
-                                                className={cx("List-section-header p2 flex align-center", {
-                                                    "cursor-pointer": sectionIsTogglable(sectionIndex),
-                                                    "border-top": sectionIndex !== 0,
-                                                    "border-bottom": sectionIsExpanded(sectionIndex)
-                                                })}
-                                                onClick={sectionIsTogglable(sectionIndex) && (() => this.toggleSection(sectionIndex))}
-                                            >
-                                                { this.renderSectionIcon(section, sectionIndex) }
-                                                <h3 className="List-section-title">{section.name}</h3>
-                                                { sections.length > 1 && section.items && section.items.length > 0 &&
-                                                    <span className="flex-align-right">
-                                                        <Icon name={sectionIsExpanded(sectionIndex) ? "chevronup" : "chevrondown"} size={12} />
-                                                    </span>
+                                                className={cx(
+                                                    "List-section-header p2 flex align-center",
+                                                    {
+                                                        "cursor-pointer": sectionIsTogglable(
+                                                            sectionIndex
+                                                        ),
+                                                        "border-top":
+                                                            sectionIndex !== 0,
+                                                        "border-bottom": sectionIsExpanded(
+                                                            sectionIndex
+                                                        )
+                                                    }
+                                                )}
+                                                onClick={
+                                                    sectionIsTogglable(
+                                                        sectionIndex
+                                                    ) &&
+                                                    (() =>
+                                                        this.toggleSection(
+                                                            sectionIndex
+                                                        ))
                                                 }
+                                            >
+                                                {this.renderSectionIcon(
+                                                    section,
+                                                    sectionIndex
+                                                )}
+                                                <h3 className="List-section-title">
+                                                    {section.name}
+                                                </h3>
+                                                {sections.length > 1 &&
+                                                    section.items &&
+                                                    section.items.length >
+                                                        0 && (
+                                                        <span className="flex-align-right">
+                                                            <Icon
+                                                                name={
+                                                                    sectionIsExpanded(
+                                                                        sectionIndex
+                                                                    )
+                                                                        ? "chevronup"
+                                                                        : "chevrondown"
+                                                                }
+                                                                size={12}
+                                                            />
+                                                        </span>
+                                                    )}
                                             </div>
-                                    ) : type === "header-hidden" ?
+                                        )
+                                    ) : type === "header-hidden" ? (
                                         <div className="my1" />
-                                    : type === "search" ?
-                                        <div className="m1" style={{ border: "2px solid transparent" }}>
+                                    ) : type === "search" ? (
+                                        <div
+                                            className="m1"
+                                            style={{
+                                                border: "2px solid transparent"
+                                            }}
+                                        >
                                             <ListSearchField
-                                                onChange={(val) => this.setState({searchText: val})}
-                                                searchText={this.state.searchText}
+                                                onChange={val =>
+                                                    this.setState({
+                                                        searchText: val
+                                                    })
+                                                }
+                                                searchText={
+                                                    this.state.searchText
+                                                }
                                                 placeholder={searchPlaceholder}
                                                 autoFocus
                                             />
                                         </div>
-                                    : type === "item" ?
+                                    ) : type === "item" ? (
                                         <div
-                                            className={cx("List-item flex mx1", {
-                                                'List-item--selected': this.itemIsSelected(item),
-                                                'List-item--disabled': !this.itemIsClickable(item),
-                                                "mb1": isLastItem
-                                            }, this.getItemClasses(item, itemIndex))}
+                                            className={cx(
+                                                "List-item flex mx1",
+                                                {
+                                                    "List-item--selected": this.itemIsSelected(
+                                                        item
+                                                    ),
+                                                    "List-item--disabled": !this.itemIsClickable(
+                                                        item
+                                                    ),
+                                                    mb1: isLastItem
+                                                },
+                                                this.getItemClasses(
+                                                    item,
+                                                    itemIndex
+                                                )
+                                            )}
                                         >
                                             <a
-                                                className={cx("p1 flex-full flex align-center", this.itemIsClickable(item) ? "cursor-pointer" : "cursor-default")}
-                                                onClick={this.itemIsClickable(item) && this.onChange.bind(this, item)}
+                                                className={cx(
+                                                    "p1 flex-full flex align-center",
+                                                    this.itemIsClickable(item)
+                                                        ? "cursor-pointer"
+                                                        : "cursor-default"
+                                                )}
+                                                onClick={
+                                                    this.itemIsClickable(
+                                                        item
+                                                    ) &&
+                                                    this.onChange.bind(
+                                                        this,
+                                                        item
+                                                    )
+                                                }
                                             >
-                                                <span className="flex align-center">{ this.renderItemIcon(item, itemIndex) }</span>
-                                                <h4 className="List-item-title ml1">{item.name}</h4>
+                                                <span className="flex align-center">
+                                                    {this.renderItemIcon(
+                                                        item,
+                                                        itemIndex
+                                                    )}
+                                                </span>
+                                                <h4 className="List-item-title ml1">
+                                                    {item.name}
+                                                </h4>
                                             </a>
-                                            { this.renderItemExtra(item, itemIndex) }
-                                            { showItemArrows &&
+                                            {this.renderItemExtra(
+                                                item,
+                                                itemIndex
+                                            )}
+                                            {showItemArrows && (
                                                 <div className="List-item-arrow flex align-center px1">
-                                                    <Icon name="chevronright" size={8} />
+                                                    <Icon
+                                                        name="chevronright"
+                                                        size={8}
+                                                    />
                                                 </div>
-                                            }
+                                            )}
                                         </div>
-                                    :
-                                        null
-                                    }
+                                    ) : null}
                                 </div>
-                            }
+                            )}
                         </CellMeasurer>
                     );
                 }}

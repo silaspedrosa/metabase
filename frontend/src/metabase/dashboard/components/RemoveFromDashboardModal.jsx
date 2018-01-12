@@ -4,7 +4,6 @@ import PropTypes from "prop-types";
 import MetabaseAnalytics from "metabase/lib/analytics";
 import ModalContent from "metabase/components/ModalContent.jsx";
 
-
 export default class RemoveFromDashboardModal extends Component {
     constructor(props, context) {
         super(props, context);
@@ -38,10 +37,19 @@ export default class RemoveFromDashboardModal extends Component {
                 title="Remove this question?"
                 onClose={() => this.props.onClose()}
             >
-
                 <div className="Form-actions flex-align-right">
-                    <button className="Button Button" onClick={this.props.onClose}>Cancel</button>
-                    <button className="Button Button--danger ml2" onClick={() => this.onRemove()}>Remove</button>
+                    <button
+                        className="Button Button"
+                        onClick={this.props.onClose}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        className="Button Button--danger ml2"
+                        onClick={() => this.onRemove()}
+                    >
+                        Remove
+                    </button>
                 </div>
             </ModalContent>
         );

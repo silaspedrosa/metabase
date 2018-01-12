@@ -20,9 +20,8 @@ export const DATETIME_UNITS = [
     // "day-of-year",
     "week-of-year",
     "month-of-year",
-    "quarter-of-year",
-]
-
+    "quarter-of-year"
+];
 
 export function computeFilterTimeRange(filter) {
     let expandedFilter;
@@ -58,7 +57,9 @@ export function expandTimeIntervalFilter(filter) {
     let [operator, field, n, unit] = filter;
 
     if (!mbqlEq(operator, "time-interval")) {
-        throw new Error("translateTimeInterval expects operator 'time-interval'");
+        throw new Error(
+            "translateTimeInterval expects operator 'time-interval'"
+        );
     }
 
     if (n === "current") {
@@ -72,9 +73,19 @@ export function expandTimeIntervalFilter(filter) {
     field = ["datetime-field", field, "as", unit];
 
     if (n < -1) {
-        return ["BETWEEN", field, ["relative-datetime", n-1, unit], ["relative-datetime", -1, unit]];
+        return [
+            "BETWEEN",
+            field,
+            ["relative-datetime", n - 1, unit],
+            ["relative-datetime", -1, unit]
+        ];
     } else if (n > 1) {
-        return ["BETWEEN", field, ["relative-datetime", 1, unit], ["relative-datetime", n, unit]];
+        return [
+            "BETWEEN",
+            field,
+            ["relative-datetime", 1, unit],
+            ["relative-datetime", n, unit]
+        ];
     } else if (n === 0) {
         return ["=", field, ["relative-datetime", "current"]];
     } else {
@@ -90,7 +101,9 @@ export function generateTimeFilterValuesDescriptions(filter) {
         let [n, unit] = values;
         return generateTimeIntervalDescription(n, unit);
     } else {
-        return values.map(value => generateTimeValueDescription(value, bucketing));
+        return values.map(value =>
+            generateTimeValueDescription(value, bucketing)
+        );
     }
 }
 
@@ -119,9 +132,9 @@ export function generateTimeIntervalDescription(n, unit) {
         return [inflection.capitalize(n) + " " + unit];
     } else {
         if (n < 0) {
-            return ["Past " + (-n) + " " + inflection.inflect(unit, -n)];
+            return ["Past " + -n + " " + inflection.inflect(unit, -n)];
         } else if (n > 0) {
-            return ["Next " + (n) + " " + inflection.inflect(unit, n)];
+            return ["Next " + n + " " + inflection.inflect(unit, n)];
         } else {
             return ["This " + unit];
         }
@@ -154,7 +167,12 @@ export function generateTimeValueDescription(value, bucketing) {
             if (n === 0) {
                 return "Now";
             } else {
-                return Math.abs(n) + " " + inflection.inflect(unit, Math.abs(n)) + (n < 0 ? " ago" : " from now");
+                return (
+                    Math.abs(n) +
+                    " " +
+                    inflection.inflect(unit, Math.abs(n)) +
+                    (n < 0 ? " ago" : " from now")
+                );
             }
         }
     } else {
@@ -187,14 +205,15 @@ export function parseFieldBucketing(field, defaultUnit = null) {
                 return field[3];
             } else {
                 // Current format [datetime-field field unit]
-                return field[2]
+                return field[2];
             }
-        } if (mbqlEq(field[0], "fk->") || mbqlEq(field[0], "field-id")) {
-            return defaultUnit;
-        } if (mbqlEq(field[0], "field-literal")) {
+        }
+        if (mbqlEq(field[0], "fk->") || mbqlEq(field[0], "field-id")) {
             return defaultUnit;
         }
-        else {
+        if (mbqlEq(field[0], "field-literal")) {
+            return defaultUnit;
+        } else {
             console.warn("Unknown field format", field);
         }
     }
@@ -214,10 +233,11 @@ export function parseFieldTargetId(field) {
     if (Number.isInteger(field)) return field;
 
     if (Array.isArray(field)) {
-        if (mbqlEq(field[0], "field-id"))       return field[1];
-        if (mbqlEq(field[0], "fk->"))           return field[1];
-        if (mbqlEq(field[0], "datetime-field")) return parseFieldTargetId(field[1]);
-        if (mbqlEq(field[0], "field-literal"))  return field;
+        if (mbqlEq(field[0], "field-id")) return field[1];
+        if (mbqlEq(field[0], "fk->")) return field[1];
+        if (mbqlEq(field[0], "datetime-field"))
+            return parseFieldTargetId(field[1]);
+        if (mbqlEq(field[0], "field-literal")) return field;
     }
 
     console.warn("Unknown field format", field);

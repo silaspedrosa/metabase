@@ -8,7 +8,13 @@ import React from "react";
 
 import ExternalLink from "metabase/components/ExternalLink.jsx";
 
-import { isDate, isNumber, isCoordinate, isLatitude, isLongitude } from "metabase/lib/schema_metadata";
+import {
+    isDate,
+    isNumber,
+    isCoordinate,
+    isLatitude,
+    isLongitude
+} from "metabase/lib/schema_metadata";
 import { isa, TYPE } from "metabase/lib/types";
 import { parseTimestamp } from "metabase/lib/time";
 import { rangeForValue } from "metabase/lib/dataset";
@@ -23,29 +29,29 @@ import type { Moment } from "metabase/meta/types";
 export type FormattingOptions = {
     column?: Column,
     majorWidth?: number,
-    type?: "axis"|"cell"|"tooltip",
+    type?: "axis" | "cell" | "tooltip",
     comma?: boolean,
     jsx?: boolean,
-    compact?: boolean,
-}
+    compact?: boolean
+};
 
-const PRECISION_NUMBER_FORMATTER      = d3.format(".2r");
-const FIXED_NUMBER_FORMATTER          = d3.format(",.f");
+const PRECISION_NUMBER_FORMATTER = d3.format(".2r");
+const FIXED_NUMBER_FORMATTER = d3.format(",.f");
 const FIXED_NUMBER_FORMATTER_NO_COMMA = d3.format(".f");
-const DECIMAL_DEGREES_FORMATTER       = d3.format(".08f");
-const BINNING_DEGREES_FORMATTER       = (value, binWidth) => {
-    return d3.format(`.0${decimalCount(binWidth)}f`)(value)
-}
+const DECIMAL_DEGREES_FORMATTER = d3.format(".08f");
+const BINNING_DEGREES_FORMATTER = (value, binWidth) => {
+    return d3.format(`.0${decimalCount(binWidth)}f`)(value);
+};
 
 // use en dashes, for Maz
 const RANGE_SEPARATOR = ` – `;
 
 export function formatNumber(number: number, options: FormattingOptions = {}) {
-    options = { comma: true, ...options};
+    options = { comma: true, ...options };
     if (options.compact) {
         if (number === 0) {
             // 0 => 0
-            return "0"
+            return "0";
         } else if (number >= -0.01 && number <= 0.01) {
             // 0.01 => ~0
             return "~ 0";
@@ -70,8 +76,14 @@ export function formatNumber(number: number, options: FormattingOptions = {}) {
     }
 }
 
-export function formatCoordinate(value: number, options: FormattingOptions = {}) {
-    const binWidth = options.column && options.column.binning_info && options.column.binning_info.bin_width;
+export function formatCoordinate(
+    value: number,
+    options: FormattingOptions = {}
+) {
+    const binWidth =
+        options.column &&
+        options.column.binning_info &&
+        options.column.binning_info.bin_width;
     let direction = "";
     if (isLatitude(options.column)) {
         direction = " " + (value < 0 ? "S" : "N");
@@ -81,12 +93,20 @@ export function formatCoordinate(value: number, options: FormattingOptions = {})
         value = Math.abs(value);
     }
 
-    const formattedValue = binWidth ? BINNING_DEGREES_FORMATTER(value, binWidth) : DECIMAL_DEGREES_FORMATTER(value)
+    const formattedValue = binWidth
+        ? BINNING_DEGREES_FORMATTER(value, binWidth)
+        : DECIMAL_DEGREES_FORMATTER(value);
     return formattedValue + "°" + direction;
 }
 
-export function formatRange(range: [number, number], formatter: (value: number) => string, options: FormattingOptions = {}) {
-    return range.map(value => formatter(value, options)).join(` ${RANGE_SEPARATOR} `);
+export function formatRange(
+    range: [number, number],
+    formatter: (value: number) => string,
+    options: FormattingOptions = {}
+) {
+    return range
+        .map(value => formatter(value, options))
+        .join(` ${RANGE_SEPARATOR} `);
 }
 
 function formatMajorMinor(major, minor, options = {}) {
@@ -98,7 +118,12 @@ function formatMajorMinor(major, minor, options = {}) {
     if (options.jsx) {
         return (
             <span>
-                <span style={{ minWidth: options.majorWidth + "em" }} className="inline-block text-right text-bold">{major}</span>
+                <span
+                    style={{ minWidth: options.majorWidth + "em" }}
+                    className="inline-block text-right text-bold"
+                >
+                    {major}
+                </span>
                 {" - "}
                 <span>{minor}</span>
             </span>
@@ -109,7 +134,11 @@ function formatMajorMinor(major, minor, options = {}) {
 }
 
 /** This formats a time with unit as a date range */
-export function formatTimeRangeWithUnit(value: Value, unit: DatetimeUnit, options: FormattingOptions = {}) {
+export function formatTimeRangeWithUnit(
+    value: Value,
+    unit: DatetimeUnit,
+    options: FormattingOptions = {}
+) {
     let m = parseTimestamp(value, unit);
     if (!m.isValid()) {
         return String(value);
@@ -123,11 +152,23 @@ export function formatTimeRangeWithUnit(value: Value, unit: DatetimeUnit, option
     const end = m.clone().endOf(unit);
     if (start.isValid() && end.isValid()) {
         if (!condensed || start.year() !== end.year()) {
-            return start.format(`${monthFormat} D, YYYY`) + RANGE_SEPARATOR + end.format(`${monthFormat} D, YYYY`);
+            return (
+                start.format(`${monthFormat} D, YYYY`) +
+                RANGE_SEPARATOR +
+                end.format(`${monthFormat} D, YYYY`)
+            );
         } else if (start.month() !== end.month()) {
-            return start.format(`${monthFormat} D`) + RANGE_SEPARATOR + end.format(`${monthFormat} D, YYYY`);
+            return (
+                start.format(`${monthFormat} D`) +
+                RANGE_SEPARATOR +
+                end.format(`${monthFormat} D, YYYY`)
+            );
         } else {
-            return start.format(`${monthFormat} D`) + RANGE_SEPARATOR + end.format(`D, YYYY`);
+            return (
+                start.format(`${monthFormat} D`) +
+                RANGE_SEPARATOR +
+                end.format(`D, YYYY`)
+            );
         }
     } else {
         return formatWeek(m, options);
@@ -140,7 +181,11 @@ function formatWeek(m: Moment, options: FormattingOptions = {}) {
     return formatMajorMinor(m.format("wo"), m.format("gggg"), options);
 }
 
-export function formatTimeWithUnit(value: Value, unit: DatetimeUnit, options: FormattingOptions = {}) {
+export function formatTimeWithUnit(
+    value: Value,
+    unit: DatetimeUnit,
+    options: FormattingOptions = {}
+) {
     let m = parseTimestamp(value, unit);
     if (!m.isValid()) {
         return String(value);
@@ -148,7 +193,11 @@ export function formatTimeWithUnit(value: Value, unit: DatetimeUnit, options: Fo
 
     switch (unit) {
         case "hour": // 12 AM - January 1, 2015
-            return formatMajorMinor(m.format("h A"), m.format("MMMM D, YYYY"), options);
+            return formatMajorMinor(
+                m.format("h A"),
+                m.format("MMMM D, YYYY"),
+                options
+            );
         case "day": // January 1, 2015
             return m.format("MMMM D, YYYY");
         case "week": // 1st - 2015
@@ -160,32 +209,55 @@ export function formatTimeWithUnit(value: Value, unit: DatetimeUnit, options: Fo
                 return formatTimeRangeWithUnit(value, unit, options);
             } else if (options.type === "axis") {
                 // axis ticks show start of the week as "Jan 1"
-                return m.clone().startOf(unit).format(`MMM D`);
+                return m
+                    .clone()
+                    .startOf(unit)
+                    .format(`MMM D`);
             } else {
                 return formatWeek(m, options);
             }
         case "month": // January 2015
-            return options.jsx ?
-                <div><span className="text-bold">{m.format("MMMM")}</span> {m.format("YYYY")}</div> :
-                m.format("MMMM") + " " + m.format("YYYY");
+            return options.jsx ? (
+                <div>
+                    <span className="text-bold">{m.format("MMMM")}</span>{" "}
+                    {m.format("YYYY")}
+                </div>
+            ) : (
+                m.format("MMMM") + " " + m.format("YYYY")
+            );
         case "year": // 2015
             return m.format("YYYY");
         case "quarter": // Q1 - 2015
-            return formatMajorMinor(m.format("[Q]Q"), m.format("YYYY"), { ...options, majorWidth: 0 });
+            return formatMajorMinor(m.format("[Q]Q"), m.format("YYYY"), {
+                ...options,
+                majorWidth: 0
+            });
         case "hour-of-day": // 12 AM
-            return moment().hour(value).format("h A");
+            return moment()
+                .hour(value)
+                .format("h A");
         case "day-of-week": // Sunday
             // $FlowFixMe:
-            return moment().day(value - 1).format("dddd");
+            return moment()
+                .day(value - 1)
+                .format("dddd");
         case "day-of-month":
-            return moment().date(value).format("D");
+            return moment()
+                .date(value)
+                .format("D");
         case "week-of-year": // 1st
-            return moment().week(value).format("wo");
+            return moment()
+                .week(value)
+                .format("wo");
         case "month-of-year": // January
             // $FlowFixMe:
-            return moment().month(value - 1).format("MMMM");
+            return moment()
+                .month(value - 1)
+                .format("MMMM");
         case "quarter-of-year": // January
-            return moment().quarter(value).format("[Q]Q");
+            return moment()
+                .quarter(value)
+                .format("[Q]Q");
         default:
             return m.format("LLLL");
     }
@@ -209,7 +281,11 @@ const URL_WHITELIST_REGEX = /^(https?|mailto):\/*(?:[^:@]+(?::[^@]+)?@)?(?:[^\s:
 export function formatUrl(value: Value, { jsx }: FormattingOptions = {}) {
     const url = String(value);
     if (jsx && URL_WHITELIST_REGEX.test(url)) {
-        return <ExternalLink className="link link--wrappable" href={url}>{url}</ExternalLink>;
+        return (
+            <ExternalLink className="link link--wrappable" href={url}>
+                {url}
+            </ExternalLink>
+        );
     } else {
         return url;
     }
@@ -218,7 +294,7 @@ export function formatUrl(value: Value, { jsx }: FormattingOptions = {}) {
 // fallback for formatting a string without a column special_type
 function formatStringFallback(value: Value, options: FormattingOptions = {}) {
     value = formatUrl(value, options);
-    if (typeof value === 'string') {
+    if (typeof value === "string") {
         value = formatEmail(value, options);
     }
     return value;
@@ -237,11 +313,11 @@ export function formatValue(value: Value, options: FormattingOptions = {}) {
     // $FlowFixMe: remapping is a special field added by Visualization.jsx or getMetadata selector
     if (column && column.remapping && column.remapping.size > 0) {
         // $FlowFixMe
-        const remappedValueSample = column.remapping.values().next().value
+        const remappedValueSample = column.remapping.values().next().value;
 
         // Even if the column only has a list of analyzed values without remappings, those values
         // are keys in `remapping` array with value `undefined`
-        const hasSetRemappings = remappedValueSample !== undefined
+        const hasSetRemappings = remappedValueSample !== undefined;
         if (hasSetRemappings) {
             // $FlowFixMe
             if (column.remapping.has(value)) {
@@ -249,7 +325,7 @@ export function formatValue(value: Value, options: FormattingOptions = {}) {
                 return column.remapping.get(value);
             }
 
-            const remappedValueIsString = typeof remappedValueSample
+            const remappedValueIsString = typeof remappedValueSample;
             if (remappedValueIsString) {
                 // A simple way to hide intermediate ticks for a numeral value that has been remapped to a string
                 return null;
@@ -265,14 +341,19 @@ export function formatValue(value: Value, options: FormattingOptions = {}) {
         return formatEmail(value, options);
     } else if (column && column.unit != null) {
         return formatTimeWithUnit(value, column.unit, options);
-    } else if (isDate(column) || moment.isDate(value) || moment.isMoment(value) || moment(value, ["YYYY-MM-DD'T'HH:mm:ss.SSSZ"], true).isValid()) {
+    } else if (
+        isDate(column) ||
+        moment.isDate(value) ||
+        moment.isMoment(value) ||
+        moment(value, ["YYYY-MM-DD'T'HH:mm:ss.SSSZ"], true).isValid()
+    ) {
         return parseTimestamp(value, column && column.unit).format("LLLL");
     } else if (typeof value === "string") {
         return formatStringFallback(value, options);
     } else if (typeof value === "number") {
-        const formatter = isCoordinate(column) ?
-            formatCoordinate :
-            formatNumber;
+        const formatter = isCoordinate(column)
+            ? formatCoordinate
+            : formatNumber;
         const range = rangeForValue(value, options.column);
         if (range) {
             return formatRange(range, formatter, options);
@@ -292,11 +373,11 @@ export function formatColumn(column: Column): string {
         return "";
     } else if (column.remapped_to_column != null) {
         // $FlowFixMe: remapped_to_column is a special field added by Visualization.jsx
-        return formatColumn(column.remapped_to_column)
+        return formatColumn(column.remapped_to_column);
     } else {
         let columnTitle = getFriendlyName(column);
         if (column.unit && column.unit !== "default") {
-            columnTitle += ": " + capitalize(column.unit.replace(/-/g, " "))
+            columnTitle += ": " + capitalize(column.unit.replace(/-/g, " "));
         }
         return columnTitle;
     }
@@ -361,7 +442,18 @@ export function slugify(name: string) {
     return name && name.toLowerCase().replace(/[^a-z0-9_]/g, "_");
 }
 
-export function assignUserColors(userIds: number[], currentUserId: number, colorClasses: string[] = ['bg-brand', 'bg-purple', 'bg-error', 'bg-green', 'bg-gold', 'bg-grey-2']) {
+export function assignUserColors(
+    userIds: number[],
+    currentUserId: number,
+    colorClasses: string[] = [
+        "bg-brand",
+        "bg-purple",
+        "bg-error",
+        "bg-green",
+        "bg-gold",
+        "bg-grey-2"
+    ]
+) {
     let assignments = {};
 
     const currentUserColor = colorClasses[0];
@@ -373,7 +465,10 @@ export function assignUserColors(userIds: number[], currentUserId: number, color
             if (userId === currentUserId) {
                 assignments[userId] = currentUserColor;
             } else if (userId != null) {
-                assignments[userId] = otherUserColors[otherUserColorIndex++ % otherUserColors.length];
+                assignments[userId] =
+                    otherUserColors[
+                        otherUserColorIndex++ % otherUserColors.length
+                    ];
             }
         }
     }

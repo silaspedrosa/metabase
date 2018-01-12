@@ -53,29 +53,35 @@ export default class LeafletMarkerPinMap extends LeafletMap {
         }
     }
 
-    _createMarker = (index) => {
-        const marker = L.marker([0,0], { icon: MARKER_ICON });
+    _createMarker = index => {
+        const marker = L.marker([0, 0], { icon: MARKER_ICON });
         marker.on("click", () => {
             const { series: [{ data }] } = this.props;
             const { popup } = this;
             const el = document.createElement("div");
-            ReactDOM.render(<ObjectDetailTooltip row={data.rows[index]} cols={data.cols} />, el);
+            ReactDOM.render(
+                <ObjectDetailTooltip row={data.rows[index]} cols={data.cols} />,
+                el
+            );
             marker.unbindPopup();
             marker.bindPopup(el, popup);
             marker.openPopup();
         });
         return marker;
-    }
+    };
 }
 
-const ObjectDetailTooltip = ({ row, cols }) =>
+const ObjectDetailTooltip = ({ row, cols }) => (
     <table>
         <tbody>
-            { cols.map((col, index) =>
+            {cols.map((col, index) => (
                 <tr>
                     <td className="pr1">{col.display_name}:</td>
-                    <td>{formatValue(row[index], { column: col, jsx: true })}</td>
+                    <td>
+                        {formatValue(row[index], { column: col, jsx: true })}
+                    </td>
                 </tr>
-            )}
+            ))}
         </tbody>
     </table>
+);

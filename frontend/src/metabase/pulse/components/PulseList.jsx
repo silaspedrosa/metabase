@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 
 import PulseListItem from "./PulseListItem.jsx";
 import WhatsAPulse from "./WhatsAPulse.jsx";
@@ -44,31 +44,47 @@ export default class PulseList extends Component {
                 <div className="border-bottom mb2">
                     <div className="wrapper wrapper--trim flex align-center mb2">
                         <h1>{t`Pulses`}</h1>
-                        <a onClick={this.create} className="PulseButton Button flex-align-right">{t`Create a pulse`}</a>
+                        <a
+                            onClick={this.create}
+                            className="PulseButton Button flex-align-right"
+                        >{t`Create a pulse`}</a>
                     </div>
                 </div>
                 <LoadingAndErrorWrapper loading={!pulses}>
-                { () => pulses.length > 0 ?
-                    <ul className="wrapper wrapper--trim">
-                        {pulses.slice().sort((a,b) => b.created_at - a.created_at).map(pulse =>
-                            <li key={pulse.id}>
-                                <PulseListItem
-                                    scrollTo={pulse.id === this.props.pulseId}
-                                    pulse={pulse}
-                                    user={user}
-                                    formInput={this.props.formInput}
-                                    savePulse={this.props.savePulse}
+                    {() =>
+                        pulses.length > 0 ? (
+                            <ul className="wrapper wrapper--trim">
+                                {pulses
+                                    .slice()
+                                    .sort((a, b) => b.created_at - a.created_at)
+                                    .map(pulse => (
+                                        <li key={pulse.id}>
+                                            <PulseListItem
+                                                scrollTo={
+                                                    pulse.id ===
+                                                    this.props.pulseId
+                                                }
+                                                pulse={pulse}
+                                                user={user}
+                                                formInput={this.props.formInput}
+                                                savePulse={this.props.savePulse}
+                                            />
+                                        </li>
+                                    ))}
+                            </ul>
+                        ) : (
+                            <div className="mt4 ml-auto mr-auto">
+                                <WhatsAPulse
+                                    button={
+                                        <a
+                                            onClick={this.create}
+                                            className="Button Button--primary"
+                                        >{t`Create a pulse`}</a>
+                                    }
                                 />
-                            </li>
-                        )}
-                    </ul>
-                :
-                    <div className="mt4 ml-auto mr-auto">
-                        <WhatsAPulse
-                            button={<a onClick={this.create} className="Button Button--primary">{t`Create a pulse`}</a>}
-                        />
-                    </div>
-                }
+                            </div>
+                        )
+                    }
                 </LoadingAndErrorWrapper>
                 <Modal isOpen={this.state.showSetupModal}>
                     <ChannelSetupModal

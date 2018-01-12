@@ -1,18 +1,18 @@
-import Query, { createQuery, AggregationClause, BreakoutClause } from "metabase/lib/query";
-import {
-    question,
-} from "__support__/sample_dataset_fixture";
+import Query, {
+    createQuery,
+    AggregationClause,
+    BreakoutClause
+} from "metabase/lib/query";
+import { question } from "__support__/sample_dataset_fixture";
 import Utils from "metabase/lib/utils";
 
 const mockTableMetadata = {
     display_name: "Order",
-    fields: [
-        { id: 1, display_name: "Total" }
-    ]
-}
+    fields: [{ id: 1, display_name: "Total" }]
+};
 
-describe('Legacy Query library', () => {
-    describe('createQuery', () => {
+describe("Legacy Query library", () => {
+    describe("createQuery", () => {
         it("should provide a structured query with no args", () => {
             expect(createQuery()).toEqual({
                 database: null,
@@ -38,7 +38,9 @@ describe('Legacy Query library', () => {
         });
 
         it("should populate the tableId if specified", () => {
-            expect(createQuery("query", 123, 456).query.source_table).toEqual(456);
+            expect(createQuery("query", 123, 456).query.source_table).toEqual(
+                456
+            );
         });
 
         it("should NOT set the tableId if query type is native", () => {
@@ -46,162 +48,149 @@ describe('Legacy Query library', () => {
         });
 
         it("should NOT populate the tableId if no database specified", () => {
-            expect(createQuery("query", null, 456).query.source_table).toEqual(null);
+            expect(createQuery("query", null, 456).query.source_table).toEqual(
+                null
+            );
         });
     });
 
-    describe('cleanQuery', () => {
+    describe("cleanQuery", () => {
         it("should pass for a query created with metabase-lib", () => {
-            const datasetQuery = question.query()
+            const datasetQuery = question
+                .query()
                 .addAggregation(["count"])
-                .datasetQuery()
+                .datasetQuery();
 
             // We have to take a copy because the original object isn't extensible
             const copiedDatasetQuery = Utils.copy(datasetQuery);
-            Query.cleanQuery(copiedDatasetQuery)
+            Query.cleanQuery(copiedDatasetQuery);
 
-            expect(copiedDatasetQuery).toBeDefined()
-        })
-        it('should not remove complete sort clauses', () => {
+            expect(copiedDatasetQuery).toBeDefined();
+        });
+        it("should not remove complete sort clauses", () => {
             let query = {
                 source_table: 0,
                 aggregation: ["rows"],
                 breakout: [],
                 filter: [],
-                order_by: [
-                    [1, "ascending"]
-                ]
+                order_by: [[1, "ascending"]]
             };
             Query.cleanQuery(query);
             expect(query.order_by).toEqual([[1, "ascending"]]);
         });
-        it('should remove incomplete sort clauses', () => {
+        it("should remove incomplete sort clauses", () => {
             let query = {
                 source_table: 0,
                 aggregation: ["rows"],
                 breakout: [],
                 filter: [],
-                order_by: [
-                    [null, "ascending"]
-                ]
+                order_by: [[null, "ascending"]]
             };
             Query.cleanQuery(query);
             expect(query.order_by).toEqual(undefined);
         });
 
-        it('should not remove sort clauses on aggregations if that aggregation supports it', () => {
+        it("should not remove sort clauses on aggregations if that aggregation supports it", () => {
             let query = {
                 source_table: 0,
                 aggregation: ["count"],
                 breakout: [1],
                 filter: [],
-                order_by: [
-                    [["aggregation", 0], "ascending"]
-                ]
+                order_by: [[["aggregation", 0], "ascending"]]
             };
             Query.cleanQuery(query);
             expect(query.order_by).toEqual([[["aggregation", 0], "ascending"]]);
         });
-        it('should remove sort clauses on aggregations if that aggregation doesn\'t support it', () => {
+        it("should remove sort clauses on aggregations if that aggregation doesn't support it", () => {
             let query = {
                 source_table: 0,
                 aggregation: ["rows"],
                 breakout: [],
                 filter: [],
-                order_by: [
-                    [["aggregation", 0], "ascending"]
-                ]
+                order_by: [[["aggregation", 0], "ascending"]]
             };
             Query.cleanQuery(query);
             expect(query.order_by).toEqual(undefined);
         });
 
-        it('should not remove sort clauses on fields appearing in breakout', () => {
+        it("should not remove sort clauses on fields appearing in breakout", () => {
             let query = {
                 source_table: 0,
                 aggregation: ["count"],
                 breakout: [1],
                 filter: [],
-                order_by: [
-                    [1, "ascending"]
-                ]
+                order_by: [[1, "ascending"]]
             };
             Query.cleanQuery(query);
             expect(query.order_by).toEqual([[1, "ascending"]]);
         });
-        it('should remove sort clauses on fields not appearing in breakout', () => {
+        it("should remove sort clauses on fields not appearing in breakout", () => {
             let query = {
                 source_table: 0,
                 aggregation: ["count"],
                 breakout: [],
                 filter: [],
-                order_by: [
-                    [1, "ascending"]
-                ]
+                order_by: [[1, "ascending"]]
             };
             Query.cleanQuery(query);
             expect(query.order_by).toEqual(undefined);
         });
 
-        it('should not remove sort clauses with foreign keys on fields appearing in breakout', () => {
+        it("should not remove sort clauses with foreign keys on fields appearing in breakout", () => {
             let query = {
                 source_table: 0,
                 aggregation: ["count"],
                 breakout: [["fk->", 1, 2]],
                 filter: [],
-                order_by: [
-                    [["fk->", 1, 2], "ascending"]
-                ]
+                order_by: [[["fk->", 1, 2], "ascending"]]
             };
             Query.cleanQuery(query);
             expect(query.order_by).toEqual([[["fk->", 1, 2], "ascending"]]);
         });
 
-        it('should not remove sort clauses with datetime-fields on fields appearing in breakout', () => {
+        it("should not remove sort clauses with datetime-fields on fields appearing in breakout", () => {
             let query = {
                 source_table: 0,
                 aggregation: ["count"],
                 breakout: [["datetime-field", 1, "as", "week"]],
                 filter: [],
-                order_by: [
-                    [["datetime-field", 1, "as", "week"], "ascending"]
-                ]
+                order_by: [[["datetime-field", 1, "as", "week"], "ascending"]]
             };
             Query.cleanQuery(query);
-            expect(query.order_by).toEqual([[["datetime-field", 1, "as", "week"], "ascending"]]);
+            expect(query.order_by).toEqual([
+                [["datetime-field", 1, "as", "week"], "ascending"]
+            ]);
         });
 
-        it('should replace order_by clauses with the exact matching datetime-fields version in the breakout', () => {
+        it("should replace order_by clauses with the exact matching datetime-fields version in the breakout", () => {
             let query = {
                 source_table: 0,
                 aggregation: ["count"],
                 breakout: [["datetime-field", 1, "as", "week"]],
                 filter: [],
-                order_by: [
-                    [1, "ascending"]
-                ]
+                order_by: [[1, "ascending"]]
             };
             Query.cleanQuery(query);
-            expect(query.order_by).toEqual([[["datetime-field", 1, "as", "week"], "ascending"]]);
+            expect(query.order_by).toEqual([
+                [["datetime-field", 1, "as", "week"], "ascending"]
+            ]);
         });
 
-        it('should replace order_by clauses with the exact matching fk-> version in the breakout', () => {
+        it("should replace order_by clauses with the exact matching fk-> version in the breakout", () => {
             let query = {
                 source_table: 0,
                 aggregation: ["count"],
                 breakout: [["fk->", 1, 2]],
                 filter: [],
-                order_by: [
-                    [2, "ascending"]
-                ]
+                order_by: [[2, "ascending"]]
             };
             Query.cleanQuery(query);
             expect(query.order_by).toEqual([[["fk->", 1, 2], "ascending"]]);
         });
     });
 
-    describe('removeBreakout', () => {
-        it('should not mutate the query', () => {
+    describe("removeBreakout", () => {
+        it("should not mutate the query", () => {
             let query = {
                 source_table: 0,
                 aggregation: ["count"],
@@ -211,7 +200,7 @@ describe('Legacy Query library', () => {
             Query.removeBreakout(query, 0);
             expect(query.breakout).toEqual([["field-id", 1]]);
         });
-        it('should remove the dimension', () => {
+        it("should remove the dimension", () => {
             let query = {
                 source_table: 0,
                 aggregation: ["count"],
@@ -221,74 +210,78 @@ describe('Legacy Query library', () => {
             query = Query.removeBreakout(query, 0);
             expect(query.breakout).toEqual(undefined);
         });
-        it('should remove sort clauses for the dimension that was removed', () => {
+        it("should remove sort clauses for the dimension that was removed", () => {
             let query = {
                 source_table: 0,
                 aggregation: ["count"],
                 breakout: [["field-id", 1]],
                 filter: [],
-                order_by: [
-                    [1, "ascending"]
-                ]
+                order_by: [[1, "ascending"]]
             };
             query = Query.removeBreakout(query, 0);
             expect(query.order_by).toEqual(undefined);
         });
     });
 
-    describe('getFieldTarget', () => {
+    describe("getFieldTarget", () => {
         let field2 = {
-            display_name: "field2",
-        }
+            display_name: "field2"
+        };
         let table2 = {
             display_name: "table2",
             fields_lookup: {
                 2: field2
             }
-        }
+        };
         let field1 = {
             display_name: "field1",
             target: {
                 table: table2
             }
-        }
+        };
         let table1 = {
             display_name: "table1",
             fields_lookup: {
                 1: field1
             }
-        }
+        };
 
-        it('should return field object for old-style local field', () => {
+        it("should return field object for old-style local field", () => {
             let target = Query.getFieldTarget(1, table1);
             expect(target.table).toEqual(table1);
             expect(target.field).toEqual(field1);
             expect(target.path).toEqual([]);
             expect(target.unit).toEqual(undefined);
         });
-        it('should return field object for new-style local field', () => {
+        it("should return field object for new-style local field", () => {
             let target = Query.getFieldTarget(["field-id", 1], table1);
             expect(target.table).toEqual(table1);
             expect(target.field).toEqual(field1);
             expect(target.path).toEqual([]);
             expect(target.unit).toEqual(undefined);
         });
-        it('should return unit object for old-style datetime-field', () => {
-            let target = Query.getFieldTarget(["datetime-field", 1, "as", "day"], table1);
+        it("should return unit object for old-style datetime-field", () => {
+            let target = Query.getFieldTarget(
+                ["datetime-field", 1, "as", "day"],
+                table1
+            );
             expect(target.table).toEqual(table1);
             expect(target.field).toEqual(field1);
             expect(target.path).toEqual([]);
             expect(target.unit).toEqual("day");
         });
-        it('should return unit object for new-style datetime-field', () => {
-            let target = Query.getFieldTarget(["datetime-field", 1, "as", "day"], table1);
+        it("should return unit object for new-style datetime-field", () => {
+            let target = Query.getFieldTarget(
+                ["datetime-field", 1, "as", "day"],
+                table1
+            );
             expect(target.table).toEqual(table1);
             expect(target.field).toEqual(field1);
             expect(target.path).toEqual([]);
             expect(target.unit).toEqual("day");
         });
 
-        it('should return field object and table for fk field', () => {
+        it("should return field object and table for fk field", () => {
             let target = Query.getFieldTarget(["fk->", 1, 2], table1);
             expect(target.table).toEqual(table2);
             expect(target.field).toEqual(field2);
@@ -296,42 +289,48 @@ describe('Legacy Query library', () => {
             expect(target.unit).toEqual(undefined);
         });
 
-        it('should return field object and table and unit for fk + datetime field', () => {
-            let target = Query.getFieldTarget(["datetime-field", ["fk->", 1, 2], "day"], table1);
+        it("should return field object and table and unit for fk + datetime field", () => {
+            let target = Query.getFieldTarget(
+                ["datetime-field", ["fk->", 1, 2], "day"],
+                table1
+            );
             expect(target.table).toEqual(table2);
             expect(target.field).toEqual(field2);
             expect(target.path).toEqual([field1]);
             expect(target.unit).toEqual("day");
         });
 
-        it('should return field object and table for expression', () => {
+        it("should return field object and table for expression", () => {
             let target = Query.getFieldTarget(["expression", "foo"], table1);
             expect(target.table).toEqual(table1);
             expect(target.field.display_name).toEqual("foo");
             expect(target.path).toEqual([]);
             expect(target.unit).toEqual(undefined);
         });
-    })
-})
+    });
+});
 
 describe("generateQueryDescription", () => {
     it("should work with multiple aggregations", () => {
-        expect(Query.generateQueryDescription(mockTableMetadata, {
-            source_table: 1,
-            aggregation: [["count"], ["sum", ["field-id", 1]]]
-        })).toEqual("Orders, Count and Sum of Total")
-    })
+        expect(
+            Query.generateQueryDescription(mockTableMetadata, {
+                source_table: 1,
+                aggregation: [["count"], ["sum", ["field-id", 1]]]
+            })
+        ).toEqual("Orders, Count and Sum of Total");
+    });
     it("should work with named aggregations", () => {
-        expect(Query.generateQueryDescription(mockTableMetadata, {
-            source_table: 1,
-            aggregation: [["named", ["sum", ["field-id", 1]], "Revenue"]]
-        })).toEqual("Orders, Revenue")
-    })
-})
+        expect(
+            Query.generateQueryDescription(mockTableMetadata, {
+                source_table: 1,
+                aggregation: [["named", ["sum", ["field-id", 1]], "Revenue"]]
+            })
+        ).toEqual("Orders, Revenue");
+    });
+});
 
-describe('AggregationClause', () => {
-
-    describe('isValid', () => {
+describe("AggregationClause", () => {
+    describe("isValid", () => {
         it("should fail on bad clauses", () => {
             expect(AggregationClause.isValid(undefined)).toEqual(false);
             expect(AggregationClause.isValid(null)).toEqual(false);
@@ -349,7 +348,7 @@ describe('AggregationClause', () => {
         });
     });
 
-    describe('isBareRows', () => {
+    describe("isBareRows", () => {
         it("should fail on bad clauses", () => {
             expect(AggregationClause.isBareRows(undefined)).toEqual(false);
             expect(AggregationClause.isBareRows(null)).toEqual(false);
@@ -357,8 +356,12 @@ describe('AggregationClause', () => {
             expect(AggregationClause.isBareRows([null])).toEqual(false);
             expect(AggregationClause.isBareRows("ab")).toEqual(false);
             expect(AggregationClause.isBareRows(["foo", null])).toEqual(false);
-            expect(AggregationClause.isBareRows(["a", "b", "c"])).toEqual(false);
-            expect(AggregationClause.isBareRows(["METRIC", 123])).toEqual(false);
+            expect(AggregationClause.isBareRows(["a", "b", "c"])).toEqual(
+                false
+            );
+            expect(AggregationClause.isBareRows(["METRIC", 123])).toEqual(
+                false
+            );
             expect(AggregationClause.isBareRows(["sum", 456])).toEqual(false);
         });
 
@@ -367,7 +370,7 @@ describe('AggregationClause', () => {
         });
     });
 
-    describe('isStandard', () => {
+    describe("isStandard", () => {
         it("should fail on bad clauses", () => {
             expect(AggregationClause.isStandard(undefined)).toEqual(false);
             expect(AggregationClause.isStandard(null)).toEqual(false);
@@ -375,8 +378,12 @@ describe('AggregationClause', () => {
             expect(AggregationClause.isStandard([null])).toEqual(false);
             expect(AggregationClause.isStandard("ab")).toEqual(false);
             expect(AggregationClause.isStandard(["foo", null])).toEqual(false);
-            expect(AggregationClause.isStandard(["a", "b", "c"])).toEqual(false);
-            expect(AggregationClause.isStandard(["METRIC", 123])).toEqual(false);
+            expect(AggregationClause.isStandard(["a", "b", "c"])).toEqual(
+                false
+            );
+            expect(AggregationClause.isStandard(["METRIC", 123])).toEqual(
+                false
+            );
         });
 
         it("should succeed on good clauses", () => {
@@ -385,7 +392,7 @@ describe('AggregationClause', () => {
         });
     });
 
-    describe('isMetric', () => {
+    describe("isMetric", () => {
         it("should fail on bad clauses", () => {
             expect(AggregationClause.isMetric(undefined)).toEqual(false);
             expect(AggregationClause.isMetric(null)).toEqual(false);
@@ -403,7 +410,7 @@ describe('AggregationClause', () => {
         });
     });
 
-    describe('getMetric', () => {
+    describe("getMetric", () => {
         it("should succeed on good clauses", () => {
             expect(AggregationClause.getMetric(["METRIC", 123])).toEqual(123);
         });
@@ -413,18 +420,20 @@ describe('AggregationClause', () => {
         });
     });
 
-    describe('getOperator', () => {
+    describe("getOperator", () => {
         it("should succeed on good clauses", () => {
             expect(AggregationClause.getOperator(["rows"])).toEqual("rows");
             expect(AggregationClause.getOperator(["sum", 123])).toEqual("sum");
         });
 
         it("should be null on metric clauses", () => {
-            expect(AggregationClause.getOperator(["METRIC", 123])).toEqual(null);
+            expect(AggregationClause.getOperator(["METRIC", 123])).toEqual(
+                null
+            );
         });
     });
 
-    describe('getField', () => {
+    describe("getField", () => {
         it("should succeed on good clauses", () => {
             expect(AggregationClause.getField(["sum", 123])).toEqual(123);
         });
@@ -438,26 +447,39 @@ describe('AggregationClause', () => {
         });
     });
 
-    describe('setField', () => {
+    describe("setField", () => {
         it("should succeed on good clauses", () => {
-            expect(AggregationClause.setField(["avg"], 123)).toEqual(["avg", 123]);
-            expect(AggregationClause.setField(["sum", null], 123)).toEqual(["sum", 123]);
+            expect(AggregationClause.setField(["avg"], 123)).toEqual([
+                "avg",
+                123
+            ]);
+            expect(AggregationClause.setField(["sum", null], 123)).toEqual([
+                "sum",
+                123
+            ]);
         });
 
         it("should return unmodified on metric clauses", () => {
-            expect(AggregationClause.setField(["METRIC", 123], 456)).toEqual(["METRIC", 123]);
+            expect(AggregationClause.setField(["METRIC", 123], 456)).toEqual([
+                "METRIC",
+                123
+            ]);
         });
     });
 });
 
-
-describe('BreakoutClause', () => {
-
-    describe('setBreakout', () => {
+describe("BreakoutClause", () => {
+    describe("setBreakout", () => {
         it("should append if index is greater than current breakouts", () => {
             expect(BreakoutClause.setBreakout([], 0, 123)).toEqual([123]);
-            expect(BreakoutClause.setBreakout([123], 1, 456)).toEqual([123, 456]);
-            expect(BreakoutClause.setBreakout([123], 5, 456)).toEqual([123, 456]);
+            expect(BreakoutClause.setBreakout([123], 1, 456)).toEqual([
+                123,
+                456
+            ]);
+            expect(BreakoutClause.setBreakout([123], 5, 456)).toEqual([
+                123,
+                456
+            ]);
         });
 
         it("should replace if index already exists", () => {
@@ -465,7 +487,7 @@ describe('BreakoutClause', () => {
         });
     });
 
-    describe('removeBreakout', () => {
+    describe("removeBreakout", () => {
         it("should remove breakout if index exists", () => {
             expect(BreakoutClause.removeBreakout([123], 0)).toEqual([]);
             expect(BreakoutClause.removeBreakout([123, 456], 1)).toEqual([123]);

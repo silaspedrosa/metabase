@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import pure from "recompose/pure";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import S from "./FieldToGroupBy.css";
 import Q from "metabase/components/QueryButton.css";
 
@@ -14,26 +14,23 @@ const FieldToGroupBy = ({
     icon,
     iconClass,
     onClick,
-    secondaryOnClick,
-}) => 
+    secondaryOnClick
+}) => (
     <div className={className}>
         <a className={Q.queryButton} onClick={onClick}>
             <span className={S.fieldToGroupByText}>
-                <span>
-                    {`${metric.name} ` + t`by` + ` `}
-                </span>
-                <span className="ml1 text-brand">
-                    {field.display_name}
-                </span>
+                <span>{`${metric.name} ` + t`by` + ` `}</span>
+                <span className="ml1 text-brand">{field.display_name}</span>
             </span>
-            <Icon 
-                className={iconClass} 
-                size={20} 
+            <Icon
+                className={iconClass}
+                size={20}
                 name="reference"
                 onClick={secondaryOnClick}
             />
         </a>
-    </div>;
+    </div>
+);
 FieldToGroupBy.propTypes = {
     className: PropTypes.string,
     metric: PropTypes.object.isRequired,

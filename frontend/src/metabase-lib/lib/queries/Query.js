@@ -30,9 +30,10 @@ export default class Query {
      * Returns a question updated with the current dataset query.
      * Can only be applied to query that is a direct child of the question.
      */
-    @memoize question(): Question {
-        const isDirectChildOfQuestion = typeof this._originalQuestion.query() ===
-            typeof this;
+    @memoize
+    question(): Question {
+        const isDirectChildOfQuestion =
+            typeof this._originalQuestion.query() === typeof this;
 
         if (isDirectChildOfQuestion) {
             return this._originalQuestion.setQuery(this);

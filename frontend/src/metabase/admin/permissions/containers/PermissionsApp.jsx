@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { withRouter } from "react-router";
-import { connect } from "react-redux"
+import { connect } from "react-redux";
 import { push } from "react-router-redux";
 
 import { initialize } from "../permissions";
 import { getIsDirty } from "../selectors";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import ConfirmContent from "metabase/components/ConfirmContent.jsx";
 import Modal from "metabase/components/Modal.jsx";
 
@@ -32,21 +32,21 @@ export default class PermissionsApp extends Component {
         this.state = {
             nextLocation: false,
             confirmed: false
-        }
+        };
     }
     componentWillMount() {
         this.props.initialize(this.props.load, this.props.save);
         this.props.router.setRouteLeaveHook(
             this.props.route,
             this.routerWillLeave
-        )
+        );
     }
-    routerWillLeave = (nextLocation) => {
+    routerWillLeave = nextLocation => {
         if (this.props.isDirty && !this.state.confirmed) {
             this.setState({ nextLocation: nextLocation, confirmed: false });
             return false;
         }
-    }
+    };
     render() {
         return (
             <div className="flex-full flex">
@@ -60,9 +60,15 @@ export default class PermissionsApp extends Component {
                         }}
                         onAction={() => {
                             const { nextLocation } = this.state;
-                            this.setState({ nextLocation: null, confirmed: true }, () => {
-                                this.props.push(nextLocation.pathname, nextLocation.state);
-                            });
+                            this.setState(
+                                { nextLocation: null, confirmed: true },
+                                () => {
+                                    this.props.push(
+                                        nextLocation.pathname,
+                                        nextLocation.state
+                                    );
+                                }
+                            );
                         }}
                     />
                 </Modal>

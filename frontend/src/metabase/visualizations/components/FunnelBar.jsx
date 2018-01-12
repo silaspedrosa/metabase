@@ -15,14 +15,20 @@ export default class BarFunnel extends Component {
     render() {
         return (
             <BarChart
-                 {...this.props}
-                 isScalarSeries={true}
-                 settings={{
-                     ...this.props.settings,
-                     ...getSettings(assocIn(this.props.series, [0, "card", "display"], "bar")),
-                     "bar.scalar_series": true
-                 }}
-             />
+                {...this.props}
+                isScalarSeries={true}
+                settings={{
+                    ...this.props.settings,
+                    ...getSettings(
+                        assocIn(
+                            this.props.series,
+                            [0, "card", "display"],
+                            "bar"
+                        )
+                    ),
+                    "bar.scalar_series": true
+                }}
+            />
         );
     }
 }

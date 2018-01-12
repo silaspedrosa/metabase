@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Link, withRouter } from "react-router";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import SaveStatus from "metabase/components/SaveStatus.jsx";
 import Toggle from "metabase/components/Toggle.jsx";
 import PopoverWithTrigger from "metabase/components/PopoverWithTrigger.jsx";
@@ -15,7 +15,7 @@ export default class MetadataHeader extends Component {
         databases: PropTypes.array.isRequired,
         selectDatabase: PropTypes.func.isRequired,
         isShowingSchema: PropTypes.bool.isRequired,
-        toggleShowSchema: PropTypes.func.isRequired,
+        toggleShowSchema: PropTypes.func.isRequired
     };
 
     setSaving() {
@@ -31,21 +31,25 @@ export default class MetadataHeader extends Component {
     }
 
     renderDbSelector() {
-        var database = this.props.databases.filter((db) => db.id === this.props.databaseId)[0];
+        var database = this.props.databases.filter(
+            db => db.id === this.props.databaseId
+        )[0];
         if (database) {
-            var columns = [{
-                selectedItem: database,
-                items: this.props.databases,
-                itemTitleFn: (db) => db.name,
-                itemSelectFn: (db) => {
-                    this.props.selectDatabase(db)
-                    this.refs.databasePopover.toggle();
+            var columns = [
+                {
+                    selectedItem: database,
+                    items: this.props.databases,
+                    itemTitleFn: db => db.name,
+                    itemSelectFn: db => {
+                        this.props.selectDatabase(db);
+                        this.refs.databasePopover.toggle();
+                    }
                 }
-            }];
+            ];
             var triggerElement = (
                 <span className="text-bold cursor-pointer text-default">
                     {database.name}
-                    <Icon className="ml1" name="chevrondown" size={8}/>
+                    <Icon className="ml1" name="chevrondown" size={8} />
                 </span>
             );
             return (
@@ -53,7 +57,7 @@ export default class MetadataHeader extends Component {
                     ref="databasePopover"
                     triggerElement={triggerElement}
                 >
-                    <ColumnarSelector columns={columns}/>
+                    <ColumnarSelector columns={columns} />
                 </PopoverWithTrigger>
             );
         }
@@ -62,12 +66,14 @@ export default class MetadataHeader extends Component {
     // Show a gear to access Table settings page if we're currently looking at a Table. Otherwise show nothing.
     // TODO - it would be nicer just to disable the gear so the page doesn't jump around once you select a Table.
     renderTableSettingsButton() {
-        const isViewingTable = this.props.location.pathname.match(/table\/\d+\/?$/);
+        const isViewingTable = this.props.location.pathname.match(
+            /table\/\d+\/?$/
+        );
         if (!isViewingTable) return null;
 
         return (
             <span className="ml4 mr3">
-                <Link to={`${this.props.location.pathname}/settings`} >
+                <Link to={`${this.props.location.pathname}/settings`}>
                     <Icon name="gear" />
                 </Link>
             </span>
@@ -78,12 +84,16 @@ export default class MetadataHeader extends Component {
         return (
             <div className="MetadataEditor-header flex align-center flex-no-shrink">
                 <div className="MetadataEditor-headerSection py2 h2">
-                    <span className="text-grey-4">{t`Current database:`}</span> {this.renderDbSelector()}
+                    <span className="text-grey-4">{t`Current database:`}</span>{" "}
+                    {this.renderDbSelector()}
                 </div>
                 <div className="MetadataEditor-headerSection flex flex-align-right align-center flex-no-shrink">
                     <SaveStatus ref="status" />
                     <span className="mr1">{t`Show original schema`}</span>
-                    <Toggle value={this.props.isShowingSchema} onChange={this.props.toggleShowSchema} />
+                    <Toggle
+                        value={this.props.isShowingSchema}
+                        onChange={this.props.toggleShowSchema}
+                    />
                     {this.renderTableSettingsButton()}
                 </div>
             </div>

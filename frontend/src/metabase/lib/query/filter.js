@@ -1,12 +1,21 @@
 /* @flow */
 
-import { mbqlEq, op, args, noNullValues, add, update, remove, clear } from "./util";
+import {
+    mbqlEq,
+    op,
+    args,
+    noNullValues,
+    add,
+    update,
+    remove,
+    clear
+} from "./util";
 
 import type { FilterClause, Filter } from "metabase/meta/types/Query";
 
 // returns canonical list of Filters
 export function getFilters(filter: ?FilterClause): Filter[] {
-    if (!filter || Array.isArray(filter) && filter.length === 0) {
+    if (!filter || (Array.isArray(filter) && filter.length === 0)) {
         return [];
     } else if (mbqlEq(op(filter), "and")) {
         return args(filter);
@@ -26,13 +35,23 @@ function getFilterClause(filters: Filter[]): ?FilterClause {
     }
 }
 
-export function addFilter(filter: ?FilterClause, newFilter: FilterClause): ?FilterClause {
+export function addFilter(
+    filter: ?FilterClause,
+    newFilter: FilterClause
+): ?FilterClause {
     return getFilterClause(add(getFilters(filter), newFilter));
 }
-export function updateFilter(filter: ?FilterClause, index: number, updatedFilter: FilterClause): ?FilterClause {
+export function updateFilter(
+    filter: ?FilterClause,
+    index: number,
+    updatedFilter: FilterClause
+): ?FilterClause {
     return getFilterClause(update(getFilters(filter), index, updatedFilter));
 }
-export function removeFilter(filter: ?FilterClause, index: number): ?FilterClause {
+export function removeFilter(
+    filter: ?FilterClause,
+    index: number
+): ?FilterClause {
     return getFilterClause(remove(getFilters(filter), index));
 }
 export function clearFilters(filter: ?FilterClause): ?FilterClause {
@@ -54,7 +73,10 @@ export function isSegmentFilter(filter: FilterClause): boolean {
 }
 
 export function isCompoundFilter(filter: FilterClause): boolean {
-    return Array.isArray(filter) && (mbqlEq(filter[0], "and") || mbqlEq(filter[0], "or"));
+    return (
+        Array.isArray(filter) &&
+        (mbqlEq(filter[0], "and") || mbqlEq(filter[0], "or"))
+    );
 }
 
 export function isFieldFilter(filter: FilterClause): boolean {

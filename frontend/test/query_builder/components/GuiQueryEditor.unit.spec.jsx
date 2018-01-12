@@ -1,7 +1,9 @@
-import React from 'react'
-import { shallow } from 'enzyme'
+import React from "react";
+import { shallow } from "enzyme";
 
-import GuiQueryEditor, { BreakoutWidget } from '../../../src/metabase/query_builder/components/GuiQueryEditor';
+import GuiQueryEditor, {
+    BreakoutWidget
+} from "../../../src/metabase/query_builder/components/GuiQueryEditor";
 import Question from "metabase-lib/lib/Question";
 import {
     DATABASE_ID,
@@ -12,7 +14,7 @@ import {
 
 import StructuredQuery from "metabase-lib/lib/queries/StructuredQuery";
 
-const getGuiQueryEditor = (query) =>
+const getGuiQueryEditor = query => (
     <GuiQueryEditor
         query={query}
         databases={metadata.databasesList()}
@@ -23,12 +25,17 @@ const getGuiQueryEditor = (query) =>
         isShowingTutorial={false}
         isShowingDataReference={false}
     />
+);
 
-describe('GuiQueryEditor', () => {
+describe("GuiQueryEditor", () => {
     it("should allow adding the first breakout", () => {
-        const query: StructuredQuery = Question.create({databaseId: DATABASE_ID, tableId: ORDERS_TABLE_ID, metadata})
+        const query: StructuredQuery = Question.create({
+            databaseId: DATABASE_ID,
+            tableId: ORDERS_TABLE_ID,
+            metadata
+        })
             .query()
-            .addAggregation(["count"])
+            .addAggregation(["count"]);
 
         const component = shallow(getGuiQueryEditor(query));
 
@@ -36,7 +43,11 @@ describe('GuiQueryEditor', () => {
         expect(component.find(BreakoutWidget).length).toBe(1);
     });
     it("should allow adding more than one breakout", () => {
-        const query: StructuredQuery = Question.create({databaseId: DATABASE_ID, tableId: ORDERS_TABLE_ID, metadata})
+        const query: StructuredQuery = Question.create({
+            databaseId: DATABASE_ID,
+            tableId: ORDERS_TABLE_ID,
+            metadata
+        })
             .query()
             .addAggregation(["count"])
             .addBreakout(["field-id", ORDERS_TOTAL_FIELD_ID]);

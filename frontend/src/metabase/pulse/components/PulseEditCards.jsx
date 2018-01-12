@@ -1,7 +1,7 @@
 /* eslint "react/prop-types": "warn" */
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 
 import CardPicker from "./CardPicker.jsx";
 import PulseCardPreview from "./PulseCardPreview.jsx";
@@ -32,26 +32,44 @@ export default class PulseEditCards extends Component {
         let { pulse } = this.props;
         this.props.setPulse({
             ...pulse,
-            cards: [...pulse.cards.slice(0, index), { id: cardId }, ...pulse.cards.slice(index + 1)]
+            cards: [
+                ...pulse.cards.slice(0, index),
+                { id: cardId },
+                ...pulse.cards.slice(index + 1)
+            ]
         });
 
-        MetabaseAnalytics.trackEvent((this.props.pulseId) ? "PulseEdit" : "PulseCreate", "AddCard", index);
+        MetabaseAnalytics.trackEvent(
+            this.props.pulseId ? "PulseEdit" : "PulseCreate",
+            "AddCard",
+            index
+        );
     }
 
     removeCard(index) {
         let { pulse } = this.props;
         this.props.setPulse({
             ...pulse,
-            cards: [...pulse.cards.slice(0, index), ...pulse.cards.slice(index + 1)]
+            cards: [
+                ...pulse.cards.slice(0, index),
+                ...pulse.cards.slice(index + 1)
+            ]
         });
 
-        MetabaseAnalytics.trackEvent((this.props.pulseId) ? "PulseEdit" : "PulseCreate", "RemoveCard", index);
+        MetabaseAnalytics.trackEvent(
+            this.props.pulseId ? "PulseEdit" : "PulseCreate",
+            "RemoveCard",
+            index
+        );
     }
 
     getWarnings(cardPreview, showSoftLimitWarning) {
         let warnings = [];
         if (cardPreview) {
-            if (cardPreview.pulse_card_type === "bar" && cardPreview.row_count > 10) {
+            if (
+                cardPreview.pulse_card_type === "bar" &&
+                cardPreview.row_count > 10
+            ) {
                 warnings.push({
                     head: t`Heads up`,
                     body: t`This is a large table and we'll have to crop it to use it in a pulse. The max size that can be displayed is 2 columns and 10 rows.`
@@ -78,15 +96,21 @@ export default class PulseEditCards extends Component {
         let warnings = this.getWarnings(cardPreview, index === SOFT_LIMIT);
         if (warnings.length > 0) {
             return (
-                <div className="absolute" style={{ width: 400, marginLeft: 420 }}>
-                    {warnings.map(warning =>
-                        <div className="text-gold border-gold border-left mt1 mb2 ml3 pl3" style={{ borderWidth: 3 }}>
+                <div
+                    className="absolute"
+                    style={{ width: 400, marginLeft: 420 }}
+                >
+                    {warnings.map(warning => (
+                        <div
+                            className="text-gold border-gold border-left mt1 mb2 ml3 pl3"
+                            style={{ borderWidth: 3 }}
+                        >
                             <h3 className="mb1">{warning.head}</h3>
                             <div className="h4">{warning.body}</div>
                         </div>
-                    )}
+                    ))}
                 </div>
-            )
+            );
         }
     }
 
@@ -101,32 +125,60 @@ export default class PulseEditCards extends Component {
         return (
             <div className="py1">
                 <h2>Pick your data</h2>
-                <p className="mt1 h4 text-bold text-grey-3">{t`Choose questions you'd like to send in this pulse`}.</p>
+                <p className="mt1 h4 text-bold text-grey-3">
+                    {t`Choose questions you'd like to send in this pulse`}.
+                </p>
                 <ol className="my3">
-                    {cards && pulseCards.map((card, index) =>
-                        <li key={index} className="my1">
-                            { index === SOFT_LIMIT && <div className="my4 ml3" style={{ width: 375, borderTop: "1px dashed rgb(214,214,214)"}}/> }
-                            <div className="flex align-top">
-                                <div className="flex align-top" style={{ width: 400 }}>
-                                    <span className="h3 text-bold mr1 mt2">{index + 1}.</span>
-                                    { card ?
-                                        <PulseCardPreview
-                                            card={card}
-                                            cardPreview={cardPreviews[card.id]}
-                                            onRemove={this.removeCard.bind(this, index)}
-                                            fetchPulseCardPreview={this.props.fetchPulseCardPreview}
-                                        />
-                                    :
-                                        <CardPicker
-                                            cardList={cardList}
-                                            onChange={this.setCard.bind(this, index)}
-                                        />
-                                    }
+                    {cards &&
+                        pulseCards.map((card, index) => (
+                            <li key={index} className="my1">
+                                {index === SOFT_LIMIT && (
+                                    <div
+                                        className="my4 ml3"
+                                        style={{
+                                            width: 375,
+                                            borderTop:
+                                                "1px dashed rgb(214,214,214)"
+                                        }}
+                                    />
+                                )}
+                                <div className="flex align-top">
+                                    <div
+                                        className="flex align-top"
+                                        style={{ width: 400 }}
+                                    >
+                                        <span className="h3 text-bold mr1 mt2">
+                                            {index + 1}.
+                                        </span>
+                                        {card ? (
+                                            <PulseCardPreview
+                                                card={card}
+                                                cardPreview={
+                                                    cardPreviews[card.id]
+                                                }
+                                                onRemove={this.removeCard.bind(
+                                                    this,
+                                                    index
+                                                )}
+                                                fetchPulseCardPreview={
+                                                    this.props
+                                                        .fetchPulseCardPreview
+                                                }
+                                            />
+                                        ) : (
+                                            <CardPicker
+                                                cardList={cardList}
+                                                onChange={this.setCard.bind(
+                                                    this,
+                                                    index
+                                                )}
+                                            />
+                                        )}
+                                    </div>
+                                    {this.renderCardWarnings(card, index)}
                                 </div>
-                                {this.renderCardWarnings(card, index)}
-                            </div>
-                        </li>
-                    )}
+                            </li>
+                        ))}
                 </ol>
             </div>
         );

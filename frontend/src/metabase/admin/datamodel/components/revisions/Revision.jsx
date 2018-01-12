@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 import RevisionDiff from "./RevisionDiff.jsx";
-import { t } from 'c-3po';
-import UserAvatar from "metabase/components/UserAvatar.jsx"
+import { t } from "c-3po";
+import UserAvatar from "metabase/components/UserAvatar.jsx";
 
 import moment from "moment";
 
@@ -21,7 +21,7 @@ export default class Revision extends Component {
     getAction() {
         const { revision, objectName } = this.props;
         if (revision.is_creation) {
-            return t`created` + " \"" + revision.diff.name.after + "\"";
+            return t`created` + ' "' + revision.diff.name.after + '"';
         }
         if (revision.is_reversion) {
             return t`reverted to a previous version`;
@@ -43,7 +43,7 @@ export default class Revision extends Component {
     getName() {
         const { revision: { user }, currentUser } = this.props;
         if (user.id === currentUser.id) {
-            return t`You`
+            return t`You`;
         } else {
             return user.first_name;
         }
@@ -57,16 +57,24 @@ export default class Revision extends Component {
         if (revision.is_creation) {
             // these are included in the
             message = revision.diff.description.after;
-            diffKeys = diffKeys.filter(k => k !== "name" && k !== "description");
+            diffKeys = diffKeys.filter(
+                k => k !== "name" && k !== "description"
+            );
         }
 
         return (
             <li className="flex flex-row">
                 <div className="flex flex-column align-center mr2">
                     <div className="text-white">
-                        <UserAvatar user={revision.user} background={userColor}/>
+                        <UserAvatar
+                            user={revision.user}
+                            background={userColor}
+                        />
                     </div>
-                    <div className="flex-full my1 border-left" style={{borderWidth: 2}} />
+                    <div
+                        className="flex-full my1 border-left"
+                        style={{ borderWidth: 2 }}
+                    />
                 </div>
                 <div className="flex-full mt1 mb4">
                     <div className="flex mb1 text-grey-4">
@@ -77,15 +85,15 @@ export default class Revision extends Component {
                             {moment(revision.timestamp).format("MMMM DD, YYYY")}
                         </span>
                     </div>
-                    { message && <p>"{message}"</p> }
-                    { diffKeys.map(key =>
+                    {message && <p>"{message}"</p>}
+                    {diffKeys.map(key => (
                         <RevisionDiff
                             key={key}
                             property={key}
                             diff={revision.diff[key]}
                             tableMetadata={tableMetadata}
                         />
-                    )}
+                    ))}
                 </div>
             </li>
         );

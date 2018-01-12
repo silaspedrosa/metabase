@@ -34,7 +34,6 @@ for (const type of _.keys(PARENTS)) {
     TYPE[key] = type;
 }
 
-
 // convenience functions since these operations are super-common
 // this will also make it easier to tweak how these checks work in the future,
 // e.g. when we add an `is_pk` column and eliminate the PK special type we can just look for places that use isPK

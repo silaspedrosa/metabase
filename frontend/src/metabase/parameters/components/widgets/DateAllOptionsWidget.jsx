@@ -1,14 +1,16 @@
 /* @flow */
 
-import React, {Component} from "react";
+import React, { Component } from "react";
 import cx from "classnames";
-import { t } from 'c-3po';
-import DatePicker, {DATE_OPERATORS} from "metabase/query_builder/components/filters/pickers/DatePicker.jsx";
-import {generateTimeFilterValuesDescriptions} from "metabase/lib/query_time";
+import { t } from "c-3po";
+import DatePicker, {
+    DATE_OPERATORS
+} from "metabase/query_builder/components/filters/pickers/DatePicker.jsx";
+import { generateTimeFilterValuesDescriptions } from "metabase/lib/query_time";
 import { dateParameterValueToMBQL } from "metabase/meta/Parameter";
 
-import type {OperatorName} from "metabase/query_builder/components/filters/pickers/DatePicker.jsx";
-import type {FieldFilter} from "metabase/meta/types/Query";
+import type { OperatorName } from "metabase/query_builder/components/filters/pickers/DatePicker.jsx";
+import type { FieldFilter } from "metabase/meta/types/Query";
 
 type UrlEncoded = string;
 
@@ -16,27 +18,33 @@ type UrlEncoded = string;
 // $FlowFixMe
 const noopRef: LocalFieldReference = null;
 
-function getFilterValueSerializer(func: ((val1: string, val2: string) => UrlEncoded)) {
+function getFilterValueSerializer(
+    func: (val1: string, val2: string) => UrlEncoded
+) {
     // $FlowFixMe
-    return filter => func(filter[2], filter[3])
+    return filter => func(filter[2], filter[3]);
 }
 
-const serializersByOperatorName: { [id: OperatorName]: (FieldFilter) => UrlEncoded } = {
+const serializersByOperatorName: {
+    [id: OperatorName]: (FieldFilter) => UrlEncoded
+} = {
     // $FlowFixMe
-    "Previous": getFilterValueSerializer((value, unit) => `past${-value}${unit}s`),
-    "Next": getFilterValueSerializer((value, unit) => `next${value}${unit}s`),
-    "Current": getFilterValueSerializer((_, unit) => `this${unit}`),
-    "Before": getFilterValueSerializer((value) => `~${value}`),
-    "After": getFilterValueSerializer((value) => `${value}~`),
-    "On": getFilterValueSerializer((value) => `${value}`),
-    "Between": getFilterValueSerializer((from, to) => `${from}~${to}`)
+    Previous: getFilterValueSerializer(
+        (value, unit) => `past${-value}${unit}s`
+    ),
+    Next: getFilterValueSerializer((value, unit) => `next${value}${unit}s`),
+    Current: getFilterValueSerializer((_, unit) => `this${unit}`),
+    Before: getFilterValueSerializer(value => `~${value}`),
+    After: getFilterValueSerializer(value => `${value}~`),
+    On: getFilterValueSerializer(value => `${value}`),
+    Between: getFilterValueSerializer((from, to) => `${from}~${to}`)
 };
 
 function getFilterOperator(filter) {
-    return DATE_OPERATORS.find((op) => op.test(filter));
+    return DATE_OPERATORS.find(op => op.test(filter));
 }
 function filterToUrlEncoded(filter: FieldFilter): ?UrlEncoded {
-    const operator = getFilterOperator(filter)
+    const operator = getFilterOperator(filter);
 
     if (operator) {
         return serializersByOperatorName[operator.name](filter);
@@ -45,12 +53,18 @@ function filterToUrlEncoded(filter: FieldFilter): ?UrlEncoded {
     }
 }
 
-
-const prefixedOperators: [OperatorName] = ["Before", "After", "On", "Is Empty", "Not Empty"];
+const prefixedOperators: [OperatorName] = [
+    "Before",
+    "After",
+    "On",
+    "Is Empty",
+    "Not Empty"
+];
 function getFilterTitle(filter) {
-    const desc = generateTimeFilterValuesDescriptions(filter).join(" - ")
+    const desc = generateTimeFilterValuesDescriptions(filter).join(" - ");
     const op = getFilterOperator(filter);
-    const prefix = op && prefixedOperators.indexOf(op.name) !== -1 ? `${op.name} ` : "";
+    const prefix =
+        op && prefixedOperators.indexOf(op.name) !== -1 ? `${op.name} ` : "";
     return prefix + desc;
 }
 
@@ -70,8 +84,11 @@ export default class DateAllOptionsWidget extends Component {
 
         this.state = {
             // $FlowFixMe
-            filter: props.value != null ? dateParameterValueToMBQL(props.value, noopRef) || [] : []
-        }
+            filter:
+                props.value != null
+                    ? dateParameterValueToMBQL(props.value, noopRef) || []
+                    : []
+        };
     }
 
     static propTypes = {};
@@ -86,34 +103,38 @@ export default class DateAllOptionsWidget extends Component {
 
     commitAndClose = () => {
         this.props.setValue(filterToUrlEncoded(this.state.filter));
-        this.props.onClose()
-    }
+        this.props.onClose();
+    };
 
     setFilter = (filter: FieldFilter) => {
-        this.setState({filter});
-    }
+        this.setState({ filter });
+    };
 
     isValid() {
         const filterValues = this.state.filter.slice(2);
-        return filterValues.every((value) => value != null);
+        return filterValues.every(value => value != null);
     }
 
     render() {
-        return (<div style={{minWidth: "300px"}}>
-            <DatePicker
-                filter={this.state.filter}
-                onFilterChange={this.setFilter}
-                hideEmptinessOperators
-                hideTimeSelectors
-            />
-            <div className="FilterPopover-footer p1">
-                <button
-                    className={cx("Button Button--purple full", {"disabled": !this.isValid()})}
-                    onClick={this.commitAndClose}
-                >
-                    {t`Update filter`}
-                </button>
+        return (
+            <div style={{ minWidth: "300px" }}>
+                <DatePicker
+                    filter={this.state.filter}
+                    onFilterChange={this.setFilter}
+                    hideEmptinessOperators
+                    hideTimeSelectors
+                />
+                <div className="FilterPopover-footer p1">
+                    <button
+                        className={cx("Button Button--purple full", {
+                            disabled: !this.isValid()
+                        })}
+                        onClick={this.commitAndClose}
+                    >
+                        {t`Update filter`}
+                    </button>
+                </div>
             </div>
-        </div>)
+        );
     }
 }

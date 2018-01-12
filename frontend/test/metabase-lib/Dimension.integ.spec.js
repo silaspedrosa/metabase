@@ -1,4 +1,7 @@
-import { createTestStore, useSharedAdminLogin } from "__support__/integrated_tests";
+import {
+    createTestStore,
+    useSharedAdminLogin
+} from "__support__/integrated_tests";
 
 import {
     ORDERS_TOTAL_FIELD_ID,

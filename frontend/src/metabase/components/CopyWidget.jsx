@@ -20,7 +20,9 @@ export default class CopyWidget extends Component {
                     style={{ borderRight: "none" }}
                     type="text"
                     value={value}
-                    onClick={(e) => e.target.setSelectionRange(0, e.target.value.length)}
+                    onClick={e =>
+                        e.target.setSelectionRange(0, e.target.value.length)
+                    }
                 />
                 <CopyButton
                     className="p1 flex align-center bordered border-med rounded-right text-brand bg-brand-hover text-white-hover"

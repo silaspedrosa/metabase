@@ -5,41 +5,46 @@ import { formatValue } from "metabase/lib/formatting";
 
 import d3 from "d3";
 
-import { NumberColumn, DateTimeColumn, StringColumn, dispatchUIEvent } from "../__support__/visualizations";
+import {
+    NumberColumn,
+    DateTimeColumn,
+    StringColumn,
+    dispatchUIEvent
+} from "../__support__/visualizations";
 
-let formatTz = (offset) => (offset < 0 ? "-" : "+") + d3.format("02d")(Math.abs(offset)) + ":00"
+let formatTz = offset =>
+    (offset < 0 ? "-" : "+") + d3.format("02d")(Math.abs(offset)) + ":00";
 
-const BROWSER_TZ = formatTz(- new Date().getTimezoneOffset() / 60);
+const BROWSER_TZ = formatTz(-new Date().getTimezoneOffset() / 60);
 const ALL_TZS = d3.range(-1, 2).map(formatTz);
 
 describe("LineAreaBarRenderer", () => {
     let element;
 
     beforeEach(function() {
-        document.body.insertAdjacentHTML('afterbegin', '<div id="fixture-parent" style="height: 800px; width: 1200px;"><div id="fixture" /></div>');
-        element = document.getElementById('fixture');
+        document.body.insertAdjacentHTML(
+            "afterbegin",
+            '<div id="fixture-parent" style="height: 800px; width: 1200px;"><div id="fixture" /></div>'
+        );
+        element = document.getElementById("fixture");
     });
 
     afterEach(function() {
-        document.body.removeChild(document.getElementById('fixture-parent'));
+        document.body.removeChild(document.getElementById("fixture-parent"));
     });
 
     it("should display numeric year in X-axis and tooltip correctly", () => {
         return new Promise((resolve, reject) => {
             renderTimeseriesLine({
-                rowsOfSeries: [
-                    [
-                        [2015, 1],
-                        [2016, 2],
-                        [2017, 3]
-                    ]
-                ],
+                rowsOfSeries: [[[2015, 1], [2016, 2], [2017, 3]]],
                 unit: "year",
-                onHoverChange: (hover) => {
+                onHoverChange: hover => {
                     try {
-                        expect(formatValue(hover.data[0].value, { column: hover.data[0].col })).toEqual(
-                            "2015"
-                        );
+                        expect(
+                            formatValue(hover.data[0].value, {
+                                column: hover.data[0].col
+                            })
+                        ).toEqual("2015");
 
                         // Doesn't return the correct ticks in Jest for some reason
                         // expect(qsa(".tick text").map(e => e.textContent)).toEqual([
@@ -49,44 +54,59 @@ describe("LineAreaBarRenderer", () => {
                         // ]);
 
                         resolve();
-                    } catch(e) {
+                    } catch (e) {
                         reject(e);
                     }
                 }
             });
 
             dispatchUIEvent(qs(".dot"), "mousemove");
-        })
+        });
     });
 
     ["Z", ...ALL_TZS].forEach(tz =>
-        it("should display hourly data (in " + tz + " timezone) in X axis and tooltip consistently", () => {
-            return new Promise((resolve, reject) => {
-                const rows = [
-                    ["2016-10-03T20:00:00.000" + tz, 1],
-                    ["2016-10-03T21:00:00.000" + tz, 1],
-                ];
+        it(
+            "should display hourly data (in " +
+                tz +
+                " timezone) in X axis and tooltip consistently",
+            () => {
+                return new Promise((resolve, reject) => {
+                    const rows = [
+                        ["2016-10-03T20:00:00.000" + tz, 1],
+                        ["2016-10-03T21:00:00.000" + tz, 1]
+                    ];
 
-                renderTimeseriesLine({
-                    rowsOfSeries: [rows],
-                    unit: "hour",
-                    onHoverChange: (hover) => {
-                        try {
-                            let expected = rows.map(row => formatValue(row[0], {column: DateTimeColumn({unit: "hour"})}));
-                            expect(formatValue(hover.data[0].value, {column: hover.data[0].col})).toEqual(
-                                expected[0]
-                            );
-                            expect(qsa(".axis.x .tick text").map(e => e.textContent)).toEqual(expected);
-                            resolve();
-                        } catch(e) {
-                            reject(e)
+                    renderTimeseriesLine({
+                        rowsOfSeries: [rows],
+                        unit: "hour",
+                        onHoverChange: hover => {
+                            try {
+                                let expected = rows.map(row =>
+                                    formatValue(row[0], {
+                                        column: DateTimeColumn({ unit: "hour" })
+                                    })
+                                );
+                                expect(
+                                    formatValue(hover.data[0].value, {
+                                        column: hover.data[0].col
+                                    })
+                                ).toEqual(expected[0]);
+                                expect(
+                                    qsa(".axis.x .tick text").map(
+                                        e => e.textContent
+                                    )
+                                ).toEqual(expected);
+                                resolve();
+                            } catch (e) {
+                                reject(e);
+                            }
                         }
-                    }
-                });
+                    });
 
-                dispatchUIEvent(qs(".dot"), "mousemove");
-            });
-        })
+                    dispatchUIEvent(qs(".dot"), "mousemove");
+                });
+            }
+        )
     );
 
     it("should display hourly data (in the browser's timezone) in X axis and tooltip consistently and correctly", () => {
@@ -102,20 +122,26 @@ describe("LineAreaBarRenderer", () => {
             renderTimeseriesLine({
                 rowsOfSeries: [rows],
                 unit: "hour",
-                onHoverChange: (hover) => {
+                onHoverChange: hover => {
                     try {
-                        expect(formatValue(rows[0][0], {column: DateTimeColumn({unit: "hour"})})).toEqual(
-                            '1 AM - January 1, 2016'
-                        )
-                        expect(formatValue(hover.data[0].value, {column: hover.data[0].col})).toEqual(
-                            '1 AM - January 1, 2016'
-                        );
+                        expect(
+                            formatValue(rows[0][0], {
+                                column: DateTimeColumn({ unit: "hour" })
+                            })
+                        ).toEqual("1 AM - January 1, 2016");
+                        expect(
+                            formatValue(hover.data[0].value, {
+                                column: hover.data[0].col
+                            })
+                        ).toEqual("1 AM - January 1, 2016");
 
-                        expect(qsa(".axis.x .tick text").map(e => e.textContent)).toEqual([
-                            '1 AM - January 1, 2016',
-                            '2 AM - January 1, 2016',
-                            '3 AM - January 1, 2016',
-                            '4 AM - January 1, 2016'
+                        expect(
+                            qsa(".axis.x .tick text").map(e => e.textContent)
+                        ).toEqual([
+                            "1 AM - January 1, 2016",
+                            "2 AM - January 1, 2016",
+                            "3 AM - January 1, 2016",
+                            "4 AM - January 1, 2016"
                         ]);
 
                         resolve();
@@ -130,17 +156,11 @@ describe("LineAreaBarRenderer", () => {
     });
 
     describe("should render correctly a compound line graph", () => {
-        const rowsOfNonemptyCard = [
-            [2015, 1],
-            [2016, 2],
-            [2017, 3]
-        ]
+        const rowsOfNonemptyCard = [[2015, 1], [2016, 2], [2017, 3]];
 
         it("when only second series is not empty", () => {
             renderTimeseriesLine({
-                rowsOfSeries: [
-                    [], rowsOfNonemptyCard, [], []
-                ],
+                rowsOfSeries: [[], rowsOfNonemptyCard, [], []],
                 unit: "hour"
             });
 
@@ -150,9 +170,7 @@ describe("LineAreaBarRenderer", () => {
 
         it("when only first series is not empty", () => {
             renderTimeseriesLine({
-                rowsOfSeries: [
-                    rowsOfNonemptyCard, [], [], []
-                ],
+                rowsOfSeries: [rowsOfNonemptyCard, [], [], []],
                 unit: "hour"
             });
 
@@ -162,32 +180,32 @@ describe("LineAreaBarRenderer", () => {
         it("when there are many empty and nonempty values ", () => {
             renderTimeseriesLine({
                 rowsOfSeries: [
-                    [], rowsOfNonemptyCard, [], [], rowsOfNonemptyCard, [], rowsOfNonemptyCard
+                    [],
+                    rowsOfNonemptyCard,
+                    [],
+                    [],
+                    rowsOfNonemptyCard,
+                    [],
+                    rowsOfNonemptyCard
                 ],
                 unit: "hour"
             });
             expect(qs(".line")).not.toBe(null);
         });
-    })
+    });
 
     describe("should render correctly a compound bar graph", () => {
         it("when only second series is not empty", () => {
             renderScalarBar({
-                scalars: [
-                    ["Non-empty value", null],
-                    ["Empty value", 25]
-                ]
-            })
+                scalars: [["Non-empty value", null], ["Empty value", 25]]
+            });
             expect(qs(".bar")).not.toBe(null);
         });
 
         it("when only first series is not empty", () => {
             renderScalarBar({
-                scalars: [
-                    ["Non-empty value", 15],
-                    ["Empty value", null]
-                ]
-            })
+                scalars: [["Non-empty value", 15], ["Empty value", null]]
+            });
             expect(qs(".bar")).not.toBe(null);
         });
 
@@ -200,19 +218,16 @@ describe("LineAreaBarRenderer", () => {
                     ["2nd non-empty value", 35],
                     ["3rd empty value", null],
                     ["4rd empty value", null],
-                    ["3rd non-empty value", 0],
+                    ["3rd non-empty value", 0]
                 ]
-            })
+            });
             expect(qs(".bar")).not.toBe(null);
         });
-    })
+    });
 
-    describe('goals', () => {
-        it('should render a goal line', () => {
-            let rows = [
-                ["2016", 1],
-                ["2017", 2],
-            ];
+    describe("goals", () => {
+        it("should render a goal line", () => {
+            let rows = [["2016", 1], ["2017", 2]];
 
             renderTimeseriesLine({
                 rowsOfSeries: [rows],
@@ -220,74 +235,73 @@ describe("LineAreaBarRenderer", () => {
                     "graph.show_goal": true,
                     "graph.goal_value": 30
                 }
-            })
+            });
 
-            expect(qs('.goal .line')).not.toBe(null)
-            expect(qs('.goal text')).not.toBe(null)
-            expect(qs('.goal text').textContent).toEqual('Goal')
-        })
+            expect(qs(".goal .line")).not.toBe(null);
+            expect(qs(".goal text")).not.toBe(null);
+            expect(qs(".goal text").textContent).toEqual("Goal");
+        });
 
-        it('should render a goal tooltip with the proper value', (done) => {
-            let rows = [
-                ["2016", 1],
-                ["2017", 2],
-            ];
+        it("should render a goal tooltip with the proper value", done => {
+            let rows = [["2016", 1], ["2017", 2]];
 
-            const goalValue = 30
+            const goalValue = 30;
             renderTimeseriesLine({
                 rowsOfSeries: [rows],
                 settings: {
                     "graph.show_goal": true,
                     "graph.goal_value": goalValue
                 },
-                onHoverChange: (hover) => {
-                    expect(hover.data[0].value).toEqual(goalValue)
+                onHoverChange: hover => {
+                    expect(hover.data[0].value).toEqual(goalValue);
                     done();
                 }
-            })
+            });
             dispatchUIEvent(qs(".goal text"), "mouseenter");
-        })
-
-    })
+        });
+    });
 
     // querySelector shortcut
-    const qs = (selector) => element.querySelector(selector);
+    const qs = selector => element.querySelector(selector);
 
     // querySelectorAll shortcut, casts to Array
-    const qsa = (selector) => [...element.querySelectorAll(selector)];
+    const qsa = selector => [...element.querySelectorAll(selector)];
 
     // helper for timeseries line charts
-    const renderTimeseriesLine = ({ rowsOfSeries, onHoverChange, unit, settings }) => {
+    const renderTimeseriesLine = ({
+        rowsOfSeries,
+        onHoverChange,
+        unit,
+        settings
+    }) => {
         lineAreaBarRenderer(element, {
             chartType: "line",
-            series: rowsOfSeries.map((rows) => ({
+            series: rowsOfSeries.map(rows => ({
                 data: {
-                    "cols" : [DateTimeColumn({ unit }), NumberColumn()],
-                    "rows" : rows
+                    cols: [DateTimeColumn({ unit }), NumberColumn()],
+                    rows: rows
                 },
-                card: {
-                }
+                card: {}
             })),
             settings: {
                 "graph.x_axis.scale": "timeseries",
                 "graph.x_axis.axis_enabled": true,
                 "graph.colors": ["#000000"],
-                ...settings,
+                ...settings
             },
             onHoverChange
         });
-    }
+    };
 
     const renderScalarBar = ({ scalars, onHoverChange, unit }) => {
         lineAreaBarRenderer(element, {
             chartType: "bar",
-            series: scalars.map((scalar) => ({
+            series: scalars.map(scalar => ({
                 data: {
-                    "cols" : [StringColumn(), NumberColumn()],
-                    "rows" : [scalar]
+                    cols: [StringColumn(), NumberColumn()],
+                    rows: [scalar]
                 },
-                card: {
-                }
+                card: {}
             })),
             settings: {
                 "bar.scalar_series": true,
@@ -299,5 +313,5 @@ describe("LineAreaBarRenderer", () => {
             },
             onHoverChange
         });
-    }
+    };
 });

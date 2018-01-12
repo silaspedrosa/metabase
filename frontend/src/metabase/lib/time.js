@@ -9,7 +9,9 @@ export function parseTimestamp(value, unit) {
         return moment.parseZone(value);
     } else if (unit === "year") {
         // workaround for https://github.com/metabase/metabase/issues/1992
-        return moment().year(value).startOf("year");
+        return moment()
+            .year(value)
+            .startOf("year");
     } else {
         return moment.utc(value);
     }

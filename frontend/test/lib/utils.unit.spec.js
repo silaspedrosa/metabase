@@ -1,59 +1,50 @@
-import MetabaseUtils from 'metabase/lib/utils';
+import MetabaseUtils from "metabase/lib/utils";
 
-
-describe('utils', () => {
-    describe('generatePassword', () => {
-        it('defaults to length 14 passwords', () => {
-            expect(
-                MetabaseUtils.generatePassword().length
-            ).toBe(
-                14
-            );
+describe("utils", () => {
+    describe("generatePassword", () => {
+        it("defaults to length 14 passwords", () => {
+            expect(MetabaseUtils.generatePassword().length).toBe(14);
         });
 
-        it('creates passwords for the length we specify', () => {
-            expect(
-                MetabaseUtils.generatePassword(25).length
-            ).toBe(
-                25
-            );
+        it("creates passwords for the length we specify", () => {
+            expect(MetabaseUtils.generatePassword(25).length).toBe(25);
         });
 
-        it('can enforce ', () => {
+        it("can enforce ", () => {
             expect(
-                (MetabaseUtils.generatePassword(14, {digit: 2}).match(/([\d])/g).length >= 2)
-            ).toBe(
-                true
-            );
+                MetabaseUtils.generatePassword(14, { digit: 2 }).match(
+                    /([\d])/g
+                ).length >= 2
+            ).toBe(true);
         });
 
-        it('can enforce digit requirements', () => {
+        it("can enforce digit requirements", () => {
             expect(
-                (MetabaseUtils.generatePassword(14, {digit: 2}).match(/([\d])/g).length >= 2)
-            ).toBe(
-                true
-            );
+                MetabaseUtils.generatePassword(14, { digit: 2 }).match(
+                    /([\d])/g
+                ).length >= 2
+            ).toBe(true);
         });
 
-        it('can enforce uppercase requirements', () => {
+        it("can enforce uppercase requirements", () => {
             expect(
-                (MetabaseUtils.generatePassword(14, {uppercase: 2}).match(/([A-Z])/g).length >= 2)
-            ).toBe(
-                true
-            );
+                MetabaseUtils.generatePassword(14, { uppercase: 2 }).match(
+                    /([A-Z])/g
+                ).length >= 2
+            ).toBe(true);
         });
 
-        it('can enforce special character requirements', () => {
+        it("can enforce special character requirements", () => {
             expect(
-                (MetabaseUtils.generatePassword(14, {special: 2}).match(/([!@#\$%\^\&*\)\(+=._-{}])/g).length >= 2)
-            ).toBe(
-                true
-            );
+                MetabaseUtils.generatePassword(14, { special: 2 }).match(
+                    /([!@#\$%\^\&*\)\(+=._-{}])/g
+                ).length >= 2
+            ).toBe(true);
         });
     });
 
     describe("compareVersions", () => {
-        it ("should compare versions correctly", () => {
+        it("should compare versions correctly", () => {
             let expected = [
                 "0.0.9",
                 "0.0.10-snapshot",
@@ -82,7 +73,11 @@ describe('utils', () => {
 
     describe("isJWT", () => {
         it("should allow for JWT tokens with dashes", () => {
-            expect(MetabaseUtils.isJWT("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXJhbXMiOnsicGFyYW0xIjoidGVzdCIsInBhcmFtMiI6ImFiIiwicGFyYW0zIjoiMjAwMC0wMC0wMFQwMDowMDowMCswMDowMCIsInBhcmFtNCI6Iu-8iO-8iSJ9LCJyZXNvdXJjZSI6eyJkYXNoYm9hcmQiOjB9fQ.wsNWliHJNwJBv_hx0sPo1EGY0nATdgEa31TM1AYotIA")).toEqual(true);
+            expect(
+                MetabaseUtils.isJWT(
+                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXJhbXMiOnsicGFyYW0xIjoidGVzdCIsInBhcmFtMiI6ImFiIiwicGFyYW0zIjoiMjAwMC0wMC0wMFQwMDowMDowMCswMDowMCIsInBhcmFtNCI6Iu-8iO-8iSJ9LCJyZXNvdXJjZSI6eyJkYXNoYm9hcmQiOjB9fQ.wsNWliHJNwJBv_hx0sPo1EGY0nATdgEa31TM1AYotIA"
+                )
+            ).toEqual(true);
         });
     });
 });

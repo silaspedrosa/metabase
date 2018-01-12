@@ -8,9 +8,9 @@ let SEPARATOR = " · ";
 let HIERARCHICAL = true;
 let BASE_NAME = null;
 
-export const setSeparator = (separator) => SEPARATOR = separator;
-export const setHierarchical = (hierarchical) => HIERARCHICAL = hierarchical;
-export const setBaseName = (baseName) => BASE_NAME = baseName;
+export const setSeparator = separator => (SEPARATOR = separator);
+export const setHierarchical = hierarchical => (HIERARCHICAL = hierarchical);
+export const setBaseName = baseName => (BASE_NAME = baseName);
 
 const updateDocumentTitle = _.debounce(() => {
     if (HIERARCHICAL) {
@@ -34,11 +34,13 @@ const updateDocumentTitle = _.debounce(() => {
             }
         }
     }
-})
+});
 
-const title = (documentTitleOrGetter) => (ComposedComponent) =>
+const title = documentTitleOrGetter => ComposedComponent =>
     class extends React.Component {
-        static displayName = "Title["+(ComposedComponent.displayName || ComposedComponent.name)+"]";
+        static displayName = "Title[" +
+            (ComposedComponent.displayName || ComposedComponent.name) +
+            "]";
 
         componentWillMount() {
             componentStack.push(this);
@@ -69,7 +71,7 @@ const title = (documentTitleOrGetter) => (ComposedComponent) =>
         render() {
             return <ComposedComponent {...this.props} />;
         }
-    }
+    };
 
 export default title;
 
@@ -80,7 +82,9 @@ export class Route extends _Route {
     static createRouteFromReactElement(element) {
         if (element.props.title) {
             element = React.cloneElement(element, {
-                component: title(element.props.title)(element.props.component || (({ children }) => children))
+                component: title(element.props.title)(
+                    element.props.component || (({ children }) => children)
+                )
             });
         }
         return _Route.createRouteFromReactElement(element);

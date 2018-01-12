@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 import { parseFieldBucketing, formatBucketing } from "metabase/lib/query_time";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import cx from "classnames";
 
 const BUCKETINGS = [
@@ -22,7 +22,7 @@ const BUCKETINGS = [
     "day-of-year",
     "week-of-year",
     "month-of-year",
-    "quarter-of-year",
+    "quarter-of-year"
 ];
 
 export default class TimeGroupingPopover extends Component {
@@ -54,33 +54,61 @@ export default class TimeGroupingPopover extends Component {
             // "day-of-year",
             "week-of-year",
             "month-of-year",
-            "quarter-of-year",
+            "quarter-of-year"
         ]
-    }
+    };
 
     setField(bucketing) {
-        this.props.onFieldChange(["datetime-field", this.props.field[1], "as", bucketing]);
+        this.props.onFieldChange([
+            "datetime-field",
+            this.props.field[1],
+            "as",
+            bucketing
+        ]);
     }
 
     render() {
         const { title, field, className, groupingOptions } = this.props;
         const enabledOptions = new Set(groupingOptions);
         return (
-            <div className={cx(className, "px2 py1")} style={{width:"250px"}}>
-                { title &&
+            <div
+                className={cx(className, "px2 py1")}
+                style={{ width: "250px" }}
+            >
+                {title && (
                     <h3 className="List-section-header pt1 mx2">{title}</h3>
-                }
-                <ul className="py1">
-                { BUCKETINGS.filter(o => o == null || enabledOptions.has(o)).map((bucketing, bucketingIndex) =>
-                    bucketing == null ?
-                        <hr key={bucketingIndex} style={{ "border": "none" }}/>
-                    :
-                        <li key={bucketingIndex} className={cx("List-item", { "List-item--selected": parseFieldBucketing(field) === bucketing })}>
-                            <a className="List-item-title full px2 py1 cursor-pointer" onClick={this.setField.bind(this, bucketing)}>
-                                {formatBucketing(bucketing)}
-                            </a>
-                        </li>
                 )}
+                <ul className="py1">
+                    {BUCKETINGS.filter(
+                        o => o == null || enabledOptions.has(o)
+                    ).map(
+                        (bucketing, bucketingIndex) =>
+                            bucketing == null ? (
+                                <hr
+                                    key={bucketingIndex}
+                                    style={{ border: "none" }}
+                                />
+                            ) : (
+                                <li
+                                    key={bucketingIndex}
+                                    className={cx("List-item", {
+                                        "List-item--selected":
+                                            parseFieldBucketing(field) ===
+                                            bucketing
+                                    })}
+                                >
+                                    <a
+                                        className="List-item-title full px2 py1 cursor-pointer"
+                                        onClick={this.setField.bind(
+                                            this,
+                                            bucketing
+                                        )}
+                                    >
+                                        {formatBucketing(bucketing)}
+                                    </a>
+                                </li>
+                            )
+                    )}
                 </ul>
             </div>
         );

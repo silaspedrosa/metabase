@@ -10,4 +10,4 @@ export type User = {
     is_superuser: true,
     last_login: string,
     last_name: string
-}
+};

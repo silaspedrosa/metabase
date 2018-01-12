@@ -26,15 +26,22 @@ export default class Portal extends Component {
             let position;
             if (target === true) {
                 position = {
-                    top: this.state.position.top + this.state.position.height / 2,
-                    left: this.state.position.left + this.state.position.width / 2,
+                    top:
+                        this.state.position.top +
+                        this.state.position.height / 2,
+                    left:
+                        this.state.position.left +
+                        this.state.position.width / 2,
                     width: -padding * 2,
                     height: -padding * 2
-                }
+                };
             } else if (target) {
                 position = target.getBoundingClientRect();
             }
-            this.setState({ target, position: position || { top: 0, left: 0, height: 0, width: 0 } });
+            this.setState({
+                target,
+                position: position || { top: 0, left: 0, height: 0, width: 0 }
+            });
         }
     }
 
@@ -48,7 +55,10 @@ export default class Portal extends Component {
             transform: "translate(-10000px, -10000px)",
             borderRadius: "10010px",
             pointerEvents: "none",
-            transition: position.width < 0 ? "all 0.25s ease-in-out" : "all 0.5s ease-in-out",
+            transition:
+                position.width < 0
+                    ? "all 0.25s ease-in-out"
+                    : "all 0.5s ease-in-out",
             top: position.top - padding,
             left: position.left - padding,
             width: position.width + 2 * padding,
@@ -61,8 +71,18 @@ export default class Portal extends Component {
             return <div className="hide" />;
         }
         return (
-            <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, overflow: "hidden", pointerEvents: "none" }}>
-                <div style={this.getStyles(this.state.position)}/>
+            <div
+                style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    overflow: "hidden",
+                    pointerEvents: "none"
+                }}
+            >
+                <div style={this.getStyles(this.state.position)} />
             </div>
         );
     }

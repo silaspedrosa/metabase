@@ -52,7 +52,7 @@ export function initBrush(parent, child, onBrushChange, onBrushEnd) {
     // end
     parent.brush().on("brushend.custom", () => {
         // remove the "dragging" classed
-        parent.svg().classed("dragging", false)
+        parent.svg().classed("dragging", false);
         // reset brush opacity (if the brush was cancelled)
         parent.select(".brush").style("opacity", 1);
         // move the brush to the back

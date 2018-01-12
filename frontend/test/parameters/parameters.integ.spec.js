@@ -6,15 +6,16 @@ import {
     restorePreviousLogin,
     waitForRequestToComplete
 } from "__support__/integrated_tests";
-import {
-    click, clickButton,
-    setInputValue
-} from "__support__/enzyme_utils"
+import { click, clickButton, setInputValue } from "__support__/enzyme_utils";
 
 import { mount } from "enzyme";
 
 import { LOAD_CURRENT_USER } from "metabase/redux/user";
-import { INITIALIZE_SETTINGS, UPDATE_SETTING, updateSetting } from "metabase/admin/settings/settings";
+import {
+    INITIALIZE_SETTINGS,
+    UPDATE_SETTING,
+    updateSetting
+} from "metabase/admin/settings/settings";
 import SettingToggle from "metabase/admin/settings/components/widgets/SettingToggle";
 import Toggle from "metabase/components/Toggle";
 import EmbeddingLegalese from "metabase/admin/settings/components/widgets/EmbeddingLegalese";
@@ -51,22 +52,20 @@ async function updateQueryText(store, queryText) {
     // We don't have Ace editor so we have to trigger the Redux action manually
     const newDatasetQuery = getQuery(store.getState())
         .updateQueryText(queryText)
-        .datasetQuery()
+        .datasetQuery();
 
-    return store.dispatch(setDatasetQuery(newDatasetQuery))
+    return store.dispatch(setDatasetQuery(newDatasetQuery));
 }
 
-const getRelativeUrlWithoutHash = (url) =>
-    url.replace(/#.*$/, "").replace(/http:\/\/.*?\//, "/")
+const getRelativeUrlWithoutHash = url =>
+    url.replace(/#.*$/, "").replace(/http:\/\/.*?\//, "/");
 
 const COUNT_ALL = "200";
 const COUNT_DOOHICKEY = "51";
 const COUNT_GADGET = "47";
 
 describe("parameters", () => {
-    beforeAll(async () =>
-        useSharedAdminLogin()
-    );
+    beforeAll(async () => useSharedAdminLogin());
 
     describe("questions", () => {
         let publicUrl = null;
@@ -76,10 +75,13 @@ describe("parameters", () => {
             const store = await createTestStore();
 
             // load public sharing settings
-            store.pushPath('/admin/settings/public_sharing');
-            const app = mount(store.getAppContainer())
+            store.pushPath("/admin/settings/public_sharing");
+            const app = mount(store.getAppContainer());
 
-            await store.waitForActions([LOAD_CURRENT_USER, INITIALIZE_SETTINGS])
+            await store.waitForActions([
+                LOAD_CURRENT_USER,
+                INITIALIZE_SETTINGS
+            ]);
 
             // // if enabled, disable it so we're in a known state
             // // TODO Atte Keinänen 8/9/17: This should be done with a direct API call in afterAll instead
@@ -89,23 +91,28 @@ describe("parameters", () => {
 
             // toggle it on
             click(enabledToggleContainer.find(Toggle));
-            await store.waitForActions([UPDATE_SETTING])
+            await store.waitForActions([UPDATE_SETTING]);
 
             // make sure it's enabled
             expect(enabledToggleContainer.text()).toBe("Enabled");
-        })
+        });
 
         it("should allow users to enable embedding", async () => {
             const store = await createTestStore();
 
             // load public sharing settings
-            store.pushPath('/admin/settings/embedding_in_other_applications');
-            const app = mount(store.getAppContainer())
+            store.pushPath("/admin/settings/embedding_in_other_applications");
+            const app = mount(store.getAppContainer());
 
-            await store.waitForActions([LOAD_CURRENT_USER, INITIALIZE_SETTINGS])
+            await store.waitForActions([
+                LOAD_CURRENT_USER,
+                INITIALIZE_SETTINGS
+            ]);
 
-            click(app.find(EmbeddingLegalese).find('button[children="Enable"]'));
-            await store.waitForActions([UPDATE_SETTING])
+            click(
+                app.find(EmbeddingLegalese).find('button[children="Enable"]')
+            );
+            await store.waitForActions([UPDATE_SETTING]);
 
             expect(app.find(EmbeddingLegalese).length).toBe(0);
             const enabledToggleContainer = app.find(SettingToggle).first();
@@ -116,24 +123,28 @@ describe("parameters", () => {
             // Don't render Ace editor in tests because it uses many DOM methods that aren't supported by jsdom
             // NOTE Atte Keinänen 8/9/17: Ace provides a MockRenderer class which could be used for pseudo-rendering and
             // testing Ace editor in tests, but it doesn't render stuff to DOM so I'm not sure how practical it would be
-            NativeQueryEditor.prototype.loadAceEditor = () => {
-            }
+            NativeQueryEditor.prototype.loadAceEditor = () => {};
 
             const store = await createTestStore();
 
             // load public sharing settings
             store.pushPath(Urls.plainQuestion());
-            const app = mount(store.getAppContainer())
+            const app = mount(store.getAppContainer());
             await store.waitForActions([INITIALIZE_QB]);
 
             click(app.find(".Icon-sql"));
             await store.waitForActions([SET_QUERY_MODE]);
 
-            await updateQueryText(store, "select count(*) from products where {{category}}");
+            await updateQueryText(
+                store,
+                "select count(*) from products where {{category}}"
+            );
 
             const tagEditorSidebar = app.find(TagEditorSidebar);
 
-            const fieldFilterVarType = tagEditorSidebar.find('.ColumnarSelector-row').at(3);
+            const fieldFilterVarType = tagEditorSidebar
+                .find(".ColumnarSelector-row")
+                .at(3);
             expect(fieldFilterVarType.text()).toBe("Field Filter");
             click(fieldFilterVarType);
 
@@ -141,38 +152,64 @@ describe("parameters", () => {
 
             await delay(500);
 
-            setInputValue(tagEditorSidebar.find(".TestPopoverBody .AdminSelect").first(), "cat")
-            const categoryRow = tagEditorSidebar.find(".TestPopoverBody .ColumnarSelector-row").first();
+            setInputValue(
+                tagEditorSidebar.find(".TestPopoverBody .AdminSelect").first(),
+                "cat"
+            );
+            const categoryRow = tagEditorSidebar
+                .find(".TestPopoverBody .ColumnarSelector-row")
+                .first();
             expect(categoryRow.text()).toBe("ProductsCategory");
             click(categoryRow);
 
-            await store.waitForActions([UPDATE_TEMPLATE_TAG, FETCH_FIELD_VALUES])
+            await store.waitForActions([
+                UPDATE_TEMPLATE_TAG,
+                FETCH_FIELD_VALUES
+            ]);
 
             // close the template variable sidebar
             click(tagEditorSidebar.find(".Icon-close"));
 
             // test without the parameter
             click(app.find(RunButton));
-            await store.waitForActions([RUN_QUERY, QUERY_COMPLETED])
+            await store.waitForActions([RUN_QUERY, QUERY_COMPLETED]);
             expect(app.find(Scalar).text()).toBe(COUNT_ALL);
 
             // test the parameter
-            click(app.find(Parameters).find("a").first());
+            click(
+                app
+                    .find(Parameters)
+                    .find("a")
+                    .first()
+            );
             click(app.find(CategoryWidget).find('li[children="Doohickey"]'));
             click(app.find(RunButton));
-            await store.waitForActions([RUN_QUERY, QUERY_COMPLETED])
+            await store.waitForActions([RUN_QUERY, QUERY_COMPLETED]);
             expect(app.find(Scalar).text()).toBe(COUNT_DOOHICKEY);
 
             // save the question, required for public link/embedding
-            click(app.find(".Header-buttonSection a").first().find("a"))
+            click(
+                app
+                    .find(".Header-buttonSection a")
+                    .first()
+                    .find("a")
+            );
             await store.waitForActions([LOAD_COLLECTIONS]);
 
-            setInputValue(app.find(SaveQuestionModal).find("input[name='name']"), "sql parametrized");
+            setInputValue(
+                app.find(SaveQuestionModal).find("input[name='name']"),
+                "sql parametrized"
+            );
 
-            clickButton(app.find(SaveQuestionModal).find("button").last());
+            clickButton(
+                app
+                    .find(SaveQuestionModal)
+                    .find("button")
+                    .last()
+            );
             await store.waitForActions([NOTIFY_CARD_CREATED]);
 
-            click(app.find('#QuestionSavedModal .Button[children="Not now"]'))
+            click(app.find('#QuestionSavedModal .Button[children="Not now"]'));
             // wait for modal to close :'(
             await delay(500);
 
@@ -180,20 +217,33 @@ describe("parameters", () => {
             click(app.find(".Icon-share"));
 
             // "Embed this question in an application"
-            click(app.find(SharingPane).find("h3").last());
+            click(
+                app
+                    .find(SharingPane)
+                    .find("h3")
+                    .last()
+            );
 
             // make the parameter editable
             click(app.find(".AdminSelect-content[children='Disabled']"));
 
-            click(app.find(".TestPopoverBody .Icon-pencil"))
+            click(app.find(".TestPopoverBody .Icon-pencil"));
 
             await delay(500);
 
             click(app.find("div[children='Publish']"));
-            await store.waitForActions([UPDATE_ENABLE_EMBEDDING, UPDATE_EMBEDDING_PARAMS])
+            await store.waitForActions([
+                UPDATE_ENABLE_EMBEDDING,
+                UPDATE_EMBEDDING_PARAMS
+            ]);
 
             // save the embed url for next tests
-            embedUrl = getRelativeUrlWithoutHash(app.find(PreviewPane).find("iframe").prop("src"));
+            embedUrl = getRelativeUrlWithoutHash(
+                app
+                    .find(PreviewPane)
+                    .find("iframe")
+                    .prop("src")
+            );
 
             // back to main share panel
             click(app.find(EmbedTitle));
@@ -203,62 +253,115 @@ describe("parameters", () => {
             await store.waitForActions([CREATE_PUBLIC_LINK]);
 
             // save the public url for next tests
-            publicUrl = getRelativeUrlWithoutHash(app.find(CopyWidget).find("input").first().prop("value"));
+            publicUrl = getRelativeUrlWithoutHash(
+                app
+                    .find(CopyWidget)
+                    .find("input")
+                    .first()
+                    .prop("value")
+            );
         });
 
         describe("as an anonymous user", () => {
             beforeAll(() => logout());
 
-            async function runSharedQuestionTests(store, questionUrl, apiRegex) {
+            async function runSharedQuestionTests(
+                store,
+                questionUrl,
+                apiRegex
+            ) {
                 store.pushPath(questionUrl);
-                const app = mount(store.getAppContainer())
+                const app = mount(store.getAppContainer());
 
                 await store.waitForActions([ADD_PARAM_VALUES]);
 
                 // Loading the query results is done in PublicQuestion itself so we have to listen to API request instead of Redux action
-                await waitForRequestToComplete("GET", apiRegex)
+                await waitForRequestToComplete("GET", apiRegex);
                 // use `update()` because of setState
-                expect(app.update().find(Scalar).text()).toBe(COUNT_ALL + "sql parametrized");
+                expect(
+                    app
+                        .update()
+                        .find(Scalar)
+                        .text()
+                ).toBe(COUNT_ALL + "sql parametrized");
 
                 // manually click parameter (sadly the query results loading happens inline again)
-                click(app.find(Parameters).find("a").first());
-                click(app.find(CategoryWidget).find('li[children="Doohickey"]'));
+                click(
+                    app
+                        .find(Parameters)
+                        .find("a")
+                        .first()
+                );
+                click(
+                    app.find(CategoryWidget).find('li[children="Doohickey"]')
+                );
 
-                await waitForRequestToComplete("GET", apiRegex)
-                expect(app.update().find(Scalar).text()).toBe(COUNT_DOOHICKEY + "sql parametrized");
+                await waitForRequestToComplete("GET", apiRegex);
+                expect(
+                    app
+                        .update()
+                        .find(Scalar)
+                        .text()
+                ).toBe(COUNT_DOOHICKEY + "sql parametrized");
 
                 // set parameter via url
                 store.pushPath("/"); // simulate a page reload by visiting other page
                 store.pushPath(questionUrl + "?category=Gadget");
-                await waitForRequestToComplete("GET", apiRegex)
+                await waitForRequestToComplete("GET", apiRegex);
                 // use `update()` because of setState
-                expect(app.update().find(Scalar).text()).toBe(COUNT_GADGET + "sql parametrized");
+                expect(
+                    app
+                        .update()
+                        .find(Scalar)
+                        .text()
+                ).toBe(COUNT_GADGET + "sql parametrized");
             }
 
             it("should allow seeing an embedded question", async () => {
-                if (!embedUrl) throw new Error("This test fails because previous tests didn't produce an embed url.")
-                const embedUrlTestStore = await createTestStore({ embedApp: true });
-                await runSharedQuestionTests(embedUrlTestStore, embedUrl, new RegExp("/api/embed/card/.*/query"))
-            })
+                if (!embedUrl)
+                    throw new Error(
+                        "This test fails because previous tests didn't produce an embed url."
+                    );
+                const embedUrlTestStore = await createTestStore({
+                    embedApp: true
+                });
+                await runSharedQuestionTests(
+                    embedUrlTestStore,
+                    embedUrl,
+                    new RegExp("/api/embed/card/.*/query")
+                );
+            });
 
             it("should allow seeing a public question", async () => {
-                if (!publicUrl) throw new Error("This test fails because previous tests didn't produce a public url.")
-                const publicUrlTestStore = await createTestStore({ publicApp: true });
-                await runSharedQuestionTests(publicUrlTestStore, publicUrl, new RegExp("/api/public/card/.*/query"))
-            })
+                if (!publicUrl)
+                    throw new Error(
+                        "This test fails because previous tests didn't produce a public url."
+                    );
+                const publicUrlTestStore = await createTestStore({
+                    publicApp: true
+                });
+                await runSharedQuestionTests(
+                    publicUrlTestStore,
+                    publicUrl,
+                    new RegExp("/api/public/card/.*/query")
+                );
+            });
 
             // I think it's cleanest to restore the login here so that there are no surprises if you want to add tests
             // that expect that we're already logged in
-            afterAll(() => restorePreviousLogin())
-        })
+            afterAll(() => restorePreviousLogin());
+        });
 
         afterAll(async () => {
             const store = await createTestStore();
 
             // Disable public sharing and embedding after running tests
-            await store.dispatch(updateSetting({ key: "enable-public-sharing", value: false }))
-            await store.dispatch(updateSetting({ key: "enable-embedding", value: false }))
-        })
+            await store.dispatch(
+                updateSetting({ key: "enable-public-sharing", value: false })
+            );
+            await store.dispatch(
+                updateSetting({ key: "enable-embedding", value: false })
+            );
+        });
     });
-
 });

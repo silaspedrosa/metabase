@@ -5,27 +5,27 @@ import d3 from "d3";
 
 export function computeMinimalBounds(features) {
     const points = getAllFeaturesPoints(features);
-    const gap = computeLargestGap(points, (d) => d[0]);
-    const [west, east] = d3.extent(points, (d) => d[0]);
-    const [north, south] = d3.extent(points, (d) => d[1]);
+    const gap = computeLargestGap(points, d => d[0]);
+    const [west, east] = d3.extent(points, d => d[0]);
+    const [north, south] = d3.extent(points, d => d[1]);
 
     const normalGapSize = gap[1] - gap[0];
-    const antemeridianGapSize = (180 + west) + (180 - east);
+    const antemeridianGapSize = 180 + west + (180 - east);
 
     if (antemeridianGapSize > normalGapSize) {
         return L.latLngBounds(
             L.latLng(south, west), // SW
-            L.latLng(north, east)  // NE
-        )
+            L.latLng(north, east) // NE
+        );
     } else {
         return L.latLngBounds(
             L.latLng(south, -360 + gap[1]), // SW
-            L.latLng(north, gap[0])  // NE
-        )
+            L.latLng(north, gap[0]) // NE
+        );
     }
 }
 
-export function computeLargestGap(items, valueAccessor = (d) => d) {
+export function computeLargestGap(items, valueAccessor = d => d) {
     const [xMin, xMax] = d3.extent(items, valueAccessor);
     if (xMin === xMax) {
         return [xMin, xMax];
@@ -39,14 +39,20 @@ export function computeLargestGap(items, valueAccessor = (d) => d) {
         if (buckets[k] === undefined) {
             buckets[k] = [x, x];
         } else {
-            buckets[k] = [Math.min(x, buckets[k][0]), Math.max(x, buckets[k][1])];
+            buckets[k] = [
+                Math.min(x, buckets[k][0]),
+                Math.max(x, buckets[k][1])
+            ];
         }
     }
     let largestGap = [0, 0];
     for (let i = 0; i < items.length; i++) {
         if (buckets[i + 1] === undefined) {
             buckets[i + 1] = buckets[i];
-        } else if (buckets[i + 1][0] - buckets[i][1] > largestGap[1] - largestGap[0]) {
+        } else if (
+            buckets[i + 1][0] - buckets[i][1] >
+            largestGap[1] - largestGap[0]
+        ) {
             largestGap = [buckets[i][1], buckets[i + 1][0]];
         }
     }
@@ -67,7 +73,10 @@ export function getAllFeaturesPoints(features) {
                 }
             }
         } else {
-            console.warn("Unimplemented feature.geometry.type", feature.geometry.type)
+            console.warn(
+                "Unimplemented feature.geometry.type",
+                feature.geometry.type
+            );
         }
     }
     return points;
@@ -132,10 +141,12 @@ const STATE_CODES = [
     ["WA", "Washington"],
     ["WV", "West Virginia"],
     ["WI", "Wisconsin"],
-    ["WY", "Wyoming"],
+    ["WY", "Wyoming"]
 ];
 
-const stateNamesMap = new Map(STATE_CODES.map(([key, name]) => [name.toLowerCase(), key.toLowerCase()]))
+const stateNamesMap = new Map(
+    STATE_CODES.map(([key, name]) => [name.toLowerCase(), key.toLowerCase()])
+);
 
 /**
  * Canonicalizes row values to match those in the GeoJSONs.

@@ -19,11 +19,11 @@ export default ({ question }: ClickActionProps): ClickAction[] => {
             name: "underlying-records",
             title: (
                 <span>
-                    {
-                        jt`View the underlying ${<span className="text-dark">
-                                {query.table().display_name}
-                            </span>} records`
-                    }
+                    {jt`View the underlying ${(
+                        <span className="text-dark">
+                            {query.table().display_name}
+                        </span>
+                    )} records`}
                 </span>
             ),
             icon: "table2",

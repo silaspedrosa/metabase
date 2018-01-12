@@ -31,17 +31,14 @@ export default class ArchiveDashboardModal extends Component {
         var formError;
         if (this.state.error) {
             var errorMessage = "Server error encountered";
-            if (this.state.error.data &&
-                this.state.error.data.message) {
+            if (this.state.error.data && this.state.error.data.message) {
                 errorMessage = this.state.error.data.message;
             } else {
                 errorMessage = this.state.error.message;
             }
 
             // TODO: timeout display?
-            formError = (
-                <span className="text-error px2">{errorMessage}</span>
-            );
+            formError = <span className="text-error px2">{errorMessage}</span>;
         }
 
         return (
@@ -54,8 +51,18 @@ export default class ArchiveDashboardModal extends Component {
                 </div>
 
                 <div className="Form-actions">
-                    <button className="Button Button--danger" onClick={() => this.archiveDashboard()}>Yes</button>
-                    <button className="Button Button--primary ml1" onClick={this.props.onClose}>No</button>
+                    <button
+                        className="Button Button--danger"
+                        onClick={() => this.archiveDashboard()}
+                    >
+                        Yes
+                    </button>
+                    <button
+                        className="Button Button--primary ml1"
+                        onClick={this.props.onClose}
+                    >
+                        No
+                    </button>
                     {formError}
                 </div>
             </ModalContent>

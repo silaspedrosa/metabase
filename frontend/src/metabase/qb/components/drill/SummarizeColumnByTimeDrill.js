@@ -24,7 +24,10 @@ export default ({ question, clicked }: ClickActionProps): ClickAction[] => {
 
     const dateField = query.table().fields.filter(isDate)[0];
     if (
-        !dateField || !clicked || !clicked.column || clicked.value !== undefined
+        !dateField ||
+        !clicked ||
+        !clicked.column ||
+        clicked.value !== undefined
     ) {
         return [];
     }
@@ -33,11 +36,16 @@ export default ({ question, clicked }: ClickActionProps): ClickAction[] => {
     return ["sum", "count"]
         .map(getAggregator)
         .filter(aggregator =>
-            isCompatibleAggregatorForField(aggregator, column))
+            isCompatibleAggregatorForField(aggregator, column)
+        )
         .map(aggregator => ({
             name: "summarize-by-time",
             section: "sum",
-            title: <span>{capitalize(aggregator.short)} {t`by time`}</span>,
+            title: (
+                <span>
+                    {capitalize(aggregator.short)} {t`by time`}
+                </span>
+            ),
             question: () =>
                 question
                     .summarize(

@@ -2,40 +2,49 @@ import React, { Component } from "react";
 import cx from "classnames";
 import _ from "underscore";
 import { assocIn } from "icepick";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import FormMessage from "metabase/components/form/FormMessage";
 
 import SchedulePicker from "metabase/components/SchedulePicker";
 import MetabaseAnalytics from "metabase/lib/analytics";
 import LoadingAndErrorWrapper from "metabase/components/LoadingAndErrorWrapper";
 
-export const SyncOption = ({ selected, name, children, select }) =>
-    <div className={cx("py3 relative", {"cursor-pointer": !selected})} onClick={() => select(name.toLowerCase()) }>
+export const SyncOption = ({ selected, name, children, select }) => (
+    <div
+        className={cx("py3 relative", { "cursor-pointer": !selected })}
+        onClick={() => select(name.toLowerCase())}
+    >
         <div
-            className={cx('circle ml2 flex align-center justify-center absolute')}
+            className={cx(
+                "circle ml2 flex align-center justify-center absolute"
+            )}
             style={{
                 width: 18,
                 height: 18,
                 borderWidth: 2,
-                borderColor: selected ? '#509ee3': '#ddd',
-                borderStyle: 'solid'
+                borderColor: selected ? "#509ee3" : "#ddd",
+                borderStyle: "solid"
             }}
         >
-            { selected &&
+            {selected && (
                 <div
                     className="circle"
-                    style={{ width: 8, height: 8, backgroundColor: selected ? '#509ee3' : '#ddd' }}
+                    style={{
+                        width: 8,
+                        height: 8,
+                        backgroundColor: selected ? "#509ee3" : "#ddd"
+                    }}
                 />
-            }
+            )}
         </div>
         <div className="Form-offset ml1">
-            <div className={cx({ 'text-brand': selected })}>
+            <div className={cx({ "text-brand": selected })}>
                 <h3>{name}</h3>
             </div>
-            { selected && children && <div className="mt2">{children}</div> }
+            {selected && children && <div className="mt2">{children}</div>}
         </div>
     </div>
-
+);
 
 export default class DatabaseSchedulingForm extends Component {
     constructor(props) {
@@ -43,7 +52,7 @@ export default class DatabaseSchedulingForm extends Component {
 
         this.state = {
             unsavedDatabase: props.database
-        }
+        };
     }
 
     updateSchemaSyncSchedule = (newSchedule, changedProp) => {
@@ -53,8 +62,14 @@ export default class DatabaseSchedulingForm extends Component {
             changedProp.value
         );
 
-        this.setState(assocIn(this.state, ["unsavedDatabase", "schedules", "metadata_sync"], newSchedule));
-    }
+        this.setState(
+            assocIn(
+                this.state,
+                ["unsavedDatabase", "schedules", "metadata_sync"],
+                newSchedule
+            )
+        );
+    };
 
     updateFieldScanSchedule = (newSchedule, changedProp) => {
         MetabaseAnalytics.trackEvent(
@@ -63,36 +78,51 @@ export default class DatabaseSchedulingForm extends Component {
             changedProp.value
         );
 
-        this.setState(assocIn(this.state, ["unsavedDatabase", "schedules", "cache_field_values"], newSchedule));
-    }
+        this.setState(
+            assocIn(
+                this.state,
+                ["unsavedDatabase", "schedules", "cache_field_values"],
+                newSchedule
+            )
+        );
+    };
 
     setIsFullSyncIsOnDemand = (isFullSync, isOnDemand) => {
         // TODO: Add event tracking
-        let state = assocIn(this.state, ["unsavedDatabase", "is_full_sync"], isFullSync);
+        let state = assocIn(
+            this.state,
+            ["unsavedDatabase", "is_full_sync"],
+            isFullSync
+        );
         state = assocIn(state, ["unsavedDatabase", "is_on_demand"], isOnDemand);
         this.setState(state);
-    }
+    };
 
-    onSubmitForm = (event) => {
+    onSubmitForm = event => {
         event.preventDefault();
 
-        const { unsavedDatabase } = this.state
+        const { unsavedDatabase } = this.state;
         this.props.save(unsavedDatabase, unsavedDatabase.details);
-    }
+    };
 
     render() {
-        const { submitButtonText, formState: { formError, formSuccess, isSubmitting } } = this.props
-        const { unsavedDatabase } = this.state
+        const {
+            submitButtonText,
+            formState: { formError, formSuccess, isSubmitting }
+        } = this.props;
+        const { unsavedDatabase } = this.state;
 
         return (
             <LoadingAndErrorWrapper loading={!this.props.database} error={null}>
-                { () =>
+                {() => (
                     <form onSubmit={this.onSubmitForm} noValidate>
-
                         <div className="Form-offset mr4 mt4">
-                            <div style={{maxWidth: 600}} className="border-bottom pb2">
+                            <div
+                                style={{ maxWidth: 600 }}
+                                className="border-bottom pb2"
+                            >
                                 <p className="text-paragraph text-measure">
-                                  {t`To do some of its magic, Metabase needs to scan your database. We will also <em>re</em>scan it periodically to keep the metadata up-to-date. You can control when the periodic rescans happen below.`}
+                                    {t`To do some of its magic, Metabase needs to scan your database. We will also <em>re</em>scan it periodically to keep the metadata up-to-date. You can control when the periodic rescans happen below.`}
                                 </p>
                             </div>
 
@@ -102,17 +132,25 @@ export default class DatabaseSchedulingForm extends Component {
                                     updates to this database’s schema. In most cases, you should be fine leaving this
                                     set to sync hourly.`}</p>
                                 <SchedulePicker
-                                    schedule={!_.isString(unsavedDatabase.schedules && unsavedDatabase.schedules.metadata_sync)
-                                            ? unsavedDatabase.schedules.metadata_sync
+                                    schedule={
+                                        !_.isString(
+                                            unsavedDatabase.schedules &&
+                                                unsavedDatabase.schedules
+                                                    .metadata_sync
+                                        )
+                                            ? unsavedDatabase.schedules
+                                                  .metadata_sync
                                             : {
-                                                schedule_day: "mon",
-                                                schedule_frame: null,
-                                                schedule_hour: 0,
-                                                schedule_type: "daily"
-                                            }
+                                                  schedule_day: "mon",
+                                                  schedule_frame: null,
+                                                  schedule_hour: 0,
+                                                  schedule_type: "daily"
+                                              }
                                     }
                                     scheduleOptions={["hourly", "daily"]}
-                                    onScheduleChange={this.updateSchemaSyncSchedule}
+                                    onScheduleChange={
+                                        this.updateSchemaSyncSchedule
+                                    }
                                     textBeforeInterval={t`Scan`}
                                 />
                             </div>
@@ -124,28 +162,52 @@ export default class DatabaseSchedulingForm extends Component {
                                     can be a somewhat resource-intensive process, particularly if you have a very large
                                     database.`}</p>
 
-                                <h3>{t`When should Metabase automatically scan and cache field values?`}</h3>
+                                <h3
+                                >{t`When should Metabase automatically scan and cache field values?`}</h3>
                                 <ol className="bordered shadowed mt3">
                                     <li className="border-bottom">
                                         <SyncOption
-                                            selected={unsavedDatabase.is_full_sync}
+                                            selected={
+                                                unsavedDatabase.is_full_sync
+                                            }
                                             name={t`Regularly, on a schedule`}
-                                            select={() => this.setIsFullSyncIsOnDemand(true, false)}
+                                            select={() =>
+                                                this.setIsFullSyncIsOnDemand(
+                                                    true,
+                                                    false
+                                                )
+                                            }
                                         >
-
                                             <div className="flex align-center">
                                                 <SchedulePicker
-                                                    schedule={!_.isString(unsavedDatabase.schedules && unsavedDatabase.schedules.cache_field_values)
-                                                            ? unsavedDatabase.schedules.cache_field_values
+                                                    schedule={
+                                                        !_.isString(
+                                                            unsavedDatabase.schedules &&
+                                                                unsavedDatabase
+                                                                    .schedules
+                                                                    .cache_field_values
+                                                        )
+                                                            ? unsavedDatabase
+                                                                  .schedules
+                                                                  .cache_field_values
                                                             : {
-                                                                schedule_day: "mon",
-                                                                schedule_frame: null,
-                                                                schedule_hour: 0,
-                                                                schedule_type: "daily"
-                                                            }
+                                                                  schedule_day:
+                                                                      "mon",
+                                                                  schedule_frame: null,
+                                                                  schedule_hour: 0,
+                                                                  schedule_type:
+                                                                      "daily"
+                                                              }
                                                     }
-                                                    scheduleOptions={["daily", "weekly", "monthly"]}
-                                                    onScheduleChange={this.updateFieldScanSchedule}
+                                                    scheduleOptions={[
+                                                        "daily",
+                                                        "weekly",
+                                                        "monthly"
+                                                    ]}
+                                                    onScheduleChange={
+                                                        this
+                                                            .updateFieldScanSchedule
+                                                    }
                                                     textBeforeInterval={t`Scan`}
                                                 />
                                             </div>
@@ -153,9 +215,17 @@ export default class DatabaseSchedulingForm extends Component {
                                     </li>
                                     <li className="border-bottom pr2">
                                         <SyncOption
-                                            selected={!unsavedDatabase.is_full_sync && unsavedDatabase.is_on_demand}
+                                            selected={
+                                                !unsavedDatabase.is_full_sync &&
+                                                unsavedDatabase.is_on_demand
+                                            }
                                             name={t`Only when adding a new filter widget`}
-                                            select={() => this.setIsFullSyncIsOnDemand(false, true)}
+                                            select={() =>
+                                                this.setIsFullSyncIsOnDemand(
+                                                    false,
+                                                    true
+                                                )
+                                            }
                                         >
                                             <p className="text-paragraph text-measure">
                                                 {t`When a user adds a new filter to a dashboard or a SQL question, Metabase will
@@ -165,24 +235,37 @@ export default class DatabaseSchedulingForm extends Component {
                                     </li>
                                     <li>
                                         <SyncOption
-                                            selected={!unsavedDatabase.is_full_sync && !unsavedDatabase.is_on_demand}
+                                            selected={
+                                                !unsavedDatabase.is_full_sync &&
+                                                !unsavedDatabase.is_on_demand
+                                            }
                                             name={t`Never, I'll do this manually if I need to`}
-                                            select={() => this.setIsFullSyncIsOnDemand(false, false)}
+                                            select={() =>
+                                                this.setIsFullSyncIsOnDemand(
+                                                    false,
+                                                    false
+                                                )
+                                            }
                                         />
                                     </li>
                                 </ol>
                             </div>
-
                         </div>
                         <div className="Form-actions mt4">
-                            <button className={"Button Button--primary"} disabled={isSubmitting}>
-                                {isSubmitting ? t`Saving...` : submitButtonText }
+                            <button
+                                className={"Button Button--primary"}
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? t`Saving...` : submitButtonText}
                             </button>
-                            <FormMessage formError={formError} formSuccess={formSuccess}/>
+                            <FormMessage
+                                formError={formError}
+                                formSuccess={formSuccess}
+                            />
                         </div>
                     </form>
-                }
+                )}
             </LoadingAndErrorWrapper>
-        )
+        );
     }
 }

@@ -2,10 +2,7 @@ import {
     createTestStore,
     useSharedAdminLogin
 } from "__support__/integrated_tests";
-import {
-    click, clickButton,
-    setInputValue
-} from "__support__/enzyme_utils"
+import { click, clickButton, setInputValue } from "__support__/enzyme_utils";
 
 import { DashboardApi, PublicApi } from "metabase/services";
 import * as Urls from "metabase/lib/urls";
@@ -22,9 +19,12 @@ import {
 } from "metabase/dashboard/dashboard";
 import EditBar from "metabase/components/EditBar";
 
-import { delay } from "metabase/lib/promise"
+import { delay } from "metabase/lib/promise";
 import DashboardHeader from "metabase/dashboard/components/DashboardHeader";
-import { ParameterOptionItem, ParameterOptionsSection } from "metabase/dashboard/components/ParametersPopover";
+import {
+    ParameterOptionItem,
+    ParameterOptionsSection
+} from "metabase/dashboard/components/ParametersPopover";
 import ParameterValueWidget from "metabase/parameters/components/ParameterValueWidget";
 import { PredefinedRelativeDatePicker } from "metabase/parameters/components/widgets/DateRelativeWidget";
 import HeaderModal from "metabase/components/HeaderModal";
@@ -34,107 +34,132 @@ import HeaderModal from "metabase/components/HeaderModal";
 
 // Mock the dashboard endpoint using a real response of `public/dashboard/:dashId`
 const mockPublicDashboardResponse = {
-    "name": "Dashboard",
-    "description": "For testing parameter values",
-    "id": 40,
-    "parameters": [{"name": "Category", "slug": "category", "id": "598ab323", "type": "category"}],
-    "ordered_cards": [{
-        "sizeX": 6,
-        "series": [],
-        "card": {
-            "id": 25,
-            "name": "Orders over time",
-            "description": null,
-            "display": "line",
-            "dataset_query": {"type": "query"}
-        },
-        "col": 0,
-        "id": 105,
-        "parameter_mappings": [{
-            "parameter_id": "598ab323",
-            "card_id": 25,
-            "target": ["dimension", ["fk->", 3, 21]]
-        }],
-        "card_id": 25,
-        "visualization_settings": {},
-        "dashboard_id": 40,
-        "sizeY": 6,
-        "row": 0
-    }],
+    name: "Dashboard",
+    description: "For testing parameter values",
+    id: 40,
+    parameters: [
+        { name: "Category", slug: "category", id: "598ab323", type: "category" }
+    ],
+    ordered_cards: [
+        {
+            sizeX: 6,
+            series: [],
+            card: {
+                id: 25,
+                name: "Orders over time",
+                description: null,
+                display: "line",
+                dataset_query: { type: "query" }
+            },
+            col: 0,
+            id: 105,
+            parameter_mappings: [
+                {
+                    parameter_id: "598ab323",
+                    card_id: 25,
+                    target: ["dimension", ["fk->", 3, 21]]
+                }
+            ],
+            card_id: 25,
+            visualization_settings: {},
+            dashboard_id: 40,
+            sizeY: 6,
+            row: 0
+        }
+    ],
     // Parameter values are self-contained in the public dashboard response
-    "param_values": {
+    param_values: {
         "21": {
-            "values": ["Doohickey", "Gadget", "Gizmo", "Widget"],
-            "human_readable_values": {},
-            "field_id": 21
+            values: ["Doohickey", "Gadget", "Gizmo", "Widget"],
+            human_readable_values: {},
+            field_id: 21
         }
     }
-}
+};
 PublicApi.dashboard = async () => {
     return mockPublicDashboardResponse;
-}
+};
 
 describe("Dashboard", () => {
     beforeAll(async () => {
         useSharedAdminLogin();
-    })
+    });
 
     describe("redux actions", () => {
         describe("fetchDashboard(...)", () => {
             it("should add the parameter values to state tree for public dashboards", async () => {
                 const store = await createTestStore();
                 // using hash as dashboard id should invoke the public API
-                await store.dispatch(fetchDashboard('6e59cc97-3b6a-4bb6-9e7a-5efeee27e40f'));
-                await store.waitForActions(ADD_PARAM_VALUES)
+                await store.dispatch(
+                    fetchDashboard("6e59cc97-3b6a-4bb6-9e7a-5efeee27e40f")
+                );
+                await store.waitForActions(ADD_PARAM_VALUES);
 
                 const getMergedParameterFieldValues = makeGetMergedParameterFieldValues();
-                const fieldValues = await getMergedParameterFieldValues(store.getState(), { parameter: { field_ids: [ 21 ] }});
-                expect(fieldValues).toEqual([["Doohickey"], ["Gadget"], ["Gizmo"], ["Widget"]]);
-            })
-        })
-    })
+                const fieldValues = await getMergedParameterFieldValues(
+                    store.getState(),
+                    { parameter: { field_ids: [21] } }
+                );
+                expect(fieldValues).toEqual([
+                    ["Doohickey"],
+                    ["Gadget"],
+                    ["Gizmo"],
+                    ["Widget"]
+                ]);
+            });
+        });
+    });
 
     // Converted from Selenium E2E test
     describe("dashboard page", () => {
         let dashboardId = null;
 
         it("lets you change title and description", async () => {
-            const name = "Customer Feedback Analysis"
-            const description = "For seeing the usual response times, feedback topics, our response rate, how often customers are directed to our knowledge base instead of providing a customized response";
+            const name = "Customer Feedback Analysis";
+            const description =
+                "For seeing the usual response times, feedback topics, our response rate, how often customers are directed to our knowledge base instead of providing a customized response";
 
             // Create a dashboard programmatically
-            const dashboard = await DashboardApi.create({name, description});
+            const dashboard = await DashboardApi.create({ name, description });
             dashboardId = dashboard.id;
 
             const store = await createTestStore();
             store.pushPath(Urls.dashboard(dashboardId));
             const app = mount(store.getAppContainer());
 
-            await store.waitForActions([FETCH_DASHBOARD])
+            await store.waitForActions([FETCH_DASHBOARD]);
 
             // Test dashboard renaming
             click(app.find(".Icon.Icon-pencil"));
             await store.waitForActions([SET_EDITING_DASHBOARD]);
 
-            const headerInputs = app.find(".Header-title input")
-            setInputValue(headerInputs.first(), "Customer Analysis Paralysis")
-            setInputValue(headerInputs.at(1), "")
+            const headerInputs = app.find(".Header-title input");
+            setInputValue(headerInputs.first(), "Customer Analysis Paralysis");
+            setInputValue(headerInputs.at(1), "");
 
             clickButton(app.find(EditBar).find(".Button--primary.Button"));
-            await store.waitForActions([SAVE_DASHBOARD_AND_CARDS, FETCH_DASHBOARD])
+            await store.waitForActions([
+                SAVE_DASHBOARD_AND_CARDS,
+                FETCH_DASHBOARD
+            ]);
 
-            await delay(500)
+            await delay(500);
 
-            expect(app.find(DashboardHeader).text()).toMatch(/Customer Analysis Paralysis/)
+            expect(app.find(DashboardHeader).text()).toMatch(
+                /Customer Analysis Paralysis/
+            );
         });
 
         it("lets you add a filter", async () => {
-            if (!dashboardId) throw new Error("Test fails because previous tests failed to create a dashboard");
+            if (!dashboardId)
+                throw new Error(
+                    "Test fails because previous tests failed to create a dashboard"
+                );
 
             const store = await createTestStore();
             store.pushPath(Urls.dashboard(dashboardId));
             const app = mount(store.getAppContainer());
-            await store.waitForActions([FETCH_DASHBOARD])
+            await store.waitForActions([FETCH_DASHBOARD]);
 
             // Test parameter filter creation
             click(app.find(".Icon.Icon-pencil"));
@@ -142,27 +167,33 @@ describe("Dashboard", () => {
             click(app.find(".Icon.Icon-funneladd"));
             // Choose Time filter type
             click(
-                app.find(ParameterOptionsSection)
-                    .filterWhere((section) => section.text().match(/Time/))
+                app
+                    .find(ParameterOptionsSection)
+                    .filterWhere(section => section.text().match(/Time/))
             );
 
             // Choose Relative date filter
             click(
-                app.find(ParameterOptionItem)
-                    .filterWhere((item) => item.text().match(/Relative Date/))
-            )
+                app
+                    .find(ParameterOptionItem)
+                    .filterWhere(item => item.text().match(/Relative Date/))
+            );
 
-            await store.waitForActions(ADD_PARAMETER)
+            await store.waitForActions(ADD_PARAMETER);
 
             click(app.find(ParameterValueWidget));
-            clickButton(app.find(PredefinedRelativeDatePicker).find("button[children='Yesterday']"));
+            clickButton(
+                app
+                    .find(PredefinedRelativeDatePicker)
+                    .find("button[children='Yesterday']")
+            );
             expect(app.find(ParameterValueWidget).text()).toEqual("Yesterday");
 
-            clickButton(app.find(HeaderModal).find("button[children='Done']"))
+            clickButton(app.find(HeaderModal).find("button[children='Done']"));
 
             // Wait until the header modal exit animation is finished
-            await store.waitForActions([SET_EDITING_PARAMETER_ID])
-        })
+            await store.waitForActions([SET_EDITING_PARAMETER_ID]);
+        });
 
         afterAll(async () => {
             if (dashboardId) {
@@ -171,7 +202,6 @@ describe("Dashboard", () => {
                     archived: true
                 });
             }
-        })
-    })
-})
-
+        });
+    });
+});

@@ -50,7 +50,9 @@ export function getMode(
         if (aggregations.length === 0 && breakouts.length === 0) {
             const isPKFilter = filter => {
                 if (
-                    tableMetadata && Array.isArray(filter) && filter[0] === "="
+                    tableMetadata &&
+                    Array.isArray(filter) &&
+                    filter[0] === "="
                 ) {
                     const fieldId = Q_DEPRECATED.getFieldTargetId(filter[1]);
                     const field = tableMetadata.fields_lookup[fieldId];
@@ -76,8 +78,8 @@ export function getMode(
         if (aggregations.length > 0 && breakouts.length > 0) {
             let breakoutFields = breakouts.map(
                 breakout =>
-                    (Q_DEPRECATED.getFieldTarget(breakout, tableMetadata) || {
-                    }).field
+                    (Q_DEPRECATED.getFieldTarget(breakout, tableMetadata) || {})
+                        .field
             );
             if (
                 (breakoutFields.length === 1 && isDate(breakoutFields[0])) ||

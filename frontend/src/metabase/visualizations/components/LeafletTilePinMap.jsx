@@ -1,4 +1,3 @@
-
 import LeafletMap from "./LeafletMap.jsx";
 import L from "leaflet";
 
@@ -15,9 +14,9 @@ export default class LeafletTilePinMap extends LeafletMap {
 
         try {
             const { pinTileLayer } = this;
-            const newUrl = this._getTileUrl({ x: "{x}", y: "{y}"}, "{z}");
+            const newUrl = this._getTileUrl({ x: "{x}", y: "{y}" }, "{z}");
             if (newUrl !== pinTileLayer._url) {
-                pinTileLayer.setUrl(newUrl)
+                pinTileLayer.setUrl(newUrl);
             }
         } catch (err) {
             console.error(err);
@@ -26,7 +25,7 @@ export default class LeafletTilePinMap extends LeafletMap {
     }
 
     _getTileUrl = (coord, zoom) => {
-        const [{ card: { dataset_query }, data: { cols }}] = this.props.series;
+        const [{ card: { dataset_query }, data: { cols } }] = this.props.series;
 
         const { latitudeIndex, longitudeIndex } = this._getLatLonIndexes();
         const latitudeField = cols[latitudeIndex];
@@ -36,9 +35,24 @@ export default class LeafletTilePinMap extends LeafletMap {
             return;
         }
 
-        return 'api/tiles/' + zoom + '/' + coord.x + '/' + coord.y + '/' +
-            latitudeField.id + '/' + longitudeField.id + '/' +
-            latitudeIndex + '/' + longitudeIndex + '/' +
-            '?query=' + encodeURIComponent(JSON.stringify(dataset_query))
-    }
+        return (
+            "api/tiles/" +
+            zoom +
+            "/" +
+            coord.x +
+            "/" +
+            coord.y +
+            "/" +
+            latitudeField.id +
+            "/" +
+            longitudeField.id +
+            "/" +
+            latitudeIndex +
+            "/" +
+            longitudeIndex +
+            "/" +
+            "?query=" +
+            encodeURIComponent(JSON.stringify(dataset_query))
+        );
+    };
 }

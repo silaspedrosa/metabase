@@ -5,7 +5,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 import { createMultiwordSearchRegex } from "metabase/lib/string";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import { getHumanReadableValue } from "metabase/lib/query/field";
 
 import ListSearchField from "metabase/components/ListSearchField.jsx";
@@ -17,11 +17,11 @@ type Props = {
     values: any[],
     setValue: () => void,
     onClose: () => void
-}
+};
 type State = {
     searchText: string,
-    searchRegex: ?RegExp,
-}
+    searchRegex: ?RegExp
+};
 
 export default class CategoryWidget extends Component {
     props: Props;
@@ -54,7 +54,7 @@ export default class CategoryWidget extends Component {
             searchText: value,
             searchRegex: regex
         });
-    }
+    };
 
     static format(value, fieldValues) {
         return getHumanReadableValue(value, fieldValues);
@@ -78,28 +78,34 @@ export default class CategoryWidget extends Component {
 
         return (
             <div style={{ maxWidth: 200 }}>
-                { values.length > 10 &&
-                  <div className="p1">
-                      <ListSearchField
-                          onChange={this.updateSearchText}
-                          searchText={this.state.searchText}
-                          placeholder={t`Find a value`}
-                          autoFocus={true}
-                      />
-                  </div>
-                }
+                {values.length > 10 && (
+                    <div className="p1">
+                        <ListSearchField
+                            onChange={this.updateSearchText}
+                            searchText={this.state.searchText}
+                            placeholder={t`Find a value`}
+                            autoFocus={true}
+                        />
+                    </div>
+                )}
                 <ul className="scroll-y scroll-show" style={{ maxHeight: 300 }}>
-                    {filteredValues.map(([rawValue, humanReadableValue]) =>
+                    {filteredValues.map(([rawValue, humanReadableValue]) => (
                         <li
                             key={rawValue}
-                            className={cx("px2 py1 bg-brand-hover text-white-hover cursor-pointer", {
-                                "text-white bg-brand": rawValue === value
-                            })}
-                            onClick={() => { setValue(rawValue); onClose(); }}
+                            className={cx(
+                                "px2 py1 bg-brand-hover text-white-hover cursor-pointer",
+                                {
+                                    "text-white bg-brand": rawValue === value
+                                }
+                            )}
+                            onClick={() => {
+                                setValue(rawValue);
+                                onClose();
+                            }}
                         >
                             {humanReadableValue || String(rawValue)}
                         </li>
-                     )}
+                    ))}
                 </ul>
             </div>
         );

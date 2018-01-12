@@ -2,7 +2,10 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-import { LeftNavPane, LeftNavPaneItem } from "metabase/components/LeftNavPane.jsx";
+import {
+    LeftNavPane,
+    LeftNavPaneItem
+} from "metabase/components/LeftNavPane.jsx";
 
 import AdminLayout from "metabase/components/AdminLayout.jsx";
 
@@ -17,8 +20,15 @@ export default class AdminPeopleApp extends Component {
             <AdminLayout
                 sidebar={
                     <LeftNavPane>
-                        <LeftNavPaneItem name="People" path="/admin/people" index />
-                        <LeftNavPaneItem name="Groups" path="/admin/people/groups" />
+                        <LeftNavPaneItem
+                            name="People"
+                            path="/admin/people"
+                            index
+                        />
+                        <LeftNavPaneItem
+                            name="Groups"
+                            path="/admin/people/groups"
+                        />
                     </LeftNavPane>
                 }
             >

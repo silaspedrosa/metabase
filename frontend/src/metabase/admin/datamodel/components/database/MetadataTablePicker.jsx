@@ -36,14 +36,16 @@ export default class MetadataTablePicker extends Component {
             schemas[name] = schemas[name] || {
                 name: titleize(humanize(name)),
                 tables: []
-            }
+            };
             schemas[name].tables.push(table);
             if (table.id === newProps.tableId) {
                 selectedSchema = schemas[name];
             }
         }
         this.setState({
-            schemas: Object.values(schemas).sort((a, b) => a.name.localeCompare(b.name)),
+            schemas: Object.values(schemas).sort((a, b) =>
+                a.name.localeCompare(b.name)
+            ),
             selectedSchema: selectedSchema
         });
     }
@@ -51,16 +53,30 @@ export default class MetadataTablePicker extends Component {
     render() {
         const { schemas } = this.state;
         if (schemas.length === 1) {
-            return <MetadataTableList {...this.props} tables={schemas[0].tables} />;
+            return (
+                <MetadataTableList {...this.props} tables={schemas[0].tables} />
+            );
         }
         if (this.state.selectedSchema && this.state.showTablePicker) {
-            return <MetadataTableList {...this.props} tables={this.state.selectedSchema.tables} schema={this.state.selectedSchema} onBack={() => this.setState({ showTablePicker: false })} />;
+            return (
+                <MetadataTableList
+                    {...this.props}
+                    tables={this.state.selectedSchema.tables}
+                    schema={this.state.selectedSchema}
+                    onBack={() => this.setState({ showTablePicker: false })}
+                />
+            );
         }
         return (
             <MetadataSchemaList
                 schemas={schemas}
                 selectedSchema={this.state.schema}
-                onChangeSchema={(schema) => this.setState({ selectedSchema: schema, showTablePicker: true })}
+                onChangeSchema={schema =>
+                    this.setState({
+                        selectedSchema: schema,
+                        showTablePicker: true
+                    })
+                }
             />
         );
     }

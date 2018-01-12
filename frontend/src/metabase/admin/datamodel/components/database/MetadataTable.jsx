@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import MetricsList from "./MetricsList.jsx";
 import ColumnsList from "./ColumnsList.jsx";
 import SegmentsList from "./SegmentsList.jsx";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import Input from "metabase/components/Input.jsx";
 import ProgressBar from "metabase/components/ProgressBar.jsx";
 
@@ -50,10 +50,30 @@ export default class MetadataTable extends Component {
     }
 
     renderVisibilityType(text, type, any) {
-        var classes = cx("mx1", "text-bold", "text-brand-hover", "cursor-pointer", "text-default", {
-            "text-brand": this.props.tableMetadata.visibility_type === type || (any && this.props.tableMetadata.visibility_type)
-        });
-        return <span className={classes} onClick={this.updateProperty.bind(null, "visibility_type", type)}>{text}</span>;
+        var classes = cx(
+            "mx1",
+            "text-bold",
+            "text-brand-hover",
+            "cursor-pointer",
+            "text-default",
+            {
+                "text-brand":
+                    this.props.tableMetadata.visibility_type === type ||
+                    (any && this.props.tableMetadata.visibility_type)
+            }
+        );
+        return (
+            <span
+                className={classes}
+                onClick={this.updateProperty.bind(
+                    null,
+                    "visibility_type",
+                    type
+                )}
+            >
+                {text}
+            </span>
+        );
     }
 
     renderVisibilityWidget() {
@@ -85,15 +105,28 @@ export default class MetadataTable extends Component {
         return (
             <div className="MetadataTable px3 flex-full">
                 <div className="MetadataTable-title flex flex-column bordered rounded">
-                    <Input className="AdminInput TableEditor-table-name text-bold border-bottom rounded-top" type="text" value={tableMetadata.display_name || ""} onBlurChange={this.onNameChange}/>
-                    <Input className="AdminInput TableEditor-table-description rounded-bottom" type="text" value={tableMetadata.description || ""} onBlurChange={this.onDescriptionChange} placeholder={t`No table description yet`} />
+                    <Input
+                        className="AdminInput TableEditor-table-name text-bold border-bottom rounded-top"
+                        type="text"
+                        value={tableMetadata.display_name || ""}
+                        onBlurChange={this.onNameChange}
+                    />
+                    <Input
+                        className="AdminInput TableEditor-table-description rounded-bottom"
+                        type="text"
+                        value={tableMetadata.description || ""}
+                        onBlurChange={this.onDescriptionChange}
+                        placeholder={t`No table description yet`}
+                    />
                 </div>
                 <div className="MetadataTable-header flex align-center py2 text-grey-3">
                     <span className="mx1 text-uppercase">{t`Visibility`}</span>
                     {this.renderVisibilityWidget()}
                     <span className="flex-align-right flex align-center">
                         <span className="text-uppercase mr1">{t`Metadata Strength`}</span>
-                        <ProgressBar percentage={tableMetadata.metadataStrength} />
+                        <ProgressBar
+                            percentage={tableMetadata.metadataStrength}
+                        />
                     </span>
                 </div>
                 <div className={"mt2 " + (this.isHidden() ? "disabled" : "")}>

@@ -9,7 +9,7 @@ export type ColumnName = string;
 
 export type BinningInfo = {
     bin_width: number
-}
+};
 
 // TODO: incomplete
 export type Column = {
@@ -18,12 +18,12 @@ export type Column = {
     display_name: string,
     base_type: string,
     special_type: ?string,
-    source?: "fields"|"aggregation"|"breakout",
+    source?: "fields" | "aggregation" | "breakout",
     unit?: DatetimeUnit,
     binning_info?: BinningInfo
 };
 
-export type Value = string|number|ISO8601Time|boolean|null|{};
+export type Value = string | number | ISO8601Time | boolean | null | {};
 export type Row = Value[];
 
 export type DatasetData = {

@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import { ModalFooter } from "metabase/components/ModalContent"
+import { ModalFooter } from "metabase/components/ModalContent";
 import AdminContentTable from "metabase/components/AdminContentTable";
 import Button from "metabase/components/Button";
 import GroupSelect from "metabase/admin/people/components/GroupSelect";
@@ -11,12 +11,12 @@ import Icon from "metabase/components/Icon";
 import LoadingSpinner from "metabase/components/LoadingSpinner";
 import Modal from "metabase/components/Modal";
 import PopoverWithTrigger from "metabase/components/PopoverWithTrigger";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import { PermissionsApi, SettingsApi } from "metabase/services";
 
 import _ from "underscore";
 
-import SettingToggle from './SettingToggle';
+import SettingToggle from "./SettingToggle";
 
 type Props = {
     setting: any,
@@ -48,24 +48,33 @@ export default class LdapGroupMappingsWidget extends React.Component {
 
     _showEditModal = (e: Event) => {
         e.preventDefault();
-        this.setState({ mappings: this.props.mappings || {}, showEditModal: true });
-        PermissionsApi.groups().then((groups) => this.setState({ groups }));
-    }
+        this.setState({
+            mappings: this.props.mappings || {},
+            showEditModal: true
+        });
+        PermissionsApi.groups().then(groups => this.setState({ groups }));
+    };
 
     _showAddRow = (e: Event) => {
         e.preventDefault();
         this.setState({ showAddRow: true });
-    }
+    };
 
     _hideAddRow = () => {
         this.setState({ showAddRow: false });
-    }
+    };
 
     _addMapping = (dn: string) => {
-        this.setState((prevState: State) => ({ mappings: { ...prevState.mappings, [dn]: [] }, showAddRow: false }));
-    }
+        this.setState((prevState: State) => ({
+            mappings: { ...prevState.mappings, [dn]: [] },
+            showAddRow: false
+        }));
+    };
 
-    _changeMapping = (dn: string) => (group: { id: number }, selected: boolean) => {
+    _changeMapping = (dn: string) => (
+        group: { id: number },
+        selected: boolean
+    ) => {
         if (selected) {
             this.setState((prevState: State) => ({
                 mappings: {
@@ -81,26 +90,30 @@ export default class LdapGroupMappingsWidget extends React.Component {
                 }
             }));
         }
-    }
+    };
 
     _deleteMapping = (dn: string) => (e: Event) => {
         e.preventDefault();
-        this.setState((prevState: State) => ({ mappings: _.omit(prevState.mappings, dn) }));
-    }
+        this.setState((prevState: State) => ({
+            mappings: _.omit(prevState.mappings, dn)
+        }));
+    };
 
     _cancelClick = (e: Event) => {
         e.preventDefault();
         this.setState({ showEditModal: false, showAddRow: false });
-    }
+    };
 
     _saveClick = (e: Event) => {
         e.preventDefault();
         const { state: { mappings }, props: { updateMappings } } = this;
-        SettingsApi.put({ key: "ldap-group-mappings", value: mappings }).then(() => {
-            updateMappings && updateMappings(mappings);
-            this.setState({ showEditModal: false, showAddRow: false });
-        });
-    }
+        SettingsApi.put({ key: "ldap-group-mappings", value: mappings }).then(
+            () => {
+                updateMappings && updateMappings(mappings);
+                this.setState({ showEditModal: false, showAddRow: false });
+            }
+        );
+    };
 
     render() {
         const { showEditModal, showAddRow, groups, mappings } = this.state;
@@ -109,26 +122,47 @@ export default class LdapGroupMappingsWidget extends React.Component {
             <div className="flex align-center">
                 <SettingToggle {...this.props} />
                 <div className="flex align-center pt1">
-                    <Button type="button" className="ml1" medium onClick={this._showEditModal}>{t`Edit Mappings`}</Button>
+                    <Button
+                        type="button"
+                        className="ml1"
+                        medium
+                        onClick={this._showEditModal}
+                    >{t`Edit Mappings`}</Button>
                 </div>
-                { showEditModal ? (
+                {showEditModal ? (
                     <Modal wide>
                         <div>
                             <div className="pt4 px4">
                                 <h2>{t`Group Mappings`}</h2>
                             </div>
                             <div className="px4">
-                                <Button className="float-right" primary onClick={this._showAddRow}>{t`Create a mapping`}</Button>
+                                <Button
+                                    className="float-right"
+                                    primary
+                                    onClick={this._showAddRow}
+                                >{t`Create a mapping`}</Button>
                                 <p className="text-measure">
                                     {t`Mappings allow Metabase to automatically add and remove users from groups based on the membership information provided by the
                                     directory server. Membership to the Admin group can be granted through mappings, but will not be automatically removed as a
                                     failsafe measure.`}
                                 </p>
-                                <AdminContentTable columnTitles={[t`Distinguished Name`, t`Groups`, '']}>
-                                    { showAddRow ? (
-                                        <AddMappingRow mappings={mappings} onCancel={this._hideAddRow} onAdd={this._addMapping} />
-                                    ) : null }
-                                    { ((Object.entries(mappings): any): Array<[string, number[]]>).map(([dn, ids]) =>
+                                <AdminContentTable
+                                    columnTitles={[
+                                        t`Distinguished Name`,
+                                        t`Groups`,
+                                        ""
+                                    ]}
+                                >
+                                    {showAddRow ? (
+                                        <AddMappingRow
+                                            mappings={mappings}
+                                            onCancel={this._hideAddRow}
+                                            onAdd={this._addMapping}
+                                        />
+                                    ) : null}
+                                    {((Object.entries(mappings): any): Array<
+                                        [string, number[]]
+                                    >).map(([dn, ids]) => (
                                         <MappingRow
                                             key={dn}
                                             dn={dn}
@@ -137,16 +171,22 @@ export default class LdapGroupMappingsWidget extends React.Component {
                                             onChange={this._changeMapping(dn)}
                                             onDelete={this._deleteMapping(dn)}
                                         />
-                                    ) }
+                                    ))}
                                 </AdminContentTable>
                             </div>
                             <ModalFooter>
-                                <Button type="button" onClick={this._cancelClick}>{t`Cancel`}</Button>
-                                <Button primary onClick={this._saveClick}>{t`Save`}</Button>
+                                <Button
+                                    type="button"
+                                    onClick={this._cancelClick}
+                                >{t`Cancel`}</Button>
+                                <Button
+                                    primary
+                                    onClick={this._saveClick}
+                                >{t`Save`}</Button>
                             </ModalFooter>
                         </div>
                     </Modal>
-                ) : null }
+                ) : null}
             </div>
         );
     }
@@ -159,7 +199,7 @@ type AddMappingRowProps = {
 };
 
 type AddMappingRowState = {
-    value: ''
+    value: ""
 };
 
 class AddMappingRow extends React.Component {
@@ -169,7 +209,7 @@ class AddMappingRow extends React.Component {
     constructor(props: AddMappingRowProps, context: any) {
         super(props, context);
         this.state = {
-            value: ''
+            value: ""
         };
     }
 
@@ -177,15 +217,15 @@ class AddMappingRow extends React.Component {
         e.preventDefault();
         const { onCancel } = this.props;
         onCancel && onCancel();
-        this.setState({ value: '' });
-    }
+        this.setState({ value: "" });
+    };
 
     _handleAddClick = (e: Event) => {
         e.preventDefault();
         const { onAdd } = this.props;
         onAdd && onAdd(this.state.value);
-        this.setState({ value: '' });
-    }
+        this.setState({ value: "" });
+    };
 
     render() {
         const { value } = this.state;
@@ -202,10 +242,20 @@ class AddMappingRow extends React.Component {
                             value={value}
                             placeholder="cn=People,ou=Groups,dc=metabase,dc=com"
                             autoFocus
-                            onChange={(e) => this.setState({ value: e.target.value })}
+                            onChange={e =>
+                                this.setState({ value: e.target.value })
+                            }
                         />
-                        <span className="link no-decoration cursor-pointer" onClick={this._handleCancelClick}>{t`Cancel`}</span>
-                        <Button className="ml2" primary={!!isValid} disabled={!isValid} onClick={this._handleAddClick}>{t`Add`}</Button>
+                        <span
+                            className="link no-decoration cursor-pointer"
+                            onClick={this._handleCancelClick}
+                        >{t`Cancel`}</span>
+                        <Button
+                            className="ml2"
+                            primary={!!isValid}
+                            disabled={!isValid}
+                            onClick={this._handleAddClick}
+                        >{t`Add`}</Button>
                     </div>
                 </td>
             </tr>
@@ -227,7 +277,10 @@ class MappingGroupSelect extends React.Component {
             return <LoadingSpinner />;
         }
 
-        const selected = selectedGroups.reduce((g, id) => ({ ...g, [id]: true }), {});
+        const selected = selectedGroups.reduce(
+            (g, id) => ({ ...g, [id]: true }),
+            {}
+        );
 
         return (
             <PopoverWithTrigger
@@ -235,15 +288,26 @@ class MappingGroupSelect extends React.Component {
                 triggerElement={
                     <div className="flex align-center">
                         <span className="mr1 text-grey-4">
-                            <GroupSummary groups={groups} selectedGroups={selected} />
+                            <GroupSummary
+                                groups={groups}
+                                selectedGroups={selected}
+                            />
                         </span>
-                        <Icon className="text-grey-2" name="chevrondown"  size={10}/>
+                        <Icon
+                            className="text-grey-2"
+                            name="chevrondown"
+                            size={10}
+                        />
                     </div>
                 }
                 triggerClasses="AdminSelectBorderless py1"
                 sizeToFit
             >
-                <GroupSelect groups={groups} selectedGroups={selected} onGroupChange={onGroupChange} />
+                <GroupSelect
+                    groups={groups}
+                    selectedGroups={selected}
+                    onGroupChange={onGroupChange}
+                />
             </PopoverWithTrigger>
         );
     }

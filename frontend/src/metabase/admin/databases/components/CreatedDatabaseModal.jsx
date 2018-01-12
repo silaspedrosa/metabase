@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router";
-import { t, jt } from 'c-3po';
+import { t, jt } from "c-3po";
 import ModalContent from "metabase/components/ModalContent.jsx";
 
 import * as Urls from "metabase/lib/urls";
@@ -23,15 +23,27 @@ export default class CreatedDatabaseModal extends Component {
                 <div className="Form-inputs mb4">
                     <p>
                         {jt`We're analyzing its schema now to make some educated guesses about its
-                        metadata. ${<Link to={`/admin/datamodel/database/${databaseId}`}>View this
-                        database</Link>} in the Data Model section to see what we've found and to
-                        make edits, or ${<Link to={Urls.question(null, `?db=${databaseId}`)}>ask a question</Link>} about
+                        metadata. ${(
+                            <Link
+                                to={`/admin/datamodel/database/${databaseId}`}
+                            >
+                                View this database
+                            </Link>
+                        )} in the Data Model section to see what we've found and to
+                        make edits, or ${(
+                            <Link to={Urls.question(null, `?db=${databaseId}`)}>
+                                ask a question
+                            </Link>
+                        )} about
                         this database.`}
                     </p>
                 </div>
 
                 <div className="Form-actions flex layout-centered">
-                    <button className="Button Button--primary px3" onClick={onDone}>{t`Done`}</button>
+                    <button
+                        className="Button Button--primary px3"
+                        onClick={onDone}
+                    >{t`Done`}</button>
                 </div>
             </ModalContent>
         );

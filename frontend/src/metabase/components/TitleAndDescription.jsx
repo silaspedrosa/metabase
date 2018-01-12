@@ -1,5 +1,5 @@
 /* @flow */
-import React from 'react';
+import React from "react";
 import cx from "classnames";
 import pure from "recompose/pure";
 
@@ -10,15 +10,16 @@ type Attributes = {
     title: string,
     description?: string,
     className?: string
-}
-const TitleAndDescription = ({ title, description, className }: Attributes) =>
+};
+const TitleAndDescription = ({ title, description, className }: Attributes) => (
     <div className={cx("flex align-center", className)}>
         <h2 className="mr1">{title}</h2>
-        { description &&
-            <Tooltip tooltip={description} maxWidth={'22em'}>
-                <Icon name='info' style={{ marginTop: 3 }}/>
+        {description && (
+            <Tooltip tooltip={description} maxWidth={"22em"}>
+                <Icon name="info" style={{ marginTop: 3 }} />
             </Tooltip>
-        }
-    </div>;
+        )}
+    </div>
+);
 
 export default pure(TitleAndDescription);

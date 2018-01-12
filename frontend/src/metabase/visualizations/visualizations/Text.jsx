@@ -19,7 +19,7 @@ const HEADER_ACTION_STYLE = {
 type State = {
     isShowingRenderedOutput: boolean,
     text: string
-}
+};
 
 export default class Text extends Component {
     props: VisualizationProps;
@@ -50,11 +50,11 @@ export default class Text extends Component {
     }
 
     static settings = {
-        "text": {
+        text: {
             value: "",
             default: ""
         }
-    }
+    };
 
     componentWillReceiveProps(newProps: VisualizationProps) {
         // dashboard is going into edit mode
@@ -64,7 +64,7 @@ export default class Text extends Component {
     }
 
     handleTextChange(text: string) {
-        this.props.onUpdateVisualizationSettings({ "text": text });
+        this.props.onUpdateVisualizationSettings({ text: text });
     }
 
     onEdit() {
@@ -76,39 +76,71 @@ export default class Text extends Component {
     }
 
     render() {
-        let { className, actionButtons, gridSize, settings, isEditing } = this.props;
+        let {
+            className,
+            actionButtons,
+            gridSize,
+            settings,
+            isEditing
+        } = this.props;
         let isSmall = gridSize && gridSize.width < 4;
 
         if (isEditing) {
             return (
-                <div className={cx(className, styles.Text, styles[isSmall ? "small" : "large"], styles["dashboard-is-editing"])}>
+                <div
+                    className={cx(
+                        className,
+                        styles.Text,
+                        styles[isSmall ? "small" : "large"],
+                        styles["dashboard-is-editing"]
+                    )}
+                >
                     <TextActionButtons
                         actionButtons={actionButtons}
-                        isShowingRenderedOutput={this.state.isShowingRenderedOutput}
+                        isShowingRenderedOutput={
+                            this.state.isShowingRenderedOutput
+                        }
                         onEdit={this.onEdit.bind(this)}
                         onPreview={this.onPreview.bind(this)}
                     />
-                    {this.state.isShowingRenderedOutput ?
+                    {this.state.isShowingRenderedOutput ? (
                         <ReactMarkdown
-                            className={cx("full flex-full flex flex-column text-card-markdown", styles["text-card-markdown"])}
+                            className={cx(
+                                "full flex-full flex flex-column text-card-markdown",
+                                styles["text-card-markdown"]
+                            )}
                             source={settings.text}
                         />
-                    :
+                    ) : (
                         <textarea
-                            className={cx("full flex-full flex flex-column bg-grey-0 bordered drag-disabled", styles["text-card-textarea"])}
+                            className={cx(
+                                "full flex-full flex flex-column bg-grey-0 bordered drag-disabled",
+                                styles["text-card-textarea"]
+                            )}
                             name="text"
                             placeholder="Write here, and use Markdown if you'd like"
                             value={settings.text}
-                            onChange={(e) => this.handleTextChange(e.target.value)}
+                            onChange={e =>
+                                this.handleTextChange(e.target.value)
+                            }
                         />
-                    }
+                    )}
                 </div>
             );
         } else {
             return (
-                <div className={cx(className, styles.Text, styles[isSmall ? "small" : "large"])}>
+                <div
+                    className={cx(
+                        className,
+                        styles.Text,
+                        styles[isSmall ? "small" : "large"]
+                    )}
+                >
                     <ReactMarkdown
-                        className={cx("full flex-full flex flex-column text-card-markdown", styles["text-card-markdown"])}
+                        className={cx(
+                            "full flex-full flex flex-column text-card-markdown",
+                            styles["text-card-markdown"]
+                        )}
                         source={settings.text}
                     />
                 </div>
@@ -117,32 +149,60 @@ export default class Text extends Component {
     }
 }
 
-const TextActionButtons = ({ actionButtons, isShowingRenderedOutput, onEdit, onPreview }) =>
+const TextActionButtons = ({
+    actionButtons,
+    isShowingRenderedOutput,
+    onEdit,
+    onPreview
+}) => (
     <div className="Card-title">
         <div className="absolute top left p1 px2">
-            <span className="DashCard-actions-persistent flex align-center" style={{ lineHeight: 1 }}>
+            <span
+                className="DashCard-actions-persistent flex align-center"
+                style={{ lineHeight: 1 }}
+            >
                 <a
                     data-metabase-event={"Dashboard;Text;edit"}
-                    className={cx(" cursor-pointer h3 flex-no-shrink relative mr1", { "text-grey-2 text-grey-4-hover": isShowingRenderedOutput, "text-brand": !isShowingRenderedOutput })}
+                    className={cx(
+                        " cursor-pointer h3 flex-no-shrink relative mr1",
+                        {
+                            "text-grey-2 text-grey-4-hover": isShowingRenderedOutput,
+                            "text-brand": !isShowingRenderedOutput
+                        }
+                    )}
                     onClick={onEdit}
                     style={HEADER_ACTION_STYLE}
                 >
                     <span className="flex align-center">
                         <span className="flex">
-                            <Icon name="editdocument" style={{ top: 0, left: 0 }} size={HEADER_ICON_SIZE} />
+                            <Icon
+                                name="editdocument"
+                                style={{ top: 0, left: 0 }}
+                                size={HEADER_ICON_SIZE}
+                            />
                         </span>
                     </span>
                 </a>
 
                 <a
                     data-metabase-event={"Dashboard;Text;preview"}
-                    className={cx(" cursor-pointer h3 flex-no-shrink relative mr1", { "text-grey-2 text-grey-4-hover": !isShowingRenderedOutput, "text-brand": isShowingRenderedOutput })}
+                    className={cx(
+                        " cursor-pointer h3 flex-no-shrink relative mr1",
+                        {
+                            "text-grey-2 text-grey-4-hover": !isShowingRenderedOutput,
+                            "text-brand": isShowingRenderedOutput
+                        }
+                    )}
                     onClick={onPreview}
                     style={HEADER_ACTION_STYLE}
                 >
                     <span className="flex align-center">
                         <span className="flex">
-                            <Icon name="eye" style={{ top: 0, left: 0 }} size={20} />
+                            <Icon
+                                name="eye"
+                                style={{ top: 0, left: 0 }}
+                                size={20}
+                            />
                         </span>
                     </span>
                 </a>
@@ -150,3 +210,4 @@ const TextActionButtons = ({ actionButtons, isShowingRenderedOutput, onEdit, onP
         </div>
         <div className="absolute top right p1 px2">{actionButtons}</div>
     </div>
+);

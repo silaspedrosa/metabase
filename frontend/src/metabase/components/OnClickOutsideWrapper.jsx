@@ -24,10 +24,15 @@ export default class OnClickOutsideWrapper extends Component {
 
             // HACK: set the z-index of the parent element to ensure it"s always on top
             // NOTE: this actually doesn"t seem to be working correctly for popovers since PopoverBody creates a stacking context
-            ReactDOM.findDOMNode(this).parentNode.style.zIndex = popoverStack.length + 2; // HACK: add 2 to ensure it"s in front of main and nav elements
+            ReactDOM.findDOMNode(this).parentNode.style.zIndex =
+                popoverStack.length + 2; // HACK: add 2 to ensure it"s in front of main and nav elements
 
             if (this.props.dismissOnEscape) {
-                document.addEventListener("keydown", this._handleKeyPress, false);
+                document.addEventListener(
+                    "keydown",
+                    this._handleKeyPress,
+                    false
+                );
             }
             if (this.props.dismissOnClickOutside) {
                 window.addEventListener("mousedown", this._handleClick, true);
@@ -50,25 +55,25 @@ export default class OnClickOutsideWrapper extends Component {
         }, 0);
     }
 
-    _handleClick = (e) => {
+    _handleClick = e => {
         if (!ReactDOM.findDOMNode(this).contains(e.target)) {
             setTimeout(this._handleDismissal, 0);
         }
-    }
+    };
 
-    _handleKeyPress = (e) => {
+    _handleKeyPress = e => {
         if (e.keyCode === KEYCODE_ESCAPE) {
             e.preventDefault();
             this._handleDismissal();
         }
-    }
+    };
 
-    _handleDismissal = (e) => {
+    _handleDismissal = e => {
         // only propagate event for the popover on top of the stack
         if (this === popoverStack[popoverStack.length - 1]) {
             this.props.handleDismissal(e);
         }
-    }
+    };
 
     render() {
         return React.Children.only(this.props.children);

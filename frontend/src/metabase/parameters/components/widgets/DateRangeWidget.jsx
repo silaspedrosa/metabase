@@ -17,10 +17,14 @@ export default class DateRangeWidget extends Component {
     static propTypes = {};
     static defaultProps = {};
 
-    static format = (value) => {
-        const [start,end] = (value || "").split(SEPARATOR);
-        return start && end ? moment(start).format("MMMM D, YYYY") + " - " + moment(end).format("MMMM D, YYYY") : "";
-    }
+    static format = value => {
+        const [start, end] = (value || "").split(SEPARATOR);
+        return start && end
+            ? moment(start).format("MMMM D, YYYY") +
+                  " - " +
+                  moment(end).format("MMMM D, YYYY")
+            : "";
+    };
 
     componentWillMount() {
         this.componentWillReceiveProps(this.props);
@@ -48,6 +52,6 @@ export default class DateRangeWidget extends Component {
                     }}
                 />
             </div>
-        )
+        );
     }
 }

@@ -8,30 +8,37 @@ import querystring from "querystring";
 import cx from "classnames";
 
 import type { QueryParams } from "metabase/meta/types";
-import type { ParameterId, Parameter, ParameterValues } from "metabase/meta/types/Parameter";
+import type {
+    ParameterId,
+    Parameter,
+    ParameterValues
+} from "metabase/meta/types/Parameter";
 
 type Props = {
-    className?:                 string,
+    className?: string,
 
-    parameters:                 Parameter[],
-    editingParameter?:          ?Parameter,
-    parameterValues?:           ParameterValues,
+    parameters: Parameter[],
+    editingParameter?: ?Parameter,
+    parameterValues?: ParameterValues,
 
-    isFullscreen?:              boolean,
-    isNightMode?:               boolean,
-    isEditing?:                 boolean,
-    isQB?:                      boolean,
-    vertical?:                  boolean,
-    commitImmediately?:         boolean,
+    isFullscreen?: boolean,
+    isNightMode?: boolean,
+    isEditing?: boolean,
+    isQB?: boolean,
+    vertical?: boolean,
+    commitImmediately?: boolean,
 
-    query?:                     QueryParams,
+    query?: QueryParams,
 
-    setParameterName?:          (parameterId: ParameterId, name: string) => void,
-    setParameterValue?:         (parameterId: ParameterId, value: string) => void,
-    setParameterDefaultValue?:  (parameterId: ParameterId, defaultValue: string) => void,
-    removeParameter?:           (parameterId: ParameterId) => void,
-    setEditingParameter?:       (parameterId: ParameterId) => void,
-}
+    setParameterName?: (parameterId: ParameterId, name: string) => void,
+    setParameterValue?: (parameterId: ParameterId, value: string) => void,
+    setParameterDefaultValue?: (
+        parameterId: ParameterId,
+        defaultValue: string
+    ) => void,
+    removeParameter?: (parameterId: ParameterId) => void,
+    setEditingParameter?: (parameterId: ParameterId) => void
+};
 
 export default class Parameters extends Component {
     props: Props;
@@ -40,7 +47,7 @@ export default class Parameters extends Component {
         syncQueryString: false,
         vertical: false,
         commitImmediately: false
-    }
+    };
 
     componentWillMount() {
         // sync parameters from URL query string
@@ -67,10 +74,14 @@ export default class Parameters extends Component {
             }
 
             let search = querystring.stringify(queryParams);
-            search = (search ? "?" + search : "");
+            search = search ? "?" + search : "";
 
             if (search !== window.location.search) {
-                history.replaceState(null, document.title, window.location.pathname + search + window.location.hash);
+                history.replaceState(
+                    null,
+                    document.title,
+                    window.location.pathname + search + window.location.hash
+                );
             }
         }
     }
@@ -90,9 +101,16 @@ export default class Parameters extends Component {
     render() {
         const {
             className,
-            editingParameter, setEditingParameter,
-            isEditing, isFullscreen, isNightMode, isQB,
-            setParameterName, setParameterValue, setParameterDefaultValue, removeParameter,
+            editingParameter,
+            setEditingParameter,
+            isEditing,
+            isFullscreen,
+            isNightMode,
+            isQB,
+            setParameterName,
+            setParameterValue,
+            setParameterDefaultValue,
+            removeParameter,
             vertical,
             commitImmediately
         } = this.props;
@@ -100,30 +118,45 @@ export default class Parameters extends Component {
         const parameters = this._parametersWithValues();
 
         return (
-            <div className={cx(className, "flex align-end flex-wrap", vertical ? "flex-column" : "flex-row", {"mt1": isQB})}>
-                { parameters.map(parameter =>
+            <div
+                className={cx(
+                    className,
+                    "flex align-end flex-wrap",
+                    vertical ? "flex-column" : "flex-row",
+                    { mt1: isQB }
+                )}
+            >
+                {parameters.map(parameter => (
                     <ParameterWidget
                         className={vertical ? "mb2" : null}
                         key={parameter.id}
-
                         isEditing={isEditing}
                         isFullscreen={isFullscreen}
                         isNightMode={isNightMode}
-
                         parameter={parameter}
                         parameters={parameters}
-
                         editingParameter={editingParameter}
                         setEditingParameter={setEditingParameter}
-
-                        setName={setParameterName && ((name) => setParameterName(parameter.id, name))}
-                        setValue={setParameterValue && ((value) => setParameterValue(parameter.id, value))}
-                        setDefaultValue={setParameterDefaultValue && ((value) => setParameterDefaultValue(parameter.id, value))}
-                        remove={removeParameter && (() => removeParameter(parameter.id))}
-
+                        setName={
+                            setParameterName &&
+                            (name => setParameterName(parameter.id, name))
+                        }
+                        setValue={
+                            setParameterValue &&
+                            (value => setParameterValue(parameter.id, value))
+                        }
+                        setDefaultValue={
+                            setParameterDefaultValue &&
+                            (value =>
+                                setParameterDefaultValue(parameter.id, value))
+                        }
+                        remove={
+                            removeParameter &&
+                            (() => removeParameter(parameter.id))
+                        }
                         commitImmediately={commitImmediately}
                     />
-                ) }
+                ))}
             </div>
         );
     }

@@ -1,9 +1,9 @@
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
+import React, { Component } from "react";
+import { connect } from "react-redux";
 import { push, replace } from "react-router-redux";
 import _ from "underscore";
 import cx from "classnames";
-import { t } from 'c-3po'
+import { t } from "c-3po";
 
 import SearchHeader from "metabase/components/SearchHeader";
 import DirectionalButton from "metabase/components/DirectionalButton";
@@ -16,7 +16,7 @@ import { KEYCODE_DOWN, KEYCODE_ENTER, KEYCODE_UP } from "metabase/lib/keyboard";
 import { LocationDescriptor } from "metabase/meta/types/index";
 import { parseHashOptions, updateQueryString } from "metabase/lib/browser";
 
-const PAGE_SIZE = 10
+const PAGE_SIZE = 10;
 
 const SEARCH_GROUPINGS = [
     {
@@ -32,43 +32,43 @@ const SEARCH_GROUPINGS = [
         id: "table",
         name: t`Table`,
         icon: "table2",
-        groupBy: (entity) => entity.table.id,
-        getGroupName: (entity) => entity.table.display_name
+        groupBy: entity => entity.table.id,
+        getGroupName: entity => entity.table.display_name
     },
     {
         id: "database",
         name: t`Database`,
         icon: "database",
-        groupBy: (entity) => entity.table.db.id,
-        getGroupName: (entity) => entity.table.db.name
+        groupBy: entity => entity.table.db.id,
+        getGroupName: entity => entity.table.db.name
     },
     {
         id: "creator",
         name: t`Creator`,
         icon: "mine",
-        groupBy: (entity) => entity.creator.id,
-        getGroupName: (entity) => entity.creator.common_name
-    },
-]
-const DEFAULT_SEARCH_GROUPING = SEARCH_GROUPINGS[0]
+        groupBy: entity => entity.creator.id,
+        getGroupName: entity => entity.creator.common_name
+    }
+];
+const DEFAULT_SEARCH_GROUPING = SEARCH_GROUPINGS[0];
 
 type Props = {
     title: string,
     entities: any[], // Sorted list of entities like segments or metrics
-    getUrlForEntity: (any) => void,
+    getUrlForEntity: any => void,
     backButtonUrl: ?string,
 
-    onReplaceLocation: (LocationDescriptor) => void,
-    onChangeLocation: (LocationDescriptor) => void,
+    onReplaceLocation: LocationDescriptor => void,
+    onChangeLocation: LocationDescriptor => void,
 
     location: LocationDescriptor // Injected by withRouter HOC
-}
+};
 
-@connect(null, { onReplaceLocation: replace, onChangeLocation: push  })
+@connect(null, { onReplaceLocation: replace, onChangeLocation: push })
 @withRouter
 export default class EntitySearch extends Component {
-    searchHeaderInput: ?HTMLButtonElement
-    props: Props
+    searchHeaderInput: ?HTMLButtonElement;
+    props: Props;
 
     constructor(props) {
         super(props);
@@ -80,72 +80,79 @@ export default class EntitySearch extends Component {
     }
 
     componentDidMount = () => {
-        this.parseQueryString()
-    }
+        this.parseQueryString();
+    };
 
-    componentWillReceiveProps = (nextProps) => {
-        this.applyFiltersForEntities(nextProps.entities)
-    }
+    componentWillReceiveProps = nextProps => {
+        this.applyFiltersForEntities(nextProps.entities);
+    };
 
     parseQueryString = () => {
-        const options = parseHashOptions(this.props.location.search.substring(1))
+        const options = parseHashOptions(
+            this.props.location.search.substring(1)
+        );
         if (Object.keys(options).length > 0) {
             if (options.search) {
-                this.setSearchText(String(options.search))
+                this.setSearchText(String(options.search));
             }
             if (options.grouping) {
-                const grouping = SEARCH_GROUPINGS.find((grouping) => grouping.id === options.grouping)
+                const grouping = SEARCH_GROUPINGS.find(
+                    grouping => grouping.id === options.grouping
+                );
                 if (grouping) {
-                    this.setGrouping(grouping)
+                    this.setGrouping(grouping);
                 }
             }
         }
-    }
+    };
 
-    updateUrl = (queryOptionsUpdater) => {
+    updateUrl = queryOptionsUpdater => {
         const { onReplaceLocation, location } = this.props;
-        onReplaceLocation(updateQueryString(location, queryOptionsUpdater))
+        onReplaceLocation(updateQueryString(location, queryOptionsUpdater));
+    };
 
-    }
-
-    setSearchText = (searchText) => {
-        this.setState({ searchText }, this.applyFiltersAfterFilterChange)
-        this.updateUrl((currentOptions) => searchText !== ""
-            ? ({ ...currentOptions, search: searchText})
-            : _.omit(currentOptions, 'search')
-        )
-    }
+    setSearchText = searchText => {
+        this.setState({ searchText }, this.applyFiltersAfterFilterChange);
+        this.updateUrl(
+            currentOptions =>
+                searchText !== ""
+                    ? { ...currentOptions, search: searchText }
+                    : _.omit(currentOptions, "search")
+        );
+    };
 
     resetSearchText = () => {
-        this.setSearchText("")
-        this.searchHeaderInput.focus()
-    }
+        this.setSearchText("");
+        this.searchHeaderInput.focus();
+    };
 
-    applyFiltersAfterFilterChange = () => this.applyFiltersForEntities(this.props.entities)
+    applyFiltersAfterFilterChange = () =>
+        this.applyFiltersForEntities(this.props.entities);
 
-    applyFiltersForEntities = (entities) => {
+    applyFiltersForEntities = entities => {
         const { searchText } = this.state;
 
         if (searchText !== "") {
             const filteredEntities = entities.filter(({ name, description }) =>
                 caseInsensitiveSearch(name, searchText)
-            )
+            );
 
-            this.setState({ filteredEntities })
+            this.setState({ filteredEntities });
+        } else {
+            this.setState({ filteredEntities: entities });
         }
-        else {
-            this.setState({ filteredEntities: entities })
-        }
-    }
+    };
 
-    setGrouping = (grouping) => {
-        this.setState({ currentGrouping: grouping })
-        this.updateUrl((currentOptions) => grouping !== DEFAULT_SEARCH_GROUPING
-            ? { ...currentOptions, grouping: grouping.id }
-            : _.omit(currentOptions, 'grouping')
-        )
-        this.searchHeaderInput.focus()
-    }
+    setGrouping = grouping => {
+        this.setState({ currentGrouping: grouping });
+        this.updateUrl(
+            currentOptions =>
+                grouping !== DEFAULT_SEARCH_GROUPING
+                    ? { ...currentOptions, grouping: grouping.id }
+                    : _.omit(currentOptions, "grouping")
+        );
+        this.searchHeaderInput.focus();
+    };
 
     // Returns an array of groups based on current grouping. The groups are sorted by their name.
     // Entities inside each group aren't separately sorted as EntitySearch expects that the `entities`
@@ -160,21 +167,40 @@ export default class EntitySearch extends Component {
                 groupName: currentGrouping.getGroupName(entitiesInGroup[0]),
                 entitiesInGroup
             }))
-            .sortBy(({ groupName }) => groupName !== null && groupName.toLowerCase())
-            .value()
-    }
+            .sortBy(
+                ({ groupName }) => groupName !== null && groupName.toLowerCase()
+            )
+            .value();
+    };
 
     render() {
-        const { title, backButtonUrl, getUrlForEntity, onChangeLocation } = this.props;
+        const {
+            title,
+            backButtonUrl,
+            getUrlForEntity,
+            onChangeLocation
+        } = this.props;
         const { searchText, currentGrouping, filteredEntities } = this.state;
 
-        const hasUngroupedResults = currentGrouping === DEFAULT_SEARCH_GROUPING && filteredEntities.length > 0
+        const hasUngroupedResults =
+            currentGrouping === DEFAULT_SEARCH_GROUPING &&
+            filteredEntities.length > 0;
 
         return (
             <div className="bg-slate-extra-light full Entity-search">
                 <div className="wrapper wrapper--small pt4 pb4">
-                    <div className="flex mb4 align-center" style={{ height: "50px" }}>
-                        <div className="Entity-search-back-button mr2" onClick={ () => backButtonUrl ? onChangeLocation(backButtonUrl) : window.history.back() }>
+                    <div
+                        className="flex mb4 align-center"
+                        style={{ height: "50px" }}
+                    >
+                        <div
+                            className="Entity-search-back-button mr2"
+                            onClick={() =>
+                                backButtonUrl
+                                    ? onChangeLocation(backButtonUrl)
+                                    : window.history.back()
+                            }
+                        >
                             <DirectionalButton direction="back" />
                         </div>
                         <div className="text-centered flex-full">
@@ -187,25 +213,29 @@ export default class EntitySearch extends Component {
                             setGrouping={this.setGrouping}
                         />
                         <div
-                            className={cx("bg-white bordered", { "rounded": !hasUngroupedResults }, { "rounded-top": hasUngroupedResults })}
+                            className={cx(
+                                "bg-white bordered",
+                                { rounded: !hasUngroupedResults },
+                                { "rounded-top": hasUngroupedResults }
+                            )}
                             style={{ padding: "5px 15px" }}
                         >
                             <SearchHeader
                                 searchText={searchText}
                                 setSearchText={this.setSearchText}
                                 autoFocus
-                                inputRef={el => this.searchHeaderInput = el}
+                                inputRef={el => (this.searchHeaderInput = el)}
                                 resetSearchText={this.resetSearchText}
                             />
                         </div>
-                        { filteredEntities.length > 0 &&
+                        {filteredEntities.length > 0 && (
                             <GroupedSearchResultsList
                                 groupingIcon={currentGrouping.icon}
                                 groups={this.getGroups()}
                                 getUrlForEntity={getUrlForEntity}
                             />
-                        }
-                        { filteredEntities.length === 0 &&
+                        )}
+                        {filteredEntities.length === 0 && (
                             <div className="mt4">
                                 <EmptyState
                                     message={
@@ -220,39 +250,40 @@ export default class EntitySearch extends Component {
                                     smallDescription
                                 />
                             </div>
-                        }
+                        )}
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 }
 
-export const SearchGroupingOptions = ({ currentGrouping, setGrouping }) =>
+export const SearchGroupingOptions = ({ currentGrouping, setGrouping }) => (
     <div className="Entity-search-grouping-options">
         <h3 className="mb3">{t`View by`}</h3>
         <ul>
-            { SEARCH_GROUPINGS.map((groupingOption) =>
+            {SEARCH_GROUPINGS.map(groupingOption => (
                 <SearchGroupingOption
                     key={groupingOption.name}
                     grouping={groupingOption}
                     active={currentGrouping === groupingOption}
                     setGrouping={setGrouping}
                 />
-            )}
+            ))}
         </ul>
     </div>
+);
 
 export class SearchGroupingOption extends Component {
     props: {
         grouping: any,
         active: boolean,
-        setGrouping: (any) => boolean
-    }
+        setGrouping: any => boolean
+    };
 
     onSetGrouping = () => {
-        this.props.setGrouping(this.props.grouping)
-    }
+        this.props.setGrouping(this.props.grouping);
+    };
 
     render() {
         const { grouping, active } = this.props;
@@ -261,14 +292,14 @@ export class SearchGroupingOption extends Component {
             <li
                 className={cx(
                     "my2 cursor-pointer text-uppercase text-small text-green-saturated-hover",
-                    {"text-grey-4": !active},
-                    {"text-green-saturated": active}
+                    { "text-grey-4": !active },
+                    { "text-green-saturated": active }
                 )}
                 onClick={this.onSetGrouping}
             >
                 {grouping.name}
             </li>
-        )
+        );
     }
 }
 
@@ -276,15 +307,15 @@ export class GroupedSearchResultsList extends Component {
     props: {
         groupingIcon: string,
         groups: any,
-        getUrlForEntity: (any) => void,
-    }
+        getUrlForEntity: any => void
+    };
 
     state = {
         highlightedItemIndex: 0,
         // `currentPages` is used as a map-like structure for storing the current pagination page for each group.
         // If a given group has no value in currentPages, then it is assumed to be in the first page (`0`).
         currentPages: {}
-    }
+    };
 
     componentDidMount() {
         window.addEventListener("keydown", this.onKeyDown, true);
@@ -298,7 +329,7 @@ export class GroupedSearchResultsList extends Component {
         this.setState({
             highlightedItemIndex: 0,
             currentPages: {}
-        })
+        });
     }
 
     /**
@@ -306,24 +337,37 @@ export class GroupedSearchResultsList extends Component {
      */
     getVisibleEntityCounts() {
         const { groups } = this.props;
-        const { currentPages } = this.state
+        const { currentPages } = this.state;
         return groups.map((group, index) =>
-            Math.min(PAGE_SIZE, group.entitiesInGroup.length - (currentPages[index] || 0) * PAGE_SIZE)
-        )
+            Math.min(
+                PAGE_SIZE,
+                group.entitiesInGroup.length -
+                    (currentPages[index] || 0) * PAGE_SIZE
+            )
+        );
     }
 
-    onKeyDown = (e) => {
-        const { highlightedItemIndex } = this.state
+    onKeyDown = e => {
+        const { highlightedItemIndex } = this.state;
 
         if (e.keyCode === KEYCODE_UP) {
-            this.setState({ highlightedItemIndex: Math.max(0, highlightedItemIndex - 1) })
+            this.setState({
+                highlightedItemIndex: Math.max(0, highlightedItemIndex - 1)
+            });
             e.preventDefault();
         } else if (e.keyCode === KEYCODE_DOWN) {
-            const visibleEntityCount = this.getVisibleEntityCounts().reduce((a, b) => a + b)
-            this.setState({ highlightedItemIndex: Math.min(highlightedItemIndex + 1, visibleEntityCount - 1) })
+            const visibleEntityCount = this.getVisibleEntityCounts().reduce(
+                (a, b) => a + b
+            );
+            this.setState({
+                highlightedItemIndex: Math.min(
+                    highlightedItemIndex + 1,
+                    visibleEntityCount - 1
+                )
+            });
             e.preventDefault();
         }
-    }
+    };
 
     /**
      * Returns `{ groupIndex, itemIndex }` which describes that which item in which group is currently highlighted.
@@ -331,19 +375,24 @@ export class GroupedSearchResultsList extends Component {
      * and the current highlight index that is modified with up and down arrow keys
      */
     getHighlightPosition() {
-        const { highlightedItemIndex } = this.state
-        const visibleEntityCounts = this.getVisibleEntityCounts()
+        const { highlightedItemIndex } = this.state;
+        const visibleEntityCounts = this.getVisibleEntityCounts();
 
-        let entitiesInPreviousGroups = 0
-        for (let groupIndex = 0; groupIndex < visibleEntityCounts.length; groupIndex++) {
-            const visibleEntityCount = visibleEntityCounts[groupIndex]
-            const indexInCurrentGroup = highlightedItemIndex - entitiesInPreviousGroups
+        let entitiesInPreviousGroups = 0;
+        for (
+            let groupIndex = 0;
+            groupIndex < visibleEntityCounts.length;
+            groupIndex++
+        ) {
+            const visibleEntityCount = visibleEntityCounts[groupIndex];
+            const indexInCurrentGroup =
+                highlightedItemIndex - entitiesInPreviousGroups;
 
             if (indexInCurrentGroup <= visibleEntityCount - 1) {
-                return { groupIndex, itemIndex: indexInCurrentGroup }
+                return { groupIndex, itemIndex: indexInCurrentGroup };
             }
 
-           entitiesInPreviousGroups += visibleEntityCount
+            entitiesInPreviousGroups += visibleEntityCount;
         }
     }
 
@@ -353,7 +402,9 @@ export class GroupedSearchResultsList extends Component {
     setCurrentPage = (entities, page) => {
         const { groups } = this.props;
         const { currentPages } = this.state;
-        const groupIndex = groups.findIndex((group) => group.entitiesInGroup === entities)
+        const groupIndex = groups.findIndex(
+            group => group.entitiesInGroup === entities
+        );
 
         this.setState({
             highlightedItemIndex: 0,
@@ -361,42 +412,58 @@ export class GroupedSearchResultsList extends Component {
                 ...currentPages,
                 [groupIndex]: page
             }
-        })
-    }
+        });
+    };
 
     render() {
         const { groupingIcon, groups, getUrlForEntity } = this.props;
         const { currentPages } = this.state;
 
-        const highlightPosition = this.getHighlightPosition(groups)
+        const highlightPosition = this.getHighlightPosition(groups);
 
         return (
             <div className="full">
-                {groups.map(({ groupName, entitiesInGroup }, groupIndex) =>
+                {groups.map(({ groupName, entitiesInGroup }, groupIndex) => (
                     <SearchResultsGroup
                         key={groupIndex}
                         groupName={groupName}
                         groupIcon={groupingIcon}
                         entities={entitiesInGroup}
                         getUrlForEntity={getUrlForEntity}
-                        highlightItemAtIndex={groupIndex === highlightPosition.groupIndex ? highlightPosition.itemIndex : undefined}
+                        highlightItemAtIndex={
+                            groupIndex === highlightPosition.groupIndex
+                                ? highlightPosition.itemIndex
+                                : undefined
+                        }
                         currentPage={currentPages[groupIndex] || 0}
                         setCurrentPage={this.setCurrentPage}
                     />
-                )}
+                ))}
             </div>
-        )
+        );
     }
 }
 
-export const SearchResultsGroup = ({ groupName, groupIcon, entities, getUrlForEntity, highlightItemAtIndex, currentPage, setCurrentPage }) =>
+export const SearchResultsGroup = ({
+    groupName,
+    groupIcon,
+    entities,
+    getUrlForEntity,
+    highlightItemAtIndex,
+    currentPage,
+    setCurrentPage
+}) => (
     <div>
-        { groupName !== null &&
+        {groupName !== null && (
             <div className="flex align-center bg-slate-almost-extra-light bordered mt3 px3 py2">
-                <Icon className="mr1" style={{color: "#BCC5CA"}} name={groupIcon}/>
+                <Icon
+                    className="mr1"
+                    style={{ color: "#BCC5CA" }}
+                    name={groupIcon}
+                />
                 <h4>{groupName}</h4>
             </div>
-        }
+        )}
         <SearchResultsList
             entities={entities}
             getUrlForEntity={getUrlForEntity}
@@ -405,7 +472,7 @@ export const SearchResultsGroup = ({ groupName, groupIcon, entities, getUrlForEn
             setCurrentPage={setCurrentPage}
         />
     </div>
-
+);
 
 class SearchResultsList extends Component {
     props: {
@@ -414,32 +481,40 @@ class SearchResultsList extends Component {
         highlightItemAtIndex?: number,
         currentPage: number,
         setCurrentPage: (entities, number) => void
-    }
+    };
 
     state = {
         page: 0
-    }
+    };
 
     getPaginationSection = (start, end, entityCount) => {
-        const { entities, currentPage, setCurrentPage } = this.props
+        const { entities, currentPage, setCurrentPage } = this.props;
 
-        const currentEntitiesText = start === end ? `${start + 1}` : `${start + 1}-${end + 1}`
-        const isInBeginning = start === 0
-        const isInEnd = end + 1 >= entityCount
+        const currentEntitiesText =
+            start === end ? `${start + 1}` : `${start + 1}-${end + 1}`;
+        const isInBeginning = start === 0;
+        const isInEnd = end + 1 >= entityCount;
 
         return (
             <li className="py1 px3 flex justify-end align-center">
-                <span className="text-bold">{ currentEntitiesText }</span>&nbsp;{t`of`}&nbsp;<span
-                className="text-bold">{entityCount}</span>
+                <span className="text-bold">{currentEntitiesText}</span>&nbsp;{t`of`}&nbsp;<span className="text-bold">
+                    {entityCount}
+                </span>
                 <span
                     className={cx(
                         "mx1 flex align-center justify-center rounded",
-                        { "cursor-pointer bg-grey-2 text-white": !isInBeginning },
+                        {
+                            "cursor-pointer bg-grey-2 text-white": !isInBeginning
+                        },
                         { "bg-grey-0 text-grey-1": isInBeginning }
                     )}
-                    style={{width: "22px", height: "22px"}}
-                    onClick={() => !isInBeginning && setCurrentPage(entities, currentPage - 1)}>
-                    <Icon name="chevronleft" size={14}/>
+                    style={{ width: "22px", height: "22px" }}
+                    onClick={() =>
+                        !isInBeginning &&
+                        setCurrentPage(entities, currentPage - 1)
+                    }
+                >
+                    <Icon name="chevronleft" size={14} />
                 </span>
                 <span
                     className={cx(
@@ -447,32 +522,49 @@ class SearchResultsList extends Component {
                         { "cursor-pointer bg-grey-2 text-white": !isInEnd },
                         { "bg-grey-0 text-grey-2": isInEnd }
                     )}
-                    style={{width: "22px", height: "22px"}}
-                    onClick={() => !isInEnd && setCurrentPage(entities, currentPage + 1)}>
-                        <Icon name="chevronright" size={14}/>
+                    style={{ width: "22px", height: "22px" }}
+                    onClick={() =>
+                        !isInEnd && setCurrentPage(entities, currentPage + 1)
+                    }
+                >
+                    <Icon name="chevronright" size={14} />
                 </span>
             </li>
-        )
-    }
+        );
+    };
     render() {
-        const { currentPage, entities, getUrlForEntity, highlightItemAtIndex } = this.props
+        const {
+            currentPage,
+            entities,
+            getUrlForEntity,
+            highlightItemAtIndex
+        } = this.props;
 
-        const showPagination = PAGE_SIZE < entities.length
+        const showPagination = PAGE_SIZE < entities.length;
 
         let start = PAGE_SIZE * currentPage;
-        let end = Math.min(entities.length - 1, PAGE_SIZE * (currentPage + 1) - 1);
+        let end = Math.min(
+            entities.length - 1,
+            PAGE_SIZE * (currentPage + 1) - 1
+        );
         const entityCount = entities.length;
 
-        const entitiesInCurrentPage = entities.slice(start, end + 1)
+        const entitiesInCurrentPage = entities.slice(start, end + 1);
 
         return (
             <ol className="Entity-search-results-list flex-full bg-white border-left border-right border-bottom rounded-bottom">
-                {entitiesInCurrentPage.map((entity, index) =>
-                    <SearchResultListItem key={index} entity={entity} getUrlForEntity={getUrlForEntity} highlight={ highlightItemAtIndex === index } />
-                )}
-                {showPagination && this.getPaginationSection(start, end, entityCount)}
+                {entitiesInCurrentPage.map((entity, index) => (
+                    <SearchResultListItem
+                        key={index}
+                        entity={entity}
+                        getUrlForEntity={getUrlForEntity}
+                        highlight={highlightItemAtIndex === index}
+                    />
+                ))}
+                {showPagination &&
+                    this.getPaginationSection(start, end, entityCount)}
             </ol>
-        )
+        );
     }
 }
 
@@ -480,11 +572,11 @@ class SearchResultsList extends Component {
 export class SearchResultListItem extends Component {
     props: {
         entity: any,
-        getUrlForEntity: (any) => void,
+        getUrlForEntity: any => void,
         highlight?: boolean,
 
-        onChangeLocation: (string) => void
-    }
+        onChangeLocation: string => void
+    };
 
     componentDidMount() {
         window.addEventListener("keydown", this.onKeyDown, true);
@@ -496,12 +588,17 @@ export class SearchResultListItem extends Component {
      * If the current search result entity is highlighted via arrow keys, then we want to
      * let the press of Enter to navigate to that entity
      */
-    onKeyDown = (e) => {
-        const { highlight, entity, getUrlForEntity, onChangeLocation } = this.props;
+    onKeyDown = e => {
+        const {
+            highlight,
+            entity,
+            getUrlForEntity,
+            onChangeLocation
+        } = this.props;
         if (highlight && e.keyCode === KEYCODE_ENTER) {
-            onChangeLocation(getUrlForEntity(entity))
+            onChangeLocation(getUrlForEntity(entity));
         }
-    }
+    };
 
     render() {
         const { entity, highlight, getUrlForEntity } = this.props;
@@ -509,12 +606,18 @@ export class SearchResultListItem extends Component {
         return (
             <li>
                 <Link
-                className={cx("no-decoration flex py2 px3 cursor-pointer bg-slate-extra-light-hover border-bottom", { "bg-grey-0": highlight })}
-                to={getUrlForEntity(entity)}
+                    className={cx(
+                        "no-decoration flex py2 px3 cursor-pointer bg-slate-extra-light-hover border-bottom",
+                        { "bg-grey-0": highlight }
+                    )}
+                    to={getUrlForEntity(entity)}
                 >
-                    <h4 className="text-brand flex-full mr1"> { entity.name } </h4>
+                    <h4 className="text-brand flex-full mr1">
+                        {" "}
+                        {entity.name}{" "}
+                    </h4>
                 </Link>
             </li>
-        )
+        );
     }
 }

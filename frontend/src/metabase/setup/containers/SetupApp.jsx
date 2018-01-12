@@ -12,7 +12,7 @@ import {
     validateDatabase,
     setDatabaseDetails,
     setAllowTracking,
-    submitSetup,
+    submitSetup
 } from "../actions";
 
 const mapStateToProps = setupSelectors;

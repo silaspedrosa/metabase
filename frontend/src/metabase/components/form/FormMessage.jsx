@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import cx from "classnames";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 export const SERVER_ERROR_MESSAGE = t`Server error encountered`;
 export const UNKNOWN_ERROR_MESSAGE = t`Unknown error encountered`;
 
@@ -22,14 +22,12 @@ export default class FormMessage extends Component {
             }
         }
 
-        const classes = cx('Form-message', 'px2', className, {
-            'Form-message--visible': !!message,
-            'text-success': formSuccess != undefined,
-            'text-error': formError != undefined
+        const classes = cx("Form-message", "px2", className, {
+            "Form-message--visible": !!message,
+            "text-success": formSuccess != undefined,
+            "text-error": formError != undefined
         });
 
-        return (
-            <span className={classes}>{message}</span>
-        );
+        return <span className={classes}>{message}</span>;
     }
 }

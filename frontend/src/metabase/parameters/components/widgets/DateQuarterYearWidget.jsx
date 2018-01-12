@@ -27,15 +27,18 @@ export default class DateQuarterYearWidget extends Component {
     static propTypes = {};
     static defaultProps = {};
 
-    static format = (value) => {
+    static format = value => {
         const m = moment(value, "[Q]Q-YYYY");
         return m.isValid() ? m.format("[Q]Q, YYYY") : "";
-    }
+    };
 
     componentWillUnmount() {
         const { quarter, year } = this.state;
         if (quarter != null && year != null) {
-            let value = moment().year(year).quarter(quarter).format("[Q]Q-YYYY");
+            let value = moment()
+                .year(year)
+                .quarter(quarter)
+                .format("[Q]Q-YYYY");
             if (this.props.value !== value) {
                 this.props.setValue(value);
             }
@@ -48,23 +51,41 @@ export default class DateQuarterYearWidget extends Component {
         return (
             <div className="py2">
                 <div className="flex flex-column align-center px1">
-                    <YearPicker value={year} onChange={(year) => this.setState({ year: year })} />
+                    <YearPicker
+                        value={year}
+                        onChange={year => this.setState({ year: year })}
+                    />
                 </div>
-                <ol className="flex flex-wrap bordered mx2 text-bold rounded" style={{ width: 150 }}>
-                    {_.range(1,5).map(q =>
-                        <Quarter quarter={q} selected={q === quarter} onClick={() => this.setState({ quarter: q }, onClose)} />
-                    )}
+                <ol
+                    className="flex flex-wrap bordered mx2 text-bold rounded"
+                    style={{ width: 150 }}
+                >
+                    {_.range(1, 5).map(q => (
+                        <Quarter
+                            quarter={q}
+                            selected={q === quarter}
+                            onClick={() =>
+                                this.setState({ quarter: q }, onClose)
+                            }
+                        />
+                    ))}
                 </ol>
             </div>
         );
     }
 }
 
-const Quarter = ({ quarter, selected, onClick}) =>
+const Quarter = ({ quarter, selected, onClick }) => (
     <li
-        className={cx("cursor-pointer bg-brand-hover text-white-hover flex layout-centered", { "bg-brand text-white": selected })}
+        className={cx(
+            "cursor-pointer bg-brand-hover text-white-hover flex layout-centered",
+            { "bg-brand text-white": selected }
+        )}
         style={{ width: 75, height: 75 }}
         onClick={onClick}
     >
-        {moment().quarter(quarter).format("[Q]Q")}
+        {moment()
+            .quarter(quarter)
+            .format("[Q]Q")}
     </li>
+);

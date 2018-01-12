@@ -11,13 +11,13 @@ export type ListFilterWidgetItem = {
     id: string,
     name: string,
     icon: string
-}
+};
 
 export default class ListFilterWidget extends Component {
     props: {
         items: ListFilterWidgetItem[],
         activeItem: ListFilterWidgetItem,
-        onChange: (ListFilterWidgetItem) => void
+        onChange: ListFilterWidgetItem => void
     };
 
     popoverRef: PopoverWithTrigger;
@@ -27,14 +27,16 @@ export default class ListFilterWidget extends Component {
         const { items, activeItem, onChange } = this.props;
         return (
             <PopoverWithTrigger
-                ref={p => this.popoverRef = p}
+                ref={p => (this.popoverRef = p)}
                 triggerClasses="block ml-auto flex-no-shrink"
                 targetOffsetY={10}
                 triggerElement={
                     <div className="ml2 flex align-center text-brand">
-                        <span className="text-bold">{activeItem && activeItem.name}</span>
+                        <span className="text-bold">
+                            {activeItem && activeItem.name}
+                        </span>
                         <Icon
-                            ref={i => this.iconRef = i}
+                            ref={i => (this.iconRef = i)}
                             className="ml1"
                             name="chevrondown"
                             width="12"
@@ -45,7 +47,7 @@ export default class ListFilterWidget extends Component {
                 target={() => this.iconRef}
             >
                 <ol className="text-brand mt2 mb1">
-                    { items.map((item, index) =>
+                    {items.map((item, index) => (
                         <li
                             key={index}
                             className="cursor-pointer flex align-center brand-hover px2 py1 mb1"
@@ -58,13 +60,11 @@ export default class ListFilterWidget extends Component {
                                 className="mr1 text-light-blue"
                                 name={item.icon}
                             />
-                            <h4 className="List-item-title">
-                                {item.name}
-                            </h4>
+                            <h4 className="List-item-title">{item.name}</h4>
                         </li>
-                    ) }
+                    ))}
                 </ol>
             </PopoverWithTrigger>
-        )
+        );
     }
 }

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router";
 
@@ -7,14 +7,14 @@ export default class ActivityStory extends Component {
         super(props, context);
 
         this.styles = {
-            borderWidth: '2px',
-            borderColor: '#DFE8EA',
-        }
+            borderWidth: "2px",
+            borderColor: "#DFE8EA"
+        };
     }
 
     static propTypes = {
         story: PropTypes.object.isRequired
-    }
+    };
 
     render() {
         const { story } = this.props;
@@ -24,15 +24,33 @@ export default class ActivityStory extends Component {
         }
 
         return (
-            <div className="mt1 border-left flex mr2" style={{borderWidth: '3px', marginLeft: '22px', borderColor: '#F2F5F6'}}>
-                <div className="flex full ml4 bordered rounded p2" style={this.styles}>
-                    { story.bodyLink ?
-                        <Link to={story.bodyLink} data-metabase-event={"Activity Feed;Story Clicked;"+story.topic} className="link">{story.body}</Link>
-                    :
+            <div
+                className="mt1 border-left flex mr2"
+                style={{
+                    borderWidth: "3px",
+                    marginLeft: "22px",
+                    borderColor: "#F2F5F6"
+                }}
+            >
+                <div
+                    className="flex full ml4 bordered rounded p2"
+                    style={this.styles}
+                >
+                    {story.bodyLink ? (
+                        <Link
+                            to={story.bodyLink}
+                            data-metabase-event={
+                                "Activity Feed;Story Clicked;" + story.topic
+                            }
+                            className="link"
+                        >
+                            {story.body}
+                        </Link>
+                    ) : (
                         <span>{story.body}</span>
-                    }
+                    )}
                 </div>
             </div>
-        )
+        );
     }
 }

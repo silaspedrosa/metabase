@@ -19,9 +19,9 @@ type Props = {
     card: Card,
     question: Question,
     setCardAndRun: (card: Card) => void,
-    navigateToNewCardInsideQB: (any) => void,
+    navigateToNewCardInsideQB: any => void,
     router: {
-        push: (string) => void
+        push: string => void
     },
     instanceSettings: {}
 };
@@ -30,7 +30,7 @@ type State = {
     iconIsVisible: boolean,
     popoverIsOpen: boolean,
     isClosing: boolean,
-    selectedActionIndex: ?number,
+    selectedActionIndex: ?number
 };
 
 const CIRCLE_SIZE = 48;
@@ -64,17 +64,18 @@ export default class ActionsWidget extends Component {
         this.handleMouseStoppedMoving();
     };
 
-    handleMouseStoppedMoving = _.debounce(
-        () => {
-            if (this.state.iconIsVisible) {
-                this.setState({ iconIsVisible: false });
-            }
-        },
-        1000
-    );
+    handleMouseStoppedMoving = _.debounce(() => {
+        if (this.state.iconIsVisible) {
+            this.setState({ iconIsVisible: false });
+        }
+    }, 1000);
 
     close = () => {
-        this.setState({ isClosing: true, popoverIsOpen: false, selectedActionIndex: null });
+        this.setState({
+            isClosing: true,
+            popoverIsOpen: false,
+            selectedActionIndex: null
+        });
         // Needed because when closing the action widget by clicking compass, this is triggered first
         // on mousedown (by OnClickOutsideWrapper) and toggle is triggered on mouseup
         setTimeout(() => this.setState({ isClosing: false }), 500);
@@ -92,15 +93,19 @@ export default class ActionsWidget extends Component {
         });
     };
 
-    handleOnChangeCardAndRun = ({ nextCard }: { nextCard: Card|UnsavedCard}) => {
+    handleOnChangeCardAndRun = ({
+        nextCard
+    }: {
+        nextCard: Card | UnsavedCard
+    }) => {
         // TODO: move lineage logic to Question?
         const { card: previousCard } = this.props;
         this.props.navigateToNewCardInsideQB({ nextCard, previousCard });
-    }
+    };
 
     handleActionClick = (index: number) => {
         const { question, router, instanceSettings } = this.props;
-        const mode = question.mode()
+        const mode = question.mode();
         if (mode) {
             const action = mode.actions(instanceSettings)[index];
             if (action && action.popover) {
@@ -108,20 +113,30 @@ export default class ActionsWidget extends Component {
             } else if (action && action.question) {
                 const nextQuestion = action.question();
                 if (nextQuestion) {
-                    MetabaseAnalytics.trackEvent("Actions", "Executed Action", `${action.section||""}:${action.name||""}`);
-                    this.handleOnChangeCardAndRun({ nextCard: nextQuestion.card() });
+                    MetabaseAnalytics.trackEvent(
+                        "Actions",
+                        "Executed Action",
+                        `${action.section || ""}:${action.name || ""}`
+                    );
+                    this.handleOnChangeCardAndRun({
+                        nextCard: nextQuestion.card()
+                    });
                 }
                 this.close();
             } else if (action && action.url) {
-                router.push(action.url())
+                router.push(action.url());
             }
         } else {
-            console.warn("handleActionClick: Question mode is missing")
+            console.warn("handleActionClick: Question mode is missing");
         }
     };
     render() {
         const { className, question, instanceSettings } = this.props;
-        const { popoverIsOpen, iconIsVisible, selectedActionIndex } = this.state;
+        const {
+            popoverIsOpen,
+            iconIsVisible,
+            selectedActionIndex
+        } = this.state;
 
         const mode = question.mode();
         const actions = mode ? mode.actions(instanceSettings) : [];
@@ -129,9 +144,8 @@ export default class ActionsWidget extends Component {
             return null;
         }
 
-
-        const selectedAction: ?ClickAction = selectedActionIndex == null ? null :
-            actions[selectedActionIndex];
+        const selectedAction: ?ClickAction =
+            selectedActionIndex == null ? null : actions[selectedActionIndex];
         let PopoverComponent = selectedAction && selectedAction.popover;
 
         return (
@@ -159,11 +173,16 @@ export default class ActionsWidget extends Component {
                         size={NEEDLE_SIZE}
                     />
                 </div>
-                {popoverIsOpen &&
-                    <OnClickOutsideWrapper handleDismissal={() => {
-                        MetabaseAnalytics.trackEvent("Actions", "Dismissed Action Menu");
-                        this.close();
-                    }}>
+                {popoverIsOpen && (
+                    <OnClickOutsideWrapper
+                        handleDismissal={() => {
+                            MetabaseAnalytics.trackEvent(
+                                "Actions",
+                                "Dismissed Action Menu"
+                            );
+                            this.close();
+                        }}
+                    >
                         <div
                             className="absolute bg-white rounded bordered shadowed py1"
                             style={{
@@ -175,56 +194,66 @@ export default class ActionsWidget extends Component {
                                 overflow: "scroll"
                             }}
                         >
-                            {PopoverComponent
-                                ? <div>
-                                      <div
-                                          className="flex align-center text-grey-4 p1 px2"
-                                      >
-                                          <Icon
-                                              name="chevronleft"
-                                              className="cursor-pointer"
-                                              onClick={() => this.setState({
-                                                  selectedActionIndex: null
-                                              })}
-                                          />
-                                          <div
-                                              className="text-centered flex-full"
-                                          >
-                                              {selectedAction && selectedAction.title}
-                                          </div>
-                                      </div>
-                                      <PopoverComponent
-                                          onChangeCardAndRun={({ nextCard }) => {
-                                              if (nextCard) {
-                                                  if (selectedAction) {
-                                                      MetabaseAnalytics.trackEvent("Actions", "Executed Action", `${selectedAction.section||""}:${selectedAction.name||""}`);
-                                                  }
-                                                  this.handleOnChangeCardAndRun({ nextCard })
-                                              }
-                                          }}
-                                          onClose={this.close}
-                                      />
-                                  </div>
-                                : actions.map((action, index) => (
-                                      <div
-                                          key={index}
-                                          className="p2 flex align-center text-grey-4 brand-hover cursor-pointer"
-                                          onClick={() =>
-                                              this.handleActionClick(index)}
-                                      >
-                                          {action.icon &&
-                                              <Icon
-                                                  name={action.icon}
-                                                  className="mr1 flex-no-shrink"
-                                                  size={16}
-                                              />}
-                                          <div>
-                                              {action.title}
-                                          </div>
-                                      </div>
-                                  ))}
+                            {PopoverComponent ? (
+                                <div>
+                                    <div className="flex align-center text-grey-4 p1 px2">
+                                        <Icon
+                                            name="chevronleft"
+                                            className="cursor-pointer"
+                                            onClick={() =>
+                                                this.setState({
+                                                    selectedActionIndex: null
+                                                })
+                                            }
+                                        />
+                                        <div className="text-centered flex-full">
+                                            {selectedAction &&
+                                                selectedAction.title}
+                                        </div>
+                                    </div>
+                                    <PopoverComponent
+                                        onChangeCardAndRun={({ nextCard }) => {
+                                            if (nextCard) {
+                                                if (selectedAction) {
+                                                    MetabaseAnalytics.trackEvent(
+                                                        "Actions",
+                                                        "Executed Action",
+                                                        `${selectedAction.section ||
+                                                            ""}:${selectedAction.name ||
+                                                            ""}`
+                                                    );
+                                                }
+                                                this.handleOnChangeCardAndRun({
+                                                    nextCard
+                                                });
+                                            }
+                                        }}
+                                        onClose={this.close}
+                                    />
+                                </div>
+                            ) : (
+                                actions.map((action, index) => (
+                                    <div
+                                        key={index}
+                                        className="p2 flex align-center text-grey-4 brand-hover cursor-pointer"
+                                        onClick={() =>
+                                            this.handleActionClick(index)
+                                        }
+                                    >
+                                        {action.icon && (
+                                            <Icon
+                                                name={action.icon}
+                                                className="mr1 flex-no-shrink"
+                                                size={16}
+                                            />
+                                        )}
+                                        <div>{action.title}</div>
+                                    </div>
+                                ))
+                            )}
                         </div>
-                    </OnClickOutsideWrapper>}
+                    </OnClickOutsideWrapper>
+                )}
             </div>
         );
     }

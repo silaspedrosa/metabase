@@ -1,12 +1,12 @@
 /* eslint "react/prop-types": "warn" */
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { t } from 'c-3po';
-import MainPane from './MainPane.jsx';
-import TablePane from './TablePane.jsx';
-import FieldPane from './FieldPane.jsx';
-import SegmentPane from './SegmentPane.jsx';
-import MetricPane from './MetricPane.jsx';
+import { t } from "c-3po";
+import MainPane from "./MainPane.jsx";
+import TablePane from "./TablePane.jsx";
+import FieldPane from "./FieldPane.jsx";
+import SegmentPane from "./SegmentPane.jsx";
+import MetricPane from "./MetricPane.jsx";
 import Icon from "metabase/components/Icon.jsx";
 
 import _ from "underscore";
@@ -53,32 +53,62 @@ export default class DataReference extends Component {
     render() {
         var content;
         if (this.state.stack.length === 0) {
-            content = <MainPane {...this.props} show={this.show} />
+            content = <MainPane {...this.props} show={this.show} />;
         } else {
             var page = this.state.stack[this.state.stack.length - 1];
             if (page.type === "table") {
-                content = <TablePane {...this.props} show={this.show} table={page.item} />
+                content = (
+                    <TablePane
+                        {...this.props}
+                        show={this.show}
+                        table={page.item}
+                    />
+                );
             } else if (page.type === "field") {
-                content = <FieldPane {...this.props} show={this.show} field={page.item}/>
+                content = (
+                    <FieldPane
+                        {...this.props}
+                        show={this.show}
+                        field={page.item}
+                    />
+                );
             } else if (page.type === "segment") {
-                content = <SegmentPane {...this.props} show={this.show} segment={page.item}/>
+                content = (
+                    <SegmentPane
+                        {...this.props}
+                        show={this.show}
+                        segment={page.item}
+                    />
+                );
             } else if (page.type === "metric") {
-                content = <MetricPane {...this.props} show={this.show} metric={page.item}/>
+                content = (
+                    <MetricPane
+                        {...this.props}
+                        show={this.show}
+                        metric={page.item}
+                    />
+                );
             }
         }
 
         var backButton;
         if (this.state.stack.length > 0) {
             backButton = (
-                <a className="flex align-center mb2 text-default text-brand-hover no-decoration" onClick={this.back}>
+                <a
+                    className="flex align-center mb2 text-default text-brand-hover no-decoration"
+                    onClick={this.back}
+                >
                     <Icon name="chevronleft" size={18} />
                     <span className="text-uppercase">{t`Back`}</span>
                 </a>
-            )
+            );
         }
 
         var closeButton = (
-            <a className="flex-align-right text-default text-brand-hover no-decoration" onClick={this.close}>
+            <a
+                className="flex-align-right text-default text-brand-hover no-decoration"
+                onClick={this.close}
+            >
                 <Icon name="close" size={18} />
             </a>
         );
@@ -89,9 +119,7 @@ export default class DataReference extends Component {
                     {backButton}
                     {closeButton}
                 </div>
-                <div className="DataReference-content">
-                    {content}
-                </div>
+                <div className="DataReference-content">{content}</div>
             </div>
         );
     }

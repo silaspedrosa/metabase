@@ -1,14 +1,14 @@
 /* eslint "react/prop-types": "warn" */
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { connect } from 'react-redux';
+import { connect } from "react-redux";
 
-import SegmentSidebar from './SegmentSidebar.jsx';
-import SidebarLayout from 'metabase/components/SidebarLayout.jsx';
-import SegmentDetail from "metabase/reference/segments/SegmentDetail.jsx"
+import SegmentSidebar from "./SegmentSidebar.jsx";
+import SidebarLayout from "metabase/components/SidebarLayout.jsx";
+import SegmentDetail from "metabase/reference/segments/SegmentDetail.jsx";
 
-import * as metadataActions from 'metabase/redux/metadata';
-import * as actions from 'metabase/reference/reference';
+import * as metadataActions from "metabase/redux/metadata";
+import * as actions from "metabase/reference/reference";
 
 import {
     getUser,
@@ -16,7 +16,7 @@ import {
     getSegmentId,
     getDatabaseId,
     getIsEditing
-} from '../selectors';
+} from "../selectors";
 
 const mapStateToProps = (state, props) => ({
     user: getUser(state, props),
@@ -43,35 +43,33 @@ export default class SegmentDetailContainer extends Component {
         isEditing: PropTypes.bool
     };
 
-    async fetchContainerData(){
-        await actions.wrappedFetchSegmentDetail(this.props, this.props.segmentId);
+    async fetchContainerData() {
+        await actions.wrappedFetchSegmentDetail(
+            this.props,
+            this.props.segmentId
+        );
     }
 
     componentWillMount() {
-        this.fetchContainerData()
+        this.fetchContainerData();
     }
-
 
     componentWillReceiveProps(newProps) {
         if (this.props.location.pathname === newProps.location.pathname) {
             return;
         }
 
-        actions.clearState(newProps)
+        actions.clearState(newProps);
     }
 
     render() {
-        const {
-            user,
-            segment,
-            isEditing
-        } = this.props;
+        const { user, segment, isEditing } = this.props;
 
         return (
             <SidebarLayout
                 className="flex-full relative"
-                style={ isEditing ? { paddingTop: '43px' } : {}}
-                sidebar={<SegmentSidebar segment={segment} user={user}/>}
+                style={isEditing ? { paddingTop: "43px" } : {}}
+                sidebar={<SegmentSidebar segment={segment} user={user} />}
             >
                 <SegmentDetail {...this.props} />
             </SidebarLayout>

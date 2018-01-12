@@ -1,7 +1,7 @@
 /* eslint "react/prop-types": "warn" */
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 
 import RetinaImage from "react-retina-image";
 
@@ -22,7 +22,10 @@ export default class WhatsAPulse extends Component {
                         forceOriginalDimensions={false}
                     />
                 </div>
-                <div className="h3 my3 text-centered text-grey-2 text-bold" style={{maxWidth: "500px"}}>
+                <div
+                    className="h3 my3 text-centered text-grey-2 text-bold"
+                    style={{ maxWidth: "500px" }}
+                >
                     {t`Pulses let you send data from Metabase to email or Slack on the schedule of your choice.`}
                 </div>
                 {this.props.button}

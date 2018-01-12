@@ -1,7 +1,7 @@
 import * as React from "react";
 import AdminAwareEmptyState from "metabase/components/AdminAwareEmptyState";
 
-const NoDatabasesEmptyState = (user) =>
+const NoDatabasesEmptyState = user => (
     <AdminAwareEmptyState
         title={t`Metabase is no fun without any data`}
         adminMessage={t`Your databases will appear here once you connect one`}
@@ -11,5 +11,6 @@ const NoDatabasesEmptyState = (user) =>
         adminLink={"/admin/databases/create"}
         user={user}
     />
+);
 
-export default NoDatabasesEmptyState
+export default NoDatabasesEmptyState;

@@ -4,8 +4,8 @@ export function cancelable(promise) {
 
     const wrappedPromise = new Promise((resolve, reject) => {
         promise.then(
-            (value) => canceled ? reject({ isCanceled: true }) : resolve(value),
-            (error) => canceled ? reject({ isCanceled: true }) : reject(error)
+            value => (canceled ? reject({ isCanceled: true }) : resolve(value)),
+            error => (canceled ? reject({ isCanceled: true }) : reject(error))
         );
     });
 
@@ -20,7 +20,10 @@ export function cancelable(promise) {
 export function timeout(promise, duration, error) {
     return new Promise((resolve, reject) => {
         promise.then(resolve, reject);
-        setTimeout(() => reject(error || new Error("Operation timed out")), duration);
+        setTimeout(
+            () => reject(error || new Error("Operation timed out")),
+            duration
+        );
     });
 }
 
@@ -30,7 +33,7 @@ export function delay(duration) {
 }
 
 export function defer() {
-    let deferrred = {}
+    let deferrred = {};
     deferrred.promise = new Promise((resolve, reject) => {
         deferrred.resolve = resolve;
         deferrred.reject = reject;

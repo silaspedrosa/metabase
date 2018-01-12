@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import Icon from "metabase/components/Icon.jsx";
 import LoadingSpinner from "metabase/components/LoadingSpinner.jsx";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import _ from "underscore";
 
 export default class SaveStatus extends Component {
@@ -20,31 +20,55 @@ export default class SaveStatus extends Component {
 
     setSaving() {
         clearTimeout(this.state.recentlySavedTimeout);
-        this.setState({ saving: true, recentlySavedTimeout: null, error: null });
+        this.setState({
+            saving: true,
+            recentlySavedTimeout: null,
+            error: null
+        });
     }
 
     setSaved() {
         clearTimeout(this.state.recentlySavedTimeout);
-        var recentlySavedTimeout = setTimeout(() => this.setState({ recentlySavedTimeout: null }), 5000);
-        this.setState({ saving: false, recentlySavedTimeout: recentlySavedTimeout, error: null });
+        var recentlySavedTimeout = setTimeout(
+            () => this.setState({ recentlySavedTimeout: null }),
+            5000
+        );
+        this.setState({
+            saving: false,
+            recentlySavedTimeout: recentlySavedTimeout,
+            error: null
+        });
     }
 
     setSaveError(error) {
-        this.setState({ saving: false, recentlySavedTimeout: null, error: error });
+        this.setState({
+            saving: false,
+            recentlySavedTimeout: null,
+            error: error
+        });
     }
 
     render() {
         if (this.state.saving) {
-            return (<div className="SaveStatus mx2 px2 border-right"><LoadingSpinner size={24} /></div>);
+            return (
+                <div className="SaveStatus mx2 px2 border-right">
+                    <LoadingSpinner size={24} />
+                </div>
+            );
         } else if (this.state.error) {
-            return (<div className="SaveStatus mx2 px2 border-right text-error">{t`Error:`} {String(this.state.error.message || this.state.error)}</div>)
+            return (
+                <div className="SaveStatus mx2 px2 border-right text-error">
+                    {t`Error:`}{" "}
+                    {String(this.state.error.message || this.state.error)}
+                </div>
+            );
         } else if (this.state.recentlySavedTimeout != null) {
             return (
                 <div className="SaveStatus mx2 px2 border-right flex align-center text-success">
                     <Icon name="check" size={16} />
                     <div className="ml1 h3 text-bold">{t`Saved`}</div>
                 </div>
-            )
+            );
         } else {
             return null;
         }

@@ -13,7 +13,6 @@ const SCROLL_MARGIN = 8;
 const LINE_HEIGHT = 16;
 
 export default class TextEditor extends Component {
-
     static propTypes = {
         mode: PropTypes.string,
         theme: PropTypes.string,
@@ -28,7 +27,11 @@ export default class TextEditor extends Component {
     };
 
     componentWillReceiveProps(nextProps) {
-        if (this._editor && nextProps.value != null && nextProps.value !== this._editor.getValue()) {
+        if (
+            this._editor &&
+            nextProps.value != null &&
+            nextProps.value !== this._editor.getValue()
+        ) {
             this._editor.setValue(nextProps.value);
             this._editor.clearSelection();
         }
@@ -58,16 +61,17 @@ export default class TextEditor extends Component {
     _updateSize() {
         const doc = this._editor.getSession().getDocument();
         const element = ReactDOM.findDOMNode(this);
-        element.style.height = 2 * SCROLL_MARGIN + LINE_HEIGHT * doc.getLength() + "px";
+        element.style.height =
+            2 * SCROLL_MARGIN + LINE_HEIGHT * doc.getLength() + "px";
         this._editor.resize();
     }
 
-    onChange = (e) => {
+    onChange = e => {
         this._update();
         if (this.props.onChange) {
             this.props.onChange(this.value);
         }
-    }
+    };
 
     componentDidMount() {
         let element = ReactDOM.findDOMNode(this);
@@ -86,13 +90,17 @@ export default class TextEditor extends Component {
             showPrintMargin: false,
             highlightActiveLine: false,
             highlightGutterLine: false,
-            showLineNumbers: true,
+            showLineNumbers: true
             // wrap: true
         });
-        this._editor.renderer.setScrollMargin(SCROLL_MARGIN, SCROLL_MARGIN)
+        this._editor.renderer.setScrollMargin(SCROLL_MARGIN, SCROLL_MARGIN);
 
         // initialize the content
-        this._editor.setValue((this.props.value != null ? this.props.value : this.props.defaultValue) || "");
+        this._editor.setValue(
+            (this.props.value != null
+                ? this.props.value
+                : this.props.defaultValue) || ""
+        );
 
         // clear the editor selection, otherwise we start with the whole editor selected
         this._editor.clearSelection();
@@ -108,9 +116,7 @@ export default class TextEditor extends Component {
     }
 
     render() {
-        const { className, style } = this.props
-        return (
-            <div className={className} style={style} />
-        );
+        const { className, style } = this.props;
+        return <div className={className} style={style} />;
     }
 }

@@ -1,12 +1,19 @@
 /* @flow */
 
 import React, { Component } from "react";
-import { t } from 'c-3po';
-import { MinRowsError, ChartSettingsError } from "metabase/visualizations/lib/errors";
+import { t } from "c-3po";
+import {
+    MinRowsError,
+    ChartSettingsError
+} from "metabase/visualizations/lib/errors";
 
 import { formatValue } from "metabase/lib/formatting";
 
-import { getSettings, metricSetting, dimensionSetting } from "metabase/visualizations/lib/settings";
+import {
+    getSettings,
+    metricSetting,
+    dimensionSetting
+} from "metabase/visualizations/lib/settings";
 
 import FunnelNormal from "../components/FunnelNormal";
 import FunnelBar from "../components/FunnelBar";
@@ -37,7 +44,7 @@ export default class Funnel extends Component {
     }
 
     static checkRenderable(series, settings) {
-        const [{ data: { rows} }] = series;
+        const [{ data: { rows } }] = series;
         if (series.length > 1) {
             return;
         }
@@ -46,7 +53,11 @@ export default class Funnel extends Component {
             throw new MinRowsError(1, rows.length);
         }
         if (!settings["funnel.dimension"] || !settings["funnel.metric"]) {
-            throw new ChartSettingsError(t`Which fields do you want to use?`, t`Data`, t`Choose fields`);
+            throw new ChartSettingsError(
+                t`Which fields do you want to use?`,
+                t`Data`,
+                t`Choose fields`
+            );
         }
     }
 
@@ -56,44 +67,58 @@ export default class Funnel extends Component {
             title: t`Step`,
             ...dimensionSetting("funnel.dimension"),
             dashboard: false,
-            useRawSeries: true,
+            useRawSeries: true
         },
         "funnel.metric": {
             section: "Data",
             title: t`Measure`,
             ...metricSetting("funnel.metric"),
             dashboard: false,
-            useRawSeries: true,
+            useRawSeries: true
         },
         "funnel.type": {
             title: t`Funnel type`,
             section: "Display",
             widget: "select",
             props: {
-                options: [{ name: t`Funnel`, value: "funnel"}, { name: t`Bar chart`, value: "bar"}]
+                options: [
+                    { name: t`Funnel`, value: "funnel" },
+                    { name: t`Bar chart`, value: "bar" }
+                ]
             },
             // legacy "bar" funnel was only previously available via multiseries
-            getDefault: (series) => series.length > 1 ? "bar" : "funnel",
+            getDefault: series => (series.length > 1 ? "bar" : "funnel"),
             useRawSeries: true
-        },
-    }
+        }
+    };
 
     static transformSeries(series) {
-        let [{ card, data: { rows, cols }}] = series;
+        let [{ card, data: { rows, cols } }] = series;
 
         const settings = getSettings(series);
 
-        const dimensionIndex = _.findIndex(cols, (col) => col.name === settings["funnel.dimension"]);
-        const metricIndex = _.findIndex(cols, (col) => col.name === settings["funnel.metric"]);
+        const dimensionIndex = _.findIndex(
+            cols,
+            col => col.name === settings["funnel.dimension"]
+        );
+        const metricIndex = _.findIndex(
+            cols,
+            col => col.name === settings["funnel.metric"]
+        );
 
-        if (!card._transformed &&
-            series.length === 1 && rows.length > 1 &&
-            dimensionIndex >= 0 && metricIndex >= 0
+        if (
+            !card._transformed &&
+            series.length === 1 &&
+            rows.length > 1 &&
+            dimensionIndex >= 0 &&
+            metricIndex >= 0
         ) {
             return rows.map(row => ({
                 card: {
                     ...card,
-                    name: formatValue(row[dimensionIndex], { column: cols[dimensionIndex] }),
+                    name: formatValue(row[dimensionIndex], {
+                        column: cols[dimensionIndex]
+                    }),
                     _transformed: true
                 },
                 data: {
@@ -112,19 +137,24 @@ export default class Funnel extends Component {
         const hasTitle = settings["card.title"];
 
         if (settings["funnel.type"] === "bar") {
-            return <FunnelBar {...this.props} />
+            return <FunnelBar {...this.props} />;
         } else {
-            const { actionButtons, className, onChangeCardAndRun, series } = this.props;
+            const {
+                actionButtons,
+                className,
+                onChangeCardAndRun,
+                series
+            } = this.props;
             return (
                 <div className={cx(className, "flex flex-column p1")}>
-                    { hasTitle &&
+                    {hasTitle && (
                         <TitleLegendHeader
                             series={series}
                             settings={settings}
                             onChangeCardAndRun={onChangeCardAndRun}
                             actionButtons={actionButtons}
                         />
-                    }
+                    )}
                     <LegendHeader
                         className="flex-no-shrink"
                         // $FlowFixMe
@@ -134,7 +164,7 @@ export default class Funnel extends Component {
                     />
                     <FunnelNormal {...this.props} className="flex-full" />
                 </div>
-            )
+            );
         }
     }
 }

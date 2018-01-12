@@ -3,8 +3,7 @@
 import { DEFAULT_ACTIONS } from "../actions";
 import { DEFAULT_DRILLS } from "../drill";
 
-import SummarizeBySegmentMetricAction
-    from "../actions/SummarizeBySegmentMetricAction";
+import SummarizeBySegmentMetricAction from "../actions/SummarizeBySegmentMetricAction";
 import CommonMetricsAction from "../actions/CommonMetricsAction";
 import CountByTimeAction from "../actions/CountByTimeAction";
 import XRaySegment from "../actions/XRaySegment";

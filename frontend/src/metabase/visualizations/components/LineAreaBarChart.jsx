@@ -2,7 +2,7 @@
 
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import CardRenderer from "./CardRenderer.jsx";
 import LegendHeader from "./LegendHeader.jsx";
 import { TitleLegendHeader } from "./TitleLegendHeader.jsx";
@@ -19,27 +19,57 @@ import { formatValue } from "metabase/lib/formatting";
 
 import { getSettings } from "metabase/visualizations/lib/settings";
 
-import { MinRowsError, ChartSettingsError } from "metabase/visualizations/lib/errors";
+import {
+    MinRowsError,
+    ChartSettingsError
+} from "metabase/visualizations/lib/errors";
 
 import _ from "underscore";
 import cx from "classnames";
 
 const MAX_SERIES = 20;
 
-const MUTE_STYLE = "opacity: 0.25;"
+const MUTE_STYLE = "opacity: 0.25;";
 for (let i = 0; i < MAX_SERIES; i++) {
-    addCSSRule(`.LineAreaBarChart.mute-${i} svg.stacked .stack._${i} .area`,       MUTE_STYLE);
-    addCSSRule(`.LineAreaBarChart.mute-${i} svg.stacked .stack._${i} .line`,       MUTE_STYLE);
-    addCSSRule(`.LineAreaBarChart.mute-${i} svg.stacked .stack._${i} .bar`,        MUTE_STYLE);
-    addCSSRule(`.LineAreaBarChart.mute-${i} svg.stacked .dc-tooltip._${i} .dot`,   MUTE_STYLE);
+    addCSSRule(
+        `.LineAreaBarChart.mute-${i} svg.stacked .stack._${i} .area`,
+        MUTE_STYLE
+    );
+    addCSSRule(
+        `.LineAreaBarChart.mute-${i} svg.stacked .stack._${i} .line`,
+        MUTE_STYLE
+    );
+    addCSSRule(
+        `.LineAreaBarChart.mute-${i} svg.stacked .stack._${i} .bar`,
+        MUTE_STYLE
+    );
+    addCSSRule(
+        `.LineAreaBarChart.mute-${i} svg.stacked .dc-tooltip._${i} .dot`,
+        MUTE_STYLE
+    );
 
-    addCSSRule(`.LineAreaBarChart.mute-${i} svg:not(.stacked) .sub._${i} .bar`,    MUTE_STYLE);
-    addCSSRule(`.LineAreaBarChart.mute-${i} svg:not(.stacked) .sub._${i} .line`,   MUTE_STYLE);
-    addCSSRule(`.LineAreaBarChart.mute-${i} svg:not(.stacked) .sub._${i} .dot`,    MUTE_STYLE);
-    addCSSRule(`.LineAreaBarChart.mute-${i} svg:not(.stacked) .sub._${i} .bubble`, MUTE_STYLE);
+    addCSSRule(
+        `.LineAreaBarChart.mute-${i} svg:not(.stacked) .sub._${i} .bar`,
+        MUTE_STYLE
+    );
+    addCSSRule(
+        `.LineAreaBarChart.mute-${i} svg:not(.stacked) .sub._${i} .line`,
+        MUTE_STYLE
+    );
+    addCSSRule(
+        `.LineAreaBarChart.mute-${i} svg:not(.stacked) .sub._${i} .dot`,
+        MUTE_STYLE
+    );
+    addCSSRule(
+        `.LineAreaBarChart.mute-${i} svg:not(.stacked) .sub._${i} .bubble`,
+        MUTE_STYLE
+    );
 
     // row charts don't support multiseries
-    addCSSRule(`.LineAreaBarChart.mute-${i} svg:not(.stacked) .row`, MUTE_STYLE);
+    addCSSRule(
+        `.LineAreaBarChart.mute-${i} svg:not(.stacked) .row`,
+        MUTE_STYLE
+    );
 }
 
 import type { VisualizationProps } from "metabase/meta/types/Visualization";
@@ -60,15 +90,22 @@ export default class LineAreaBarChart extends Component {
     }
 
     static checkRenderable(series, settings) {
-        const singleSeriesHasNoRows = ({ data: { cols, rows} }) => rows.length < 1;
+        const singleSeriesHasNoRows = ({ data: { cols, rows } }) =>
+            rows.length < 1;
         if (_.every(series, singleSeriesHasNoRows)) {
-             throw new MinRowsError(1, 0);
+            throw new MinRowsError(1, 0);
         }
 
-        const dimensions = (settings["graph.dimensions"] || []).filter(name => name);
+        const dimensions = (settings["graph.dimensions"] || []).filter(
+            name => name
+        );
         const metrics = (settings["graph.metrics"] || []).filter(name => name);
         if (dimensions.length < 1 || metrics.length < 1) {
-            throw new ChartSettingsError(t`Which fields do you want to use for the X and Y axes?`, t`Data`, t`Choose fields`);
+            throw new ChartSettingsError(
+                t`Which fields do you want to use for the X and Y axes?`,
+                t`Data`,
+                t`Choose fields`
+            );
         }
     }
 
@@ -76,9 +113,18 @@ export default class LineAreaBarChart extends Component {
         let initialSettings = getSettings([initialSeries]);
         let newSettings = getSettings([newSeries]);
 
-        let initialDimensions = getColumnsFromNames(initialSeries.data.cols, initialSettings["graph.dimensions"]);
-        let newDimensions = getColumnsFromNames(newSeries.data.cols, newSettings["graph.dimensions"]);
-        let newMetrics = getColumnsFromNames(newSeries.data.cols, newSettings["graph.metrics"]);
+        let initialDimensions = getColumnsFromNames(
+            initialSeries.data.cols,
+            initialSettings["graph.dimensions"]
+        );
+        let newDimensions = getColumnsFromNames(
+            newSeries.data.cols,
+            newSettings["graph.dimensions"]
+        );
+        let newMetrics = getColumnsFromNames(
+            newSeries.data.cols,
+            newSettings["graph.metrics"]
+        );
 
         // must have at least one dimension and one metric
         if (newDimensions.length === 0 || newMetrics.length === 0) {
@@ -97,8 +143,10 @@ export default class LineAreaBarChart extends Component {
 
         // both or neither primary dimension must be numeric
         // a timestamp field is both date and number so don't enforce the condition if both fields are dates; see #2811
-        if ((isNumeric(initialDimensions[0]) !== isNumeric(newDimensions[0])) &&
-            !(isDate(initialDimensions[0]) && isDate(newDimensions[0]))) {
+        if (
+            isNumeric(initialDimensions[0]) !== isNumeric(newDimensions[0]) &&
+            !(isDate(initialDimensions[0]) && isDate(newDimensions[0]))
+        ) {
             return false;
         }
 
@@ -106,7 +154,11 @@ export default class LineAreaBarChart extends Component {
     }
 
     static transformSeries(series) {
-        let newSeries = [].concat(...series.map((s, seriesIndex) => transformSingleSeries(s, series, seriesIndex)));
+        let newSeries = [].concat(
+            ...series.map((s, seriesIndex) =>
+                transformSingleSeries(s, series, seriesIndex)
+            )
+        );
         if (_.isEqual(series, newSeries) || newSeries.length === 0) {
             return series;
         } else {
@@ -121,17 +173,18 @@ export default class LineAreaBarChart extends Component {
         isDashboard: PropTypes.bool
     };
 
-    static defaultProps = {
-    };
+    static defaultProps = {};
 
     getHoverClasses() {
         const { hovered } = this.props;
         if (hovered && hovered.index != null) {
-            let seriesClasses = _.range(0, MAX_SERIES).filter(n => n !== hovered.index).map(n => "mute-"+n);
+            let seriesClasses = _.range(0, MAX_SERIES)
+                .filter(n => n !== hovered.index)
+                .map(n => "mute-" + n);
             let axisClasses =
-                hovered.axisIndex === 0 ? "mute-yr" :
-                hovered.axisIndex === 1 ? "mute-yl" :
-                null;
+                hovered.axisIndex === 0
+                    ? "mute-yr"
+                    : hovered.axisIndex === 1 ? "mute-yl" : null;
             return seriesClasses.concat(axisClasses);
         } else {
             return null;
@@ -140,7 +193,7 @@ export default class LineAreaBarChart extends Component {
 
     getFidelity() {
         let fidelity = { x: 0, y: 0 };
-        let size = this.props.gridSize ||  { width: Infinity, height: Infinity };
+        let size = this.props.gridSize || { width: Infinity, height: Infinity };
         if (size.width >= 5) {
             fidelity.x = 2;
         } else if (size.width >= 4) {
@@ -179,7 +232,15 @@ export default class LineAreaBarChart extends Component {
     }
 
     render() {
-        const { series, hovered, showTitle, actionButtons, onChangeCardAndRun, onVisualizationClick, visualizationIsClickable } = this.props;
+        const {
+            series,
+            hovered,
+            showTitle,
+            actionButtons,
+            onChangeCardAndRun,
+            onVisualizationClick,
+            visualizationIsClickable
+        } = this.props;
 
         const settings = this.getSettings();
 
@@ -191,16 +252,22 @@ export default class LineAreaBarChart extends Component {
         const hasTitle = showTitle && settings["card.title"];
 
         return (
-            <div className={cx("LineAreaBarChart flex flex-column p1", this.getHoverClasses(), this.props.className)}>
-                { hasTitle &&
+            <div
+                className={cx(
+                    "LineAreaBarChart flex flex-column p1",
+                    this.getHoverClasses(),
+                    this.props.className
+                )}
+            >
+                {hasTitle && (
                     <TitleLegendHeader
                         series={series}
                         settings={settings}
                         onChangeCardAndRun={onChangeCardAndRun}
                         actionButtons={actionButtons}
                     />
-                }
-                { multiseriesHeaderSeries || (!hasTitle && actionButtons) ? // always show action buttons if we have them
+                )}
+                {multiseriesHeaderSeries || (!hasTitle && actionButtons) ? ( // always show action buttons if we have them
                     <LegendHeader
                         className="flex-no-shrink"
                         series={multiseriesHeaderSeries}
@@ -212,7 +279,7 @@ export default class LineAreaBarChart extends Component {
                         onVisualizationClick={onVisualizationClick}
                         visualizationIsClickable={visualizationIsClickable}
                     />
-                : null }
+                ) : null}
                 <CardRenderer
                     {...this.props}
                     series={series}
@@ -247,20 +314,29 @@ function transformSingleSeries(s, series, seriesIndex) {
     const dimensions = settings["graph.dimensions"].filter(d => d != null);
     const metrics = settings["graph.metrics"].filter(d => d != null);
     const dimensionColumnIndexes = dimensions.map(dimensionName =>
-        _.findIndex(cols, (col) => col.name === dimensionName)
+        _.findIndex(cols, col => col.name === dimensionName)
     );
     const metricColumnIndexes = metrics.map(metricName =>
-        _.findIndex(cols, (col) => col.name === metricName)
+        _.findIndex(cols, col => col.name === metricName)
     );
-    const bubbleColumnIndex = settings["scatter.bubble"] && _.findIndex(cols, (col) => col.name === settings["scatter.bubble"]);
-    const extraColumnIndexes = bubbleColumnIndex && bubbleColumnIndex >= 0 ? [bubbleColumnIndex] : [];
+    const bubbleColumnIndex =
+        settings["scatter.bubble"] &&
+        _.findIndex(cols, col => col.name === settings["scatter.bubble"]);
+    const extraColumnIndexes =
+        bubbleColumnIndex && bubbleColumnIndex >= 0 ? [bubbleColumnIndex] : [];
 
     if (dimensions.length > 1) {
-        const [dimensionColumnIndex, seriesColumnIndex] = dimensionColumnIndexes;
-        const rowColumnIndexes = [dimensionColumnIndex].concat(metricColumnIndexes, extraColumnIndexes);
+        const [
+            dimensionColumnIndex,
+            seriesColumnIndex
+        ] = dimensionColumnIndexes;
+        const rowColumnIndexes = [dimensionColumnIndex].concat(
+            metricColumnIndexes,
+            extraColumnIndexes
+        );
 
         const breakoutValues = [];
-        const breakoutRowsByValue = new Map;
+        const breakoutRowsByValue = new Map();
 
         for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
             const row = rows[rowIndex];
@@ -268,7 +344,7 @@ function transformSingleSeries(s, series, seriesIndex) {
 
             let seriesRows = breakoutRowsByValue.get(seriesValue);
             if (!seriesRows) {
-                breakoutRowsByValue.set(seriesValue, seriesRows = []);
+                breakoutRowsByValue.set(seriesValue, (seriesRows = []));
                 breakoutValues.push(seriesValue);
             }
 
@@ -278,7 +354,7 @@ function transformSingleSeries(s, series, seriesIndex) {
             seriesRows.push(newRow);
         }
 
-        return breakoutValues.map((breakoutValue) => ({
+        return breakoutValues.map(breakoutValue => ({
             card: {
                 ...card,
                 // if multiseries include the card title as well as the breakout value
@@ -286,11 +362,15 @@ function transformSingleSeries(s, series, seriesIndex) {
                     // show series title if it's multiseries
                     series.length > 1 && card.name,
                     // always show grouping value
-                    formatValue(breakoutValue, { column: cols[seriesColumnIndex] })
-                ].filter(n => n).join(": "),
+                    formatValue(breakoutValue, {
+                        column: cols[seriesColumnIndex]
+                    })
+                ]
+                    .filter(n => n)
+                    .join(": "),
                 _transformed: true,
                 _breakoutValue: breakoutValue,
-                _breakoutColumn: cols[seriesColumnIndex],
+                _breakoutColumn: cols[seriesColumnIndex]
             },
             data: {
                 rows: breakoutRowsByValue.get(breakoutValue),
@@ -299,10 +379,12 @@ function transformSingleSeries(s, series, seriesIndex) {
             },
             // for when the legend header for the breakout is clicked
             clicked: {
-                dimensions: [{
-                    value: breakoutValue,
-                    column: cols[seriesColumnIndex]
-                }]
+                dimensions: [
+                    {
+                        value: breakoutValue,
+                        column: cols[seriesColumnIndex]
+                    }
+                ]
             }
         }));
     }
@@ -311,7 +393,10 @@ function transformSingleSeries(s, series, seriesIndex) {
     const dimensionColumnIndex = dimensionColumnIndexes[0];
     return metricColumnIndexes.map(metricColumnIndex => {
         const col = cols[metricColumnIndex];
-        const rowColumnIndexes = [dimensionColumnIndex].concat(metricColumnIndex, extraColumnIndexes);
+        const rowColumnIndexes = [dimensionColumnIndex].concat(
+            metricColumnIndex,
+            extraColumnIndexes
+        );
         return {
             card: {
                 ...card,
@@ -320,9 +405,11 @@ function transformSingleSeries(s, series, seriesIndex) {
                     series.length > 1 && card.name,
                     // show column name if there are multiple metrics
                     metricColumnIndexes.length > 1 && getFriendlyName(col)
-                ].filter(n => n).join(": "),
+                ]
+                    .filter(n => n)
+                    .join(": "),
                 _transformed: true,
-                _seriesIndex: seriesIndex,
+                _seriesIndex: seriesIndex
             },
             data: {
                 rows: rows.map((row, rowIndex) => {

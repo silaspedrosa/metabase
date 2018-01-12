@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import cx from "classnames";
 import { connect } from "react-redux";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import ReactCSSTransitionGroup from "react-addons-css-transition-group";
 
 import S from "./Formula.css";
@@ -15,12 +15,12 @@ import { getMetadata } from "metabase/selectors/metadata";
 import type Metadata from "metabase-lib/lib/metadata/Metadata";
 
 const mapDispatchToProps = {
-    fetchTableMetadata,
+    fetchTableMetadata
 };
 
 const mapStateToProps = (state, props) => ({
     metadata: getMetadata(state, props)
-})
+});
 
 @connect(mapStateToProps, mapDispatchToProps)
 export default class Formula extends Component {
@@ -31,10 +31,17 @@ export default class Formula extends Component {
         expandFormula: any,
         collapseFormula: any,
         metadata: Metadata
-    }
+    };
 
     render() {
-        const { type, entity, isExpanded, expandFormula, collapseFormula, metadata } = this.props;
+        const {
+            type,
+            entity,
+            isExpanded,
+            expandFormula,
+            collapseFormula,
+            metadata
+        } = this.props;
 
         return (
             <div
@@ -42,25 +49,30 @@ export default class Formula extends Component {
                 onClick={isExpanded ? collapseFormula : expandFormula}
             >
                 <div className={S.formulaHeader}>
-                    <Icon name="beaker" size={24}/>
-                    <span className={S.formulaTitle}>{t`View the ${type} formula`}</span>
+                    <Icon name="beaker" size={24} />
+                    <span
+                        className={S.formulaTitle}
+                    >{t`View the ${type} formula`}</span>
                 </div>
                 <ReactCSSTransitionGroup
                     transitionName="formulaDefinition"
                     transitionEnterTimeout={300}
                     transitionLeaveTimeout={300}
                 >
-                    { isExpanded &&
-                    <div key="formulaDefinition" className="formulaDefinition">
-                        <QueryDefinition
-                            className={S.formulaDefinitionInner}
-                            object={entity}
-                            tableMetadata={metadata.tables[entity.table_id]}
-                        />
-                    </div>
-                    }
+                    {isExpanded && (
+                        <div
+                            key="formulaDefinition"
+                            className="formulaDefinition"
+                        >
+                            <QueryDefinition
+                                className={S.formulaDefinitionInner}
+                                object={entity}
+                                tableMetadata={metadata.tables[entity.table_id]}
+                            />
+                        </div>
+                    )}
                 </ReactCSSTransitionGroup>
             </div>
-        )
+        );
     }
 }

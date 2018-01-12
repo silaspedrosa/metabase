@@ -5,7 +5,6 @@ import * as Urls from "metabase/lib/urls";
 
 import { CardApi } from "metabase/services";
 
-
 export function createCard(name = null) {
     return {
         name: name,
@@ -28,7 +27,7 @@ export function startNewCard(type, databaseId, tableId) {
 // TODO: move to redux
 export async function loadCard(cardId) {
     try {
-        return await CardApi.get({ "cardId": cardId });
+        return await CardApi.get({ cardId: cardId });
     } catch (error) {
         console.log("error loading card", error);
         throw error;
@@ -50,15 +49,22 @@ export function isCardDirty(card, originalCard) {
     } else if (!card.id) {
         if (card.dataset_query.query && card.dataset_query.query.source_table) {
             return true;
-        } else if (card.dataset_query.native && !_.isEmpty(card.dataset_query.native.query)) {
+        } else if (
+            card.dataset_query.native &&
+            !_.isEmpty(card.dataset_query.native.query)
+        ) {
             return true;
         } else {
             return false;
         }
     } else {
-        const origCardSerialized = originalCard ? serializeCardForUrl(originalCard) : null;
-        const newCardSerialized = card ? serializeCardForUrl(_.omit(card, 'original_card_id')) : null;
-        return (newCardSerialized !== origCardSerialized);
+        const origCardSerialized = originalCard
+            ? serializeCardForUrl(originalCard)
+            : null;
+        const newCardSerialized = card
+            ? serializeCardForUrl(_.omit(card, "original_card_id"))
+            : null;
+        return newCardSerialized !== origCardSerialized;
     }
 }
 
@@ -70,7 +76,10 @@ export function isCardRunnable(card, tableMetadata) {
     if (datasetQuery.query) {
         return Query.canRun(datasetQuery.query, tableMetadata);
     } else {
-        return (datasetQuery.database != undefined && datasetQuery.native.query !== "");
+        return (
+            datasetQuery.database != undefined &&
+            datasetQuery.native.query !== ""
+        );
     }
 }
 
@@ -110,16 +119,18 @@ export function b64_to_utf8(b64) {
 
 // for "URL safe" base64, replace "+" with "-" and "/" with "_" as per RFC 4648
 export function utf8_to_b64url(str) {
-    return utf8_to_b64(str).replace(/\+/g, "-").replace(/\//g, "_");
+    return utf8_to_b64(str)
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_");
 }
 export function b64url_to_utf8(b64url) {
-    return b64_to_utf8(b64url.replace(/-/g, "+").replace(/_/g, "/"))
+    return b64_to_utf8(b64url.replace(/-/g, "+").replace(/_/g, "/"));
 }
 
 export function urlForCardState(state, dirty) {
     return Urls.question(
         state.cardId,
-        (state.serializedCard && dirty) ? state.serializedCard : ""
+        state.serializedCard && dirty ? state.serializedCard : ""
     );
 }
 

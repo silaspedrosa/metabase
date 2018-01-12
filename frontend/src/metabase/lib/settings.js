@@ -1,5 +1,5 @@
 import _ from "underscore";
-import inflection from 'inflection';
+import inflection from "inflection";
 import MetabaseUtils from "metabase/lib/utils";
 
 const mb_settings = _.clone(window.MetabaseBootstrap);
@@ -8,9 +8,10 @@ const settingListeners = {};
 
 // provides access to Metabase application settings
 const MetabaseSettings = {
-
     get: function(propName, defaultValue = null) {
-        return mb_settings[propName] !== undefined ? mb_settings[propName] : defaultValue;
+        return mb_settings[propName] !== undefined
+            ? mb_settings[propName]
+            : defaultValue;
     },
 
     set: function(key, value) {
@@ -44,7 +45,10 @@ const MetabaseSettings = {
     },
 
     hasSetupToken: function() {
-        return (mb_settings.setup_token !== undefined && mb_settings.setup_token !== null);
+        return (
+            mb_settings.setup_token !== undefined &&
+            mb_settings.setup_token !== null
+        );
     },
 
     ssoEnabled: function() {
@@ -60,38 +64,56 @@ const MetabaseSettings = {
     metastoreUrl: () => mb_settings.metastore_url,
 
     newVersionAvailable: function(settings) {
-        let versionInfo = _.findWhere(settings, {key: "version-info"}),
+        let versionInfo = _.findWhere(settings, { key: "version-info" }),
             currentVersion = MetabaseSettings.get("version").tag;
 
         if (versionInfo) versionInfo = versionInfo.value;
 
-        return (versionInfo && MetabaseUtils.compareVersions(currentVersion, versionInfo.latest.version) < 0);
+        return (
+            versionInfo &&
+            MetabaseUtils.compareVersions(
+                currentVersion,
+                versionInfo.latest.version
+            ) < 0
+        );
     },
 
     passwordComplexity: function(capitalize) {
-        const complexity = this.get('password_complexity');
+        const complexity = this.get("password_complexity");
 
         const clauseDescription = function(clause) {
             switch (clause) {
-                case "lower": return "lower case letter";
-                case "upper": return "upper case letter";
-                case "digit": return "number";
-                case "special": return "special character";
+                case "lower":
+                    return "lower case letter";
+                case "upper":
+                    return "upper case letter";
+                case "digit":
+                    return "number";
+                case "special":
+                    return "special character";
             }
         };
 
-        let description = (capitalize === false) ? "must be "+complexity.total+" characters long" : "Must be "+complexity.total+" characters long",
+        let description =
+                capitalize === false
+                    ? "must be " + complexity.total + " characters long"
+                    : "Must be " + complexity.total + " characters long",
             clauses = [];
 
         ["lower", "upper", "digit", "special"].forEach(function(clause) {
             if (clause in complexity) {
-                let desc = (complexity[clause] > 1) ? inflection.pluralize(clauseDescription(clause)) : clauseDescription(clause);
-                clauses.push(MetabaseUtils.numberToWord(complexity[clause])+" "+desc);
+                let desc =
+                    complexity[clause] > 1
+                        ? inflection.pluralize(clauseDescription(clause))
+                        : clauseDescription(clause);
+                clauses.push(
+                    MetabaseUtils.numberToWord(complexity[clause]) + " " + desc
+                );
             }
         });
 
         if (clauses.length > 0) {
-            return description+" and include "+clauses.join(", ");
+            return description + " and include " + clauses.join(", ");
         } else {
             return description;
         }
@@ -101,6 +123,6 @@ const MetabaseSettings = {
         settingListeners[setting] = settingListeners[setting] || [];
         settingListeners[setting].push(callback);
     }
-}
+};
 
 export default MetabaseSettings;

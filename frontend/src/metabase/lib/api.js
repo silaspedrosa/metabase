@@ -10,23 +10,35 @@ type Options = {
     noEvent?: boolean,
     transformResponse?: TransformFn,
     cancelled?: Promise<any>
-}
+};
 type Data = {
-    [key:string]: any
+    [key: string]: any
 };
 
 const DEFAULT_OPTIONS: Options = {
     noEvent: false,
-    transformResponse: (o) => o
-}
+    transformResponse: o => o
+};
 
 class Api extends EventEmitter {
     basename: "";
 
-    GET:    (t: string, o?: Options|TransformFn) => (d?: Data, o?: Options) => Promise<any>;
-    POST:   (t: string, o?: Options|TransformFn) => (d?: Data, o?: Options) => Promise<any>;
-    PUT:    (t: string, o?: Options|TransformFn) => (d?: Data, o?: Options) => Promise<any>;
-    DELETE: (t: string, o?: Options|TransformFn) => (d?: Data, o?: Options) => Promise<any>;
+    GET: (
+        t: string,
+        o?: Options | TransformFn
+    ) => (d?: Data, o?: Options) => Promise<any>;
+    POST: (
+        t: string,
+        o?: Options | TransformFn
+    ) => (d?: Data, o?: Options) => Promise<any>;
+    PUT: (
+        t: string,
+        o?: Options | TransformFn
+    ) => (d?: Data, o?: Options) => Promise<any>;
+    DELETE: (
+        t: string,
+        o?: Options | TransformFn
+    ) => (d?: Data, o?: Options) => Promise<any>;
 
     constructor() {
         super();
@@ -39,7 +51,7 @@ class Api extends EventEmitter {
     _makeMethod(method: string, hasBody: boolean = false) {
         return (
             urlTemplate: string,
-            methodOptions?: Options|TransformFn = {}
+            methodOptions?: Options | TransformFn = {}
         ) => {
             if (typeof methodOptions === "function") {
                 methodOptions = { transformResponse: methodOptions };
@@ -49,21 +61,32 @@ class Api extends EventEmitter {
                 data?: Data,
                 invocationOptions?: Options = {}
             ): Promise<any> => {
-                const options: Options = { ...defaultOptions, ...invocationOptions };
+                const options: Options = {
+                    ...defaultOptions,
+                    ...invocationOptions
+                };
                 let url = urlTemplate;
                 data = { ...data };
-                for (let tag of (url.match(/:\w+/g) || [])) {
+                for (let tag of url.match(/:\w+/g) || []) {
                     let value = data[tag.slice(1)];
                     if (value === undefined) {
-                        console.warn("Warning: calling", method, "without", tag);
+                        console.warn(
+                            "Warning: calling",
+                            method,
+                            "without",
+                            tag
+                        );
                         value = "";
                     }
-                    url = url.replace(tag, encodeURIComponent(data[tag.slice(1)]))
+                    url = url.replace(
+                        tag,
+                        encodeURIComponent(data[tag.slice(1)])
+                    );
                     delete data[tag.slice(1)];
                 }
 
-                let headers: { [key:string]: string } = {
-                    "Accept": "application/json",
+                let headers: { [key: string]: string } = {
+                    Accept: "application/json"
                 };
 
                 let body;
@@ -77,9 +100,16 @@ class Api extends EventEmitter {
                     }
                 }
 
-                return this._makeRequest(method, url, headers, body, data, options);
-            }
-        }
+                return this._makeRequest(
+                    method,
+                    url,
+                    headers,
+                    body,
+                    data,
+                    options
+                );
+            };
+        };
     }
 
     // TODO Atte Keinänen 6/26/17: Replacing this with isomorphic-fetch could simplify the implementation
@@ -89,13 +119,15 @@ class Api extends EventEmitter {
             let xhr = new XMLHttpRequest();
             xhr.open(method, this.basename + url);
             for (let headerName in headers) {
-                xhr.setRequestHeader(headerName, headers[headerName])
+                xhr.setRequestHeader(headerName, headers[headerName]);
             }
             xhr.onreadystatechange = () => {
                 // $FlowFixMe
                 if (xhr.readyState === XMLHttpRequest.DONE) {
                     let body = xhr.responseText;
-                    try { body = JSON.parse(body); } catch (e) {}
+                    try {
+                        body = JSON.parse(body);
+                    } catch (e) {}
                     if (xhr.status >= 200 && xhr.status <= 299) {
                         if (options.transformResponse) {
                             body = options.transformResponse(body, { data });
@@ -112,13 +144,13 @@ class Api extends EventEmitter {
                         this.emit(xhr.status, url);
                     }
                 }
-            }
+            };
             xhr.send(body);
 
             if (options.cancelled) {
                 options.cancelled.then(() => {
                     isCancelled = true;
-                    xhr.abort()
+                    xhr.abort();
                 });
             }
         });

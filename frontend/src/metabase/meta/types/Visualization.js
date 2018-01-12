@@ -6,13 +6,13 @@ import type { TableMetadata } from "metabase/meta/types/Metadata";
 import type { Field, FieldId } from "metabase/meta/types/Field";
 import Question from "metabase-lib/lib/Question";
 
-export type ActionCreator = (props: ClickActionProps) => ClickAction[]
+export type ActionCreator = (props: ClickActionProps) => ClickAction[];
 
 export type QueryMode = {
     name: string,
     actions: ActionCreator[],
     drills: ActionCreator[]
-}
+};
 
 export type HoverData = Array<{ key: string, value: any, col?: Column }>;
 
@@ -21,8 +21,8 @@ export type HoverObject = {
     axisIndex?: number,
     data?: HoverData,
     element?: ?HTMLElement,
-    event?: MouseEvent,
-}
+    event?: MouseEvent
+};
 
 export type DimensionValue = {
     value: Value,
@@ -35,8 +35,8 @@ export type ClickObject = {
     dimensions?: DimensionValue[],
     event?: MouseEvent,
     element?: HTMLElement,
-    seriesIndex?: number,
-}
+    seriesIndex?: number
+};
 
 export type ClickAction = {
     title: any, // React Element
@@ -45,27 +45,30 @@ export type ClickAction = {
     question?: () => ?Question,
     url?: () => string,
     section?: string,
-    name?: string,
-}
+    name?: string
+};
 
 export type ClickActionProps = {
     question: Question,
     clicked?: ClickObject,
     settings: {
-        'enable_xrays': boolean,
-        'xray_max_cost': string
+        enable_xrays: boolean,
+        xray_max_cost: string
     }
-}
+};
 
-export type OnChangeCardAndRun = ({ nextCard: Card, previousCard?: ?Card }) => void
+export type OnChangeCardAndRun = ({
+    nextCard: Card,
+    previousCard?: ?Card
+}) => void;
 
 export type ClickActionPopoverProps = {
     onChangeCardAndRun: OnChangeCardAndRun,
-    onClose: () => void,
-}
+    onClose: () => void
+};
 
 export type SingleSeries = { card: Card, data: DatasetData };
-export type Series = SingleSeries[] & { _raw: Series }
+export type Series = SingleSeries[] & { _raw: Series };
 
 export type VisualizationProps = {
     series: Series,
@@ -99,11 +102,11 @@ export type VisualizationProps = {
 
     // object detail
     tableMetadata: ?TableMetadata,
-    tableForeignKeys: ?ForeignKey[],
+    tableForeignKeys: ?(ForeignKey[]),
     tableForeignKeyReferences: { [id: ForeignKeyId]: ForeignKeyCountInfo },
     loadObjectDetailFKReferences: () => void,
-    followForeignKey: (fk: any) => void,
-}
+    followForeignKey: (fk: any) => void
+};
 
 type ForeignKeyId = number;
 type ForeignKey = {
@@ -112,10 +115,10 @@ type ForeignKey = {
     origin: Field,
     origin_id: FieldId,
     destination: Field,
-    destination_id: FieldId,
-}
+    destination_id: FieldId
+};
 
 type ForeignKeyCountInfo = {
     status: number,
-    value: number,
+    value: number
 };

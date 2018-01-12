@@ -1,12 +1,12 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 import "./Calendar.css";
 
-import cx from 'classnames';
-import moment from 'moment';
-import { t } from 'c-3po';
-import Icon from 'metabase/components/Icon';
+import cx from "classnames";
+import moment from "moment";
+import { t } from "c-3po";
+import Icon from "metabase/components/Icon";
 
 export default class Calendar extends Component {
     constructor(props) {
@@ -27,7 +27,7 @@ export default class Calendar extends Component {
         onAfterClick: PropTypes.func,
         onBeforeClick: PropTypes.func,
         isRangePicker: PropTypes.bool,
-        isDual: PropTypes.bool,
+        isDual: PropTypes.bool
     };
 
     static defaultProps = {
@@ -56,9 +56,15 @@ export default class Calendar extends Component {
             this.props.onChange(date.format("YYYY-MM-DD"), null);
         } else if (!selectedEnd) {
             if (date.isAfter(selected)) {
-                this.props.onChange(selected.format("YYYY-MM-DD"), date.format("YYYY-MM-DD"));
+                this.props.onChange(
+                    selected.format("YYYY-MM-DD"),
+                    date.format("YYYY-MM-DD")
+                );
             } else {
-                this.props.onChange(date.format("YYYY-MM-DD"), selected.format("YYYY-MM-DD"));
+                this.props.onChange(
+                    date.format("YYYY-MM-DD"),
+                    selected.format("YYYY-MM-DD")
+                );
             }
         }
     }
@@ -78,30 +84,43 @@ export default class Calendar extends Component {
     renderMonthHeader(current, side) {
         return (
             <div className="Calendar-header flex align-center">
-                { side !=="right" &&
-                    <div className="bordered rounded p1 cursor-pointer transition-border border-hover px1" onClick={this.previous}>
+                {side !== "right" && (
+                    <div
+                        className="bordered rounded p1 cursor-pointer transition-border border-hover px1"
+                        onClick={this.previous}
+                    >
                         <Icon name="chevronleft" size={10} />
                     </div>
-                }
+                )}
                 <span className="flex-full" />
                 <h4 className="cursor-pointer rounded p1">
                     {current.format("MMMM YYYY")}
                 </h4>
                 <span className="flex-full" />
-                { side !=="left" &&
-                    <div className="bordered border-hover rounded p1 transition-border cursor-pointer px1" onClick={this.next}>
+                {side !== "left" && (
+                    <div
+                        className="bordered border-hover rounded p1 transition-border cursor-pointer px1"
+                        onClick={this.next}
+                    >
                         <Icon name="chevronright" size={10} />
                     </div>
-                }
+                )}
             </div>
-        )
+        );
     }
 
     renderDayNames() {
         const names = [t`Su`, t`Mo`, t`Tu`, t`We`, t`Th`, t`Fr`, t`Sa`];
         return (
             <div className="Calendar-day-names Calendar-week py1">
-                {names.map((name) => <span key={name} className="Calendar-day-name text-centered">{name}</span>)}
+                {names.map(name => (
+                    <span
+                        key={name}
+                        className="Calendar-day-name text-centered"
+                    >
+                        {name}
+                    </span>
+                ))}
             </div>
         );
     }
@@ -109,7 +128,10 @@ export default class Calendar extends Component {
     renderWeeks(current) {
         var weeks = [],
             done = false,
-            date = moment(current).startOf("month").add("w" -1).day("Sunday"),
+            date = moment(current)
+                .startOf("month")
+                .add("w" - 1)
+                .day("Sunday"),
             monthIndex = date.month(),
             count = 0;
 
@@ -129,17 +151,17 @@ export default class Calendar extends Component {
             monthIndex = date.month();
         }
 
-        return (
-            <div className="Calendar-weeks relative">
-                {weeks}
-            </div>
-        );
+        return <div className="Calendar-weeks relative">{weeks}</div>;
     }
 
     renderCalender(current, side) {
         return (
-            <div className={
-                cx("Calendar Grid-cell", { "Calendar--range": this.props.selected && this.props.selectedEnd })}>
+            <div
+                className={cx("Calendar Grid-cell", {
+                    "Calendar--range":
+                        this.props.selected && this.props.selectedEnd
+                })}
+            >
                 {this.renderMonthHeader(current, side)}
                 {this.renderDayNames(current)}
                 {this.renderWeeks(current)}
@@ -153,9 +175,12 @@ export default class Calendar extends Component {
             return (
                 <div className="Grid Grid--1of2 Grid--gutters">
                     {this.renderCalender(current, "left")}
-                    {this.renderCalender(moment(current).add(1, "month"), "right")}
+                    {this.renderCalender(
+                        moment(current).add(1, "month"),
+                        "right"
+                    )}
                 </div>
-            )
+            );
         } else {
             return this.renderCalender(current);
         }
@@ -167,7 +192,7 @@ class Week extends Component {
         selected: PropTypes.object,
         selectedEnd: PropTypes.object,
         onClickDay: PropTypes.func.isRequired
-    }
+    };
 
     render() {
         let days = [];
@@ -175,23 +200,35 @@ class Week extends Component {
 
         for (let i = 0; i < 7; i++) {
             let classes = cx({
-                'p1': true,
-                'cursor-pointer': true,
-                'text-centered': true,
+                p1: true,
+                "cursor-pointer": true,
+                "text-centered": true,
                 "Calendar-day": true,
                 "Calendar-day--today": date.isSame(new Date(), "day"),
                 "Calendar-day--this-month": date.month() === month.month(),
-                "Calendar-day--selected": selected && date.isSame(selected, "day"),
-                "Calendar-day--selected-end": selectedEnd && date.isSame(selectedEnd, "day"),
+                "Calendar-day--selected":
+                    selected && date.isSame(selected, "day"),
+                "Calendar-day--selected-end":
+                    selectedEnd && date.isSame(selectedEnd, "day"),
                 "Calendar-day--week-start": i === 0,
                 "Calendar-day--week-end": i === 6,
-                "Calendar-day--in-range": !(date.isSame(selected, "day") || date.isSame(selectedEnd, "day")) && (
-                    date.isSame(selected, "day") || date.isSame(selectedEnd, "day") ||
-                    (selectedEnd && selectedEnd.isAfter(date, "day") && date.isAfter(selected, "day"))
-                )
+                "Calendar-day--in-range":
+                    !(
+                        date.isSame(selected, "day") ||
+                        date.isSame(selectedEnd, "day")
+                    ) &&
+                    (date.isSame(selected, "day") ||
+                        date.isSame(selectedEnd, "day") ||
+                        (selectedEnd &&
+                            selectedEnd.isAfter(date, "day") &&
+                            date.isAfter(selected, "day")))
             });
             days.push(
-                <span key={date.toString()} className={classes} onClick={this.props.onClickDay.bind(null, date)}>
+                <span
+                    key={date.toString()}
+                    className={classes}
+                    onClick={this.props.onClickDay.bind(null, date)}
+                >
                     {date.date()}
                 </span>
             );

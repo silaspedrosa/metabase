@@ -30,7 +30,7 @@ function adjustYAxisTicksIfNeeded(axis, axisHeightPixels) {
 
     const numTicks = getNumTicks(axis);
 
-    if ((axisHeightPixels / numTicks) < MIN_PIXELS_PER_TICK) {
+    if (axisHeightPixels / numTicks < MIN_PIXELS_PER_TICK) {
         axis.ticks(Math.floor(axisHeightPixels / MIN_PIXELS_PER_TICK));
     }
 }
@@ -64,7 +64,8 @@ function adjustXAxisTicksIfNeeded(axis, chartWidthPixels, xValues) {
 
     // calculate the average length of each tick, then convert that to pixels
     const tickAverageStringLength = averageStringLengthOfValues(xValues);
-    const tickAverageWidthPixels  = tickAverageStringLength * APPROXIMATE_AVERAGE_CHAR_WIDTH_PIXELS;
+    const tickAverageWidthPixels =
+        tickAverageStringLength * APPROXIMATE_AVERAGE_CHAR_WIDTH_PIXELS;
 
     // now figure out the approximate number of ticks we'll be able to show based on the width of the chart. Round
     // down so we error on the side of more space rather than less.
@@ -74,84 +75,146 @@ function adjustXAxisTicksIfNeeded(axis, chartWidthPixels, xValues) {
     if (getNumTicks(axis) > maxTicks) axis.ticks(maxTicks);
 }
 
-export function applyChartTimeseriesXAxis(chart, settings, series, { xValues, xDomain, xInterval }) {
+export function applyChartTimeseriesXAxis(
+    chart,
+    settings,
+    series,
+    { xValues, xDomain, xInterval }
+) {
     // find the first nonempty single series
     // $FlowFixMe
-    const firstSeries: SingleSeries = _.find(series, (s) => !datasetContainsNoResults(s.data));
+    const firstSeries: SingleSeries = _.find(
+        series,
+        s => !datasetContainsNoResults(s.data)
+    );
 
     // setup an x-axis where the dimension is a timeseries
     let dimensionColumn = firstSeries.data.cols[0];
 
     // get the data's timezone offset from the first row
-    let dataOffset = parseTimestamp(firstSeries.data.rows[0][0]).utcOffset() / 60;
+    let dataOffset =
+        parseTimestamp(firstSeries.data.rows[0][0]).utcOffset() / 60;
 
     // compute the data interval
     let dataInterval = xInterval;
     let tickInterval = dataInterval;
 
     if (settings["graph.x_axis.labels_enabled"]) {
-        chart.xAxisLabel(settings["graph.x_axis.title_text"] || getFriendlyName(dimensionColumn), X_LABEL_PADDING);
+        chart.xAxisLabel(
+            settings["graph.x_axis.title_text"] ||
+                getFriendlyName(dimensionColumn),
+            X_LABEL_PADDING
+        );
     }
     if (settings["graph.x_axis.axis_enabled"]) {
-        chart.renderVerticalGridLines(settings["graph.x_axis.gridLine_enabled"]);
+        chart.renderVerticalGridLines(
+            settings["graph.x_axis.gridLine_enabled"]
+        );
 
         if (dimensionColumn.unit == null) {
-            dimensionColumn = { ...dimensionColumn, unit: dataInterval.interval };
+            dimensionColumn = {
+                ...dimensionColumn,
+                unit: dataInterval.interval
+            };
         }
 
         // special handling for weeks
         // TODO: are there any other cases where we should do this?
         if (dataInterval.interval === "week") {
             // if tick interval is compressed then show months instead of weeks because they're nicer formatted
-            const newTickInterval = computeTimeseriesTicksInterval(xDomain, tickInterval, chart.width());
-            if (newTickInterval.interval !== tickInterval.interval || newTickInterval.count !== tickInterval.count) {
-                dimensionColumn = { ...dimensionColumn, unit: "month" },
-                tickInterval = { interval: "month", count: 1 };
+            const newTickInterval = computeTimeseriesTicksInterval(
+                xDomain,
+                tickInterval,
+                chart.width()
+            );
+            if (
+                newTickInterval.interval !== tickInterval.interval ||
+                newTickInterval.count !== tickInterval.count
+            ) {
+                (dimensionColumn = { ...dimensionColumn, unit: "month" }),
+                    (tickInterval = { interval: "month", count: 1 });
             }
         }
 
         chart.xAxis().tickFormat(timestamp => {
             // timestamp is a plain Date object which discards the timezone,
             // so add it back in so it's formatted correctly
-            const timestampFixed = moment(timestamp).utcOffset(dataOffset).format();
-            return formatValue(timestampFixed, { column: dimensionColumn, type: "axis" })
+            const timestampFixed = moment(timestamp)
+                .utcOffset(dataOffset)
+                .format();
+            return formatValue(timestampFixed, {
+                column: dimensionColumn,
+                type: "axis"
+            });
         });
 
         // Compute a sane interval to display based on the data granularity, domain, and chart width
-        tickInterval = computeTimeseriesTicksInterval(xDomain, tickInterval, chart.width());
+        tickInterval = computeTimeseriesTicksInterval(
+            xDomain,
+            tickInterval,
+            chart.width()
+        );
         chart.xAxis().ticks(tickInterval.rangeFn, tickInterval.count);
     } else {
         chart.xAxis().ticks(0);
     }
 
     // pad the domain slightly to prevent clipping
-    xDomain[0] = moment(xDomain[0]).subtract(dataInterval.count * 0.75, dataInterval.interval);
-    xDomain[1] = moment(xDomain[1]).add(dataInterval.count * 0.75, dataInterval.interval);
+    xDomain[0] = moment(xDomain[0]).subtract(
+        dataInterval.count * 0.75,
+        dataInterval.interval
+    );
+    xDomain[1] = moment(xDomain[1]).add(
+        dataInterval.count * 0.75,
+        dataInterval.interval
+    );
 
     // set the x scale
-    chart.x(d3.time.scale.utc().domain(xDomain));//.nice(d3.time[dataInterval.interval]));
+    chart.x(d3.time.scale.utc().domain(xDomain)); //.nice(d3.time[dataInterval.interval]));
 
     // set the x units (used to compute bar size)
-    chart.xUnits((start, stop) => Math.ceil(1 + moment(stop).diff(start, dataInterval.interval) / dataInterval.count));
+    chart.xUnits((start, stop) =>
+        Math.ceil(
+            1 +
+                moment(stop).diff(start, dataInterval.interval) /
+                    dataInterval.count
+        )
+    );
 }
 
-export function applyChartQuantitativeXAxis(chart, settings, series, { xValues, xDomain, xInterval }) {
+export function applyChartQuantitativeXAxis(
+    chart,
+    settings,
+    series,
+    { xValues, xDomain, xInterval }
+) {
     // find the first nonempty single series
     // $FlowFixMe
-    const firstSeries: SingleSeries = _.find(series, (s) => !datasetContainsNoResults(s.data));
+    const firstSeries: SingleSeries = _.find(
+        series,
+        s => !datasetContainsNoResults(s.data)
+    );
     const dimensionColumn = firstSeries.data.cols[0];
 
     if (settings["graph.x_axis.labels_enabled"]) {
-        chart.xAxisLabel(settings["graph.x_axis.title_text"] || getFriendlyName(dimensionColumn), X_LABEL_PADDING);
+        chart.xAxisLabel(
+            settings["graph.x_axis.title_text"] ||
+                getFriendlyName(dimensionColumn),
+            X_LABEL_PADDING
+        );
     }
     if (settings["graph.x_axis.axis_enabled"]) {
-        chart.renderVerticalGridLines(settings["graph.x_axis.gridLine_enabled"]);
+        chart.renderVerticalGridLines(
+            settings["graph.x_axis.gridLine_enabled"]
+        );
         adjustXAxisTicksIfNeeded(chart.xAxis(), chart.width(), xValues);
 
-        chart.xAxis().tickFormat(d => formatValue(d, { column: dimensionColumn }));
+        chart
+            .xAxis()
+            .tickFormat(d => formatValue(d, { column: dimensionColumn }));
     } else {
         chart.xAxis().ticks(0);
-        chart.xAxis().tickFormat('');
+        chart.xAxis().tickFormat("");
     }
 
     let scale;
@@ -159,7 +222,12 @@ export function applyChartQuantitativeXAxis(chart, settings, series, { xValues, 
         scale = d3.scale.pow().exponent(0.5);
     } else if (settings["graph.x_axis.scale"] === "log") {
         scale = d3.scale.log().base(Math.E);
-        if (!((xDomain[0] < 0 && xDomain[1] < 0) || (xDomain[0] > 0 && xDomain[1] > 0))) {
+        if (
+            !(
+                (xDomain[0] < 0 && xDomain[1] < 0) ||
+                (xDomain[0] > 0 && xDomain[1] > 0)
+            )
+        ) {
             throw "X-axis must not cross 0 when using log scale.";
         }
     } else {
@@ -167,27 +235,32 @@ export function applyChartQuantitativeXAxis(chart, settings, series, { xValues, 
     }
 
     // pad the domain slightly to prevent clipping
-    xDomain = [
-        xDomain[0] - xInterval * 0.75,
-        xDomain[1] + xInterval * 0.75
-    ];
+    xDomain = [xDomain[0] - xInterval * 0.75, xDomain[1] + xInterval * 0.75];
 
-    chart.x(scale.domain(xDomain))
-         .xUnits(dc.units.fp.precision(xInterval));
+    chart.x(scale.domain(xDomain)).xUnits(dc.units.fp.precision(xInterval));
 }
 
 export function applyChartOrdinalXAxis(chart, settings, series, { xValues }) {
     // find the first nonempty single series
     // $FlowFixMe
-    const firstSeries: SingleSeries = _.find(series, (s) => !datasetContainsNoResults(s.data));
+    const firstSeries: SingleSeries = _.find(
+        series,
+        s => !datasetContainsNoResults(s.data)
+    );
 
     const dimensionColumn = firstSeries.data.cols[0];
 
     if (settings["graph.x_axis.labels_enabled"]) {
-        chart.xAxisLabel(settings["graph.x_axis.title_text"] || getFriendlyName(dimensionColumn), X_LABEL_PADDING);
+        chart.xAxisLabel(
+            settings["graph.x_axis.title_text"] ||
+                getFriendlyName(dimensionColumn),
+            X_LABEL_PADDING
+        );
     }
     if (settings["graph.x_axis.axis_enabled"]) {
-        chart.renderVerticalGridLines(settings["graph.x_axis.gridLine_enabled"]);
+        chart.renderVerticalGridLines(
+            settings["graph.x_axis.gridLine_enabled"]
+        );
         chart.xAxis().ticks(xValues.length);
         adjustXAxisTicksIfNeeded(chart.xAxis(), chart.width(), xValues);
 
@@ -199,31 +272,32 @@ export function applyChartOrdinalXAxis(chart, settings, series, { xValues }) {
             let visibleKeys = xValues.filter((v, i) => i % keyInterval === 0);
             chart.xAxis().tickValues(visibleKeys);
         }
-        chart.xAxis().tickFormat(d => formatValue(d, { column: dimensionColumn }));
+        chart
+            .xAxis()
+            .tickFormat(d => formatValue(d, { column: dimensionColumn }));
     } else {
         chart.xAxis().ticks(0);
-        chart.xAxis().tickFormat('');
+        chart.xAxis().tickFormat("");
     }
 
-    chart.x(d3.scale.ordinal().domain(xValues))
-         .xUnits(dc.units.ordinal);
+    chart.x(d3.scale.ordinal().domain(xValues)).xUnits(dc.units.ordinal);
 }
 
 export function applyChartYAxis(chart, settings, series, yExtent, axisName) {
     let axis;
     if (axisName !== "right") {
         axis = {
-            scale:   (...args) => chart.y(...args),
-            axis:    (...args) => chart.yAxis(...args),
-            label:   (...args) => chart.yAxisLabel(...args),
-            setting: (name) => settings["graph.y_axis." + name]
+            scale: (...args) => chart.y(...args),
+            axis: (...args) => chart.yAxis(...args),
+            label: (...args) => chart.yAxisLabel(...args),
+            setting: name => settings["graph.y_axis." + name]
         };
     } else {
         axis = {
-            scale:   (...args) => chart.rightY(...args),
-            axis:    (...args) => chart.rightYAxis(...args),
-            label:   (...args) => chart.rightYAxisLabel(...args),
-            setting: (name) => settings["graph.y_axis." + name] // TODO: right axis settings
+            scale: (...args) => chart.rightY(...args),
+            axis: (...args) => chart.rightYAxis(...args),
+            label: (...args) => chart.rightYAxisLabel(...args),
+            setting: name => settings["graph.y_axis." + name] // TODO: right axis settings
         };
     }
 
@@ -233,7 +307,9 @@ export function applyChartYAxis(chart, settings, series, yExtent, axisName) {
             axis.label(axis.setting("title_text"), Y_LABEL_PADDING);
         } else {
             // only use the column name if all in the series are the same
-            const labels = _.uniq(series.map(s => getFriendlyName(s.data.cols[1])));
+            const labels = _.uniq(
+                series.map(s => getFriendlyName(s.data.cols[1]))
+            );
             if (labels.length === 1) {
                 axis.label(labels[0], Y_LABEL_PADDING);
             }
@@ -269,19 +345,27 @@ export function applyChartYAxis(chart, settings, series, yExtent, axisName) {
             // TODO: right axis?
             chart.elasticY(true);
         } else {
-            if (!((yExtent[0] < 0 && yExtent[1] < 0) || (yExtent[0] > 0 && yExtent[1] > 0))) {
+            if (
+                !(
+                    (yExtent[0] < 0 && yExtent[1] < 0) ||
+                    (yExtent[0] > 0 && yExtent[1] > 0)
+                )
+            ) {
                 throw "Y-axis must not cross 0 when using log scale.";
             }
             scale.domain(yExtent);
         }
         axis.scale(scale);
     } else {
-        if (axis.setting("scale") === "log" && !(
-            (axis.setting("min") < 0 && axis.setting("max") < 0) ||
-            (axis.setting("min") > 0 && axis.setting("max") > 0)
-        )) {
+        if (
+            axis.setting("scale") === "log" &&
+            !(
+                (axis.setting("min") < 0 && axis.setting("max") < 0) ||
+                (axis.setting("min") > 0 && axis.setting("max") > 0)
+            )
+        ) {
             throw "Y-axis must not cross 0 when using log scale.";
         }
-        axis.scale(scale.domain([axis.setting("min"), axis.setting("max")]))
+        axis.scale(scale.domain([axis.setting("min"), axis.setting("max")]));
     }
 }

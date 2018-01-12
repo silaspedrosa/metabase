@@ -8,9 +8,9 @@ import MetabaseSettings from "metabase/lib/settings";
 import DeleteDatabaseModal from "../components/DeleteDatabaseModal.jsx";
 import DatabaseEditForms from "../components/DatabaseEditForms.jsx";
 import DatabaseSchedulingForm from "../components/DatabaseSchedulingForm";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import ActionButton from "metabase/components/ActionButton.jsx";
-import Breadcrumbs from "metabase/components/Breadcrumbs.jsx"
+import Breadcrumbs from "metabase/components/Breadcrumbs.jsx";
 import ModalWithTrigger from "metabase/components/ModalWithTrigger.jsx";
 
 import {
@@ -34,39 +34,37 @@ import ConfirmContent from "metabase/components/ConfirmContent";
 import LoadingAndErrorWrapper from "metabase/components/LoadingAndErrorWrapper";
 
 const mapStateToProps = (state, props) => ({
-    database:  getEditingDatabase(state),
+    database: getEditingDatabase(state),
     databaseCreationStep: getDatabaseCreationStep(state),
     formState: getFormState(state)
 });
 
 export const Tab = ({ name, setTab, currentTab }) => {
-    const isCurrentTab = currentTab === name.toLowerCase()
+    const isCurrentTab = currentTab === name.toLowerCase();
 
     return (
         <div
-            className={cx('cursor-pointer py2', {'text-brand': isCurrentTab })}
+            className={cx("cursor-pointer py2", { "text-brand": isCurrentTab })}
             // TODO Use css classes instead?
             style={isCurrentTab ? { borderBottom: "3px solid #509EE3" } : {}}
-            onClick={() => setTab(name)}>
+            onClick={() => setTab(name)}
+        >
             <h3>{name}</h3>
         </div>
-    )
-}
+    );
+};
 
-export const Tabs = ({ tabs, currentTab, setTab }) =>
+export const Tabs = ({ tabs, currentTab, setTab }) => (
     <div className="border-bottom">
         <ol className="Form-offset flex align center">
-            {tabs.map((tab, index) =>
+            {tabs.map((tab, index) => (
                 <li key={index} className="mr3">
-                    <Tab
-                        name={tab}
-                        setTab={setTab}
-                        currentTab={currentTab}
-                    />
+                    <Tab name={tab} setTab={setTab} currentTab={currentTab} />
                 </li>
-            )}
+            ))}
         </ol>
     </div>
+);
 
 const mapDispatchToProps = {
     reset,
@@ -87,7 +85,7 @@ export default class DatabaseEditApp extends Component {
         super(props, context);
 
         this.state = {
-            currentTab: 'connection'
+            currentTab: "connection"
         };
     }
 
@@ -114,9 +112,9 @@ export default class DatabaseEditApp extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        const addingNewDatabase = !nextProps.database || !nextProps.database.id
+        const addingNewDatabase = !nextProps.database || !nextProps.database.id;
 
-       if (addingNewDatabase) {
+        if (addingNewDatabase) {
             // Update the current creation step (= active tab) if adding a new database
             this.setState({ currentTab: nextProps.databaseCreationStep });
         }
@@ -126,62 +124,90 @@ export default class DatabaseEditApp extends Component {
         let { database, formState } = this.props;
         const { currentTab } = this.state;
 
-        const editingExistingDatabase = database && database.id != null
-        const addingNewDatabase = !editingExistingDatabase
+        const editingExistingDatabase = database && database.id != null;
+        const addingNewDatabase = !editingExistingDatabase;
 
-        const letUserControlScheduling = database && database.details && database.details["let-user-control-scheduling"]
-        const showTabs = editingExistingDatabase && letUserControlScheduling
+        const letUserControlScheduling =
+            database &&
+            database.details &&
+            database.details["let-user-control-scheduling"];
+        const showTabs = editingExistingDatabase && letUserControlScheduling;
 
         return (
             <div className="wrapper">
-                <Breadcrumbs className="py4" crumbs={[
-                    [t`Databases`, "/admin/databases"],
-                    [addingNewDatabase ? t`Add Database` : database.name]
-                ]} />
+                <Breadcrumbs
+                    className="py4"
+                    crumbs={[
+                        [t`Databases`, "/admin/databases"],
+                        [addingNewDatabase ? t`Add Database` : database.name]
+                    ]}
+                />
                 <section className="Grid Grid--gutters Grid--2-of-3">
                     <div className="Grid-cell">
                         <div className="Form-new bordered rounded shadowed pt0">
-                            { showTabs &&
+                            {showTabs && (
                                 <Tabs
                                     tabs={[t`Connection`, t`Scheduling`]}
                                     currentTab={currentTab}
-                                    setTab={tab => this.setState({currentTab: tab.toLowerCase()})}
+                                    setTab={tab =>
+                                        this.setState({
+                                            currentTab: tab.toLowerCase()
+                                        })
+                                    }
                                 />
-                            }
-                            <LoadingAndErrorWrapper loading={!database} error={null}>
-                                { () =>
+                            )}
+                            <LoadingAndErrorWrapper
+                                loading={!database}
+                                error={null}
+                            >
+                                {() => (
                                     <div>
-                                        { currentTab === 'connection' &&
-                                        <DatabaseEditForms
-                                            database={database}
-                                            details={database ? database.details : null}
-                                            engines={MetabaseSettings.get('engines')}
-                                            hiddenFields={{ssl: true}}
-                                            formState={formState}
-                                            selectEngine={this.props.selectEngine}
-                                            save={ addingNewDatabase
-                                                ? this.props.proceedWithDbCreation
-                                                : this.props.saveDatabase
-                                            }
-                                        />
-                                        }
-                                        { currentTab === 'scheduling' &&
-                                        <DatabaseSchedulingForm
-                                            database={database}
-                                            formState={formState}
-                                            // Use saveDatabase both for db creation and updating
-                                            save={this.props.saveDatabase}
-                                            submitButtonText={ addingNewDatabase ? t`Save` : t`Save changes` }
-                                        />
-                                        }
+                                        {currentTab === "connection" && (
+                                            <DatabaseEditForms
+                                                database={database}
+                                                details={
+                                                    database
+                                                        ? database.details
+                                                        : null
+                                                }
+                                                engines={MetabaseSettings.get(
+                                                    "engines"
+                                                )}
+                                                hiddenFields={{ ssl: true }}
+                                                formState={formState}
+                                                selectEngine={
+                                                    this.props.selectEngine
+                                                }
+                                                save={
+                                                    addingNewDatabase
+                                                        ? this.props
+                                                              .proceedWithDbCreation
+                                                        : this.props
+                                                              .saveDatabase
+                                                }
+                                            />
+                                        )}
+                                        {currentTab === "scheduling" && (
+                                            <DatabaseSchedulingForm
+                                                database={database}
+                                                formState={formState}
+                                                // Use saveDatabase both for db creation and updating
+                                                save={this.props.saveDatabase}
+                                                submitButtonText={
+                                                    addingNewDatabase
+                                                        ? t`Save`
+                                                        : t`Save changes`
+                                                }
+                                            />
+                                        )}
                                     </div>
-                                }
+                                )}
                             </LoadingAndErrorWrapper>
                         </div>
                     </div>
 
-                    { /* Sidebar Actions */ }
-                    { editingExistingDatabase &&
+                    {/* Sidebar Actions */}
+                    {editingExistingDatabase && (
                         <div className="Grid-cell Cell--1of3">
                             <div className="Actions bordered rounded shadowed">
                                 <div className="Actions-group">
@@ -189,7 +215,11 @@ export default class DatabaseEditApp extends Component {
                                     <ol>
                                         <li>
                                             <ActionButton
-                                                actionFn={() => this.props.syncDatabaseSchema(database.id)}
+                                                actionFn={() =>
+                                                    this.props.syncDatabaseSchema(
+                                                        database.id
+                                                    )
+                                                }
                                                 className="Button Button--syncDbSchema"
                                                 normalText={t`Sync database schema now`}
                                                 activeText={t`Starting…`}
@@ -199,7 +229,11 @@ export default class DatabaseEditApp extends Component {
                                         </li>
                                         <li className="mt2">
                                             <ActionButton
-                                                actionFn={() => this.props.rescanDatabaseFields(database.id)}
+                                                actionFn={() =>
+                                                    this.props.rescanDatabaseFields(
+                                                        database.id
+                                                    )
+                                                }
                                                 className="Button Button--rescanFieldValues"
                                                 normalText={t`Re-scan field values now`}
                                                 activeText={t`Starting…`}
@@ -221,8 +255,14 @@ export default class DatabaseEditApp extends Component {
                                             >
                                                 <ConfirmContent
                                                     title={t`Discard saved field values`}
-                                                    onClose={() => this.refs.discardSavedFieldValuesModal.toggle()}
-                                                    onAction={() => this.props.discardSavedFieldValues(database.id)}
+                                                    onClose={() =>
+                                                        this.refs.discardSavedFieldValuesModal.toggle()
+                                                    }
+                                                    onAction={() =>
+                                                        this.props.discardSavedFieldValues(
+                                                            database.id
+                                                        )
+                                                    }
                                                 />
                                             </ModalWithTrigger>
                                         </li>
@@ -235,8 +275,15 @@ export default class DatabaseEditApp extends Component {
                                             >
                                                 <DeleteDatabaseModal
                                                     database={database}
-                                                    onClose={() => this.refs.deleteDatabaseModal.toggle()}
-                                                    onDelete={() => this.props.deleteDatabase(database.id, true)}
+                                                    onClose={() =>
+                                                        this.refs.deleteDatabaseModal.toggle()
+                                                    }
+                                                    onDelete={() =>
+                                                        this.props.deleteDatabase(
+                                                            database.id,
+                                                            true
+                                                        )
+                                                    }
                                                 />
                                             </ModalWithTrigger>
                                         </li>
@@ -244,7 +291,7 @@ export default class DatabaseEditApp extends Component {
                                 </div>
                             </div>
                         </div>
-                    }
+                    )}
                 </section>
             </div>
         );

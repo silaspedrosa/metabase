@@ -22,15 +22,18 @@ export type Parameter = {
 };
 
 export type VariableTarget = ["template-tag", string];
-export type DimensionTarget = ["template-tag", string] | LocalFieldReference | ForeignFieldReference
+export type DimensionTarget =
+    | ["template-tag", string]
+    | LocalFieldReference
+    | ForeignFieldReference;
 
 export type ParameterTarget =
-    ["variable", VariableTarget] |
-    ["dimension", DimensionTarget];
+    | ["variable", VariableTarget]
+    | ["dimension", DimensionTarget];
 
 export type ParameterMappingOption = {
     name: string,
-    target: ParameterTarget,
+    target: ParameterTarget
 };
 
 export type ParameterMapping = {
@@ -55,7 +58,7 @@ export type ParameterMappingUIOption = ParameterMappingOption & {
     icon: ?string,
     sectionName: string,
     isFk?: boolean,
-    isVariable?: boolean,
+    isVariable?: boolean
 };
 
 export type ParameterValues = {

@@ -36,9 +36,10 @@ export default ({ question }: ClickActionProps): ClickAction[] => {
             title: t`Summarize this segment`,
             icon: "sum",
             // eslint-disable-next-line react/display-name
-            popover: (
-                { onChangeCardAndRun, onClose }: ClickActionPopoverProps
-            ) => (
+            popover: ({
+                onChangeCardAndRun,
+                onClose
+            }: ClickActionPopoverProps) => (
                 <AggregationPopover
                     query={query}
                     tableMetadata={tableMetadata}

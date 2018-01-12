@@ -14,11 +14,11 @@ type Props = {
     operator: ?string,
     operators: Operator[],
     onOperatorChange: (o: Operator) => void,
-    hideTimeSelectors?: bool
-}
+    hideTimeSelectors?: boolean
+};
 
 type State = {
-    expanded: bool
+    expanded: boolean
 };
 
 export default class DateOperatorSelector extends Component {
@@ -40,7 +40,7 @@ export default class DateOperatorSelector extends Component {
 
     toggleExpanded = () => {
         this.setState({ expanded: !this.state.expanded });
-    }
+    };
 
     render() {
         const { operator, operators, onOperatorChange } = this.props;
@@ -54,7 +54,7 @@ export default class DateOperatorSelector extends Component {
                 >
                     <h3>{operator && titleCase(operator)}</h3>
                     <Icon
-                        name={expanded ? 'chevronup' : 'chevrondown'}
+                        name={expanded ? "chevronup" : "chevrondown"}
                         width="12"
                         height="12"
                         className="ml1"
@@ -63,15 +63,15 @@ export default class DateOperatorSelector extends Component {
                 <ul
                     className="text-purple"
                     style={{
-                        height: expanded ? 'auto' : 0,
-                        overflow: 'hidden',
-                        display: 'block',
+                        height: expanded ? "auto" : 0,
+                        overflow: "hidden",
+                        display: "block"
                     }}
                 >
-                    { operators.map(o =>
+                    {operators.map(o => (
                         <li
-                            className={cx('List-item cursor-pointer p1', {
-                                'List-item--selected': o.name === operator
+                            className={cx("List-item cursor-pointer p1", {
+                                "List-item--selected": o.name === operator
                             })}
                             key={o.name}
                             onClick={() => {
@@ -81,7 +81,7 @@ export default class DateOperatorSelector extends Component {
                         >
                             <h4 className="List-item-title">{o.name}</h4>
                         </li>
-                    )}
+                    ))}
                 </ul>
             </div>
         );

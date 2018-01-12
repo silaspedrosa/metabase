@@ -25,8 +25,14 @@ export default class Toggle extends Component {
     render() {
         return (
             <a
-                className={cx(styles.toggle, "no-decoration", { [styles.selected]: this.props.value }) + " " + (this.props.className||"")}
-                style={{color: this.props.color || null}}
+                className={
+                    cx(styles.toggle, "no-decoration", {
+                        [styles.selected]: this.props.value
+                    }) +
+                    " " +
+                    (this.props.className || "")
+                }
+                style={{ color: this.props.color || null }}
                 onClick={this.props.onChange ? this.onClick : null}
             />
         );

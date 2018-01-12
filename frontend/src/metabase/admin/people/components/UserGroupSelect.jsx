@@ -11,38 +11,41 @@ import LoadingSpinner from "metabase/components/LoadingSpinner.jsx";
 import GroupSelect from "./GroupSelect.jsx";
 import GroupSummary from "./GroupSummary.jsx";
 
-const GroupOption = ({ name, color, selected, disabled, onChange }) =>
-    <div className={cx("flex align-center p1 px2", { "cursor-pointer": !disabled })} onClick={() => !disabled && onChange(!selected) }>
+const GroupOption = ({ name, color, selected, disabled, onChange }) => (
+    <div
+        className={cx("flex align-center p1 px2", {
+            "cursor-pointer": !disabled
+        })}
+        onClick={() => !disabled && onChange(!selected)}
+    >
         <span className={cx("pr1", color, { disabled })}>
-            <CheckBox
-                checked={selected}
-                size={18}
-            />
+            <CheckBox checked={selected} size={18} />
         </span>
         {name}
     </div>
+);
 
 GroupOption.propTypes = {
     name: PropTypes.string,
     color: PropTypes.string,
     selected: PropTypes.bool,
     disabled: PropTypes.bool,
-    onChange: PropTypes.func,
-}
+    onChange: PropTypes.func
+};
 
 export default class UserGroupSelect extends Component {
     static propTypes = {
         user: PropTypes.object.isRequired,
         groups: PropTypes.array,
         createMembership: PropTypes.func.isRequired,
-        deleteMembership: PropTypes.func.isRequired,
+        deleteMembership: PropTypes.func.isRequired
     };
 
     static defaultProps = {
         isInitiallyOpen: false
     };
 
-    toggle () {
+    toggle() {
         this.refs.popover.toggle();
     }
 
@@ -55,11 +58,13 @@ export default class UserGroupSelect extends Component {
 
         const changeMembership = (group, member) => {
             if (member) {
-                createMembership({ groupId: group.id, userId: user.id })
+                createMembership({ groupId: group.id, userId: user.id });
             } else {
-                deleteMembership({ membershipId: user.memberships[group.id].membership_id })
+                deleteMembership({
+                    membershipId: user.memberships[group.id].membership_id
+                });
             }
-        }
+        };
 
         return (
             <PopoverWithTrigger
@@ -67,9 +72,16 @@ export default class UserGroupSelect extends Component {
                 triggerElement={
                     <div className="flex align-center">
                         <span className="mr1 text-grey-4">
-                            <GroupSummary groups={groups} selectedGroups={user.memberships} />
+                            <GroupSummary
+                                groups={groups}
+                                selectedGroups={user.memberships}
+                            />
                         </span>
-                        <Icon className="text-grey-2" name="chevrondown"  size={10}/>
+                        <Icon
+                            className="text-grey-2"
+                            name="chevrondown"
+                            size={10}
+                        />
                     </div>
                 }
                 triggerClasses="AdminSelectBorderless py1"

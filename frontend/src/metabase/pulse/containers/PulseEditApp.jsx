@@ -17,15 +17,15 @@ import {
     fetchUsers,
     fetchPulseFormInput,
     fetchPulseCardPreview,
-    testPulse,
+    testPulse
 } from "../actions";
 
 const mapStateToProps = (state, props) => {
     return {
         ...editPulseSelectors(state, props),
         user: state.currentUser
-    }
-}
+    };
+};
 
 const mapDispatchToProps = {
     setEditingPulse,
@@ -44,8 +44,6 @@ const mapDispatchToProps = {
 @title(({ pulse }) => pulse && pulse.name)
 export default class PulseEditApp extends Component {
     render() {
-        return (
-            <PulseEdit { ...this.props } />
-        );
+        return <PulseEdit {...this.props} />;
     }
 }

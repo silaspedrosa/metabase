@@ -28,20 +28,36 @@ export default class Input extends Component {
     }
 
     onChange(event) {
-        this.setState({ value:  event.target.value });
+        this.setState({ value: event.target.value });
         if (this.props.onChange) {
             this.props.onChange(event);
         }
     }
 
     onBlur(event) {
-        if (this.props.onBlurChange && (this.props.value || "") !== event.target.value) {
+        if (
+            this.props.onBlurChange &&
+            (this.props.value || "") !== event.target.value
+        ) {
             this.props.onBlurChange(event);
         }
     }
 
     render() {
-        let props = _.omit(this.props, "onBlurChange", "value", "onBlur", "onChange");
-        return <input {...props} value={this.state.value} onBlur={this.onBlur} onChange={this.onChange} />
+        let props = _.omit(
+            this.props,
+            "onBlurChange",
+            "value",
+            "onBlur",
+            "onChange"
+        );
+        return (
+            <input
+                {...props}
+                value={this.state.value}
+                onBlur={this.onBlur}
+                onChange={this.onChange}
+            />
+        );
     }
 }

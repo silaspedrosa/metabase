@@ -10,14 +10,19 @@ import _ from "underscore";
 import PulseEditChannels from "metabase/pulse/components/PulseEditChannels";
 import { fetchPulseFormInput, fetchUsers } from "metabase/pulse/actions";
 import {
-    formInputSelector, hasConfiguredAnyChannelSelector, hasConfiguredEmailChannelSelector, hasLoadedChannelInfoSelector,
+    formInputSelector,
+    hasConfiguredAnyChannelSelector,
+    hasConfiguredEmailChannelSelector,
+    hasLoadedChannelInfoSelector,
     userListSelector
 } from "metabase/pulse/selectors";
 import DeleteModalWithConfirm from "metabase/components/DeleteModalWithConfirm";
 import ModalWithTrigger from "metabase/components/ModalWithTrigger";
 import { inflect } from "metabase/lib/formatting";
 import {
-    ALERT_TYPE_PROGRESS_BAR_GOAL, ALERT_TYPE_ROWS, ALERT_TYPE_TIMESERIES_GOAL,
+    ALERT_TYPE_PROGRESS_BAR_GOAL,
+    ALERT_TYPE_ROWS,
+    ALERT_TYPE_TIMESERIES_GOAL,
     getDefaultAlert
 } from "metabase-lib/lib/Alert";
 import type { AlertType } from "metabase-lib/lib/Alert";
@@ -25,39 +30,48 @@ import Radio from "metabase/components/Radio";
 import RetinaImage from "react-retina-image";
 import Icon from "metabase/components/Icon";
 import MetabaseCookies from "metabase/lib/cookies";
-import cxs from 'cxs';
+import cxs from "cxs";
 import ChannelSetupModal from "metabase/components/ChannelSetupModal";
 import ButtonWithStatus from "metabase/components/ButtonWithStatus";
 
-const getScheduleFromChannel = (channel) =>
-    _.pick(channel, "schedule_day", "schedule_frame", "schedule_hour", "schedule_type")
-const classes = cxs ({
-    width: '162px',
-})
+const getScheduleFromChannel = channel =>
+    _.pick(
+        channel,
+        "schedule_day",
+        "schedule_frame",
+        "schedule_hour",
+        "schedule_type"
+    );
+const classes = cxs({
+    width: "162px"
+});
 
-@connect((state) => ({
-    question: getQuestion(state),
-    isAdmin: getUserIsAdmin(state),
-    user: getUser(state),
-    hasLoadedChannelInfo: hasLoadedChannelInfoSelector(state),
-    hasConfiguredAnyChannel: hasConfiguredAnyChannelSelector(state),
-    hasConfiguredEmailChannel: hasConfiguredEmailChannelSelector(state)
-}), { createAlert, fetchPulseFormInput })
+@connect(
+    state => ({
+        question: getQuestion(state),
+        isAdmin: getUserIsAdmin(state),
+        user: getUser(state),
+        hasLoadedChannelInfo: hasLoadedChannelInfoSelector(state),
+        hasConfiguredAnyChannel: hasConfiguredAnyChannelSelector(state),
+        hasConfiguredEmailChannel: hasConfiguredEmailChannelSelector(state)
+    }),
+    { createAlert, fetchPulseFormInput }
+)
 export class CreateAlertModalContent extends Component {
     props: {
         onCancel: () => void,
         onAlertCreated: () => void
-    }
+    };
 
     constructor(props) {
-        super()
+        super();
 
-        const { question, user } = props
+        const { question, user } = props;
 
         this.state = {
             hasSeenEducationalScreen: MetabaseCookies.getHasSeenAlertSplash(),
             alert: getDefaultAlert(question, user)
-        }
+        };
     }
 
     componentWillReceiveProps(newProps) {
@@ -71,7 +85,7 @@ export class CreateAlertModalContent extends Component {
                     ...this.state.alert,
                     card: { id: newProps.question.id() }
                 }
-            })
+            });
         }
     }
 
@@ -80,24 +94,24 @@ export class CreateAlertModalContent extends Component {
         this.props.fetchPulseFormInput();
     }
 
-    onAlertChange = (alert) => this.setState({ alert })
+    onAlertChange = alert => this.setState({ alert });
 
     onCreateAlert = async () => {
-        const { createAlert, onAlertCreated } = this.props
-        const { alert } = this.state
+        const { createAlert, onAlertCreated } = this.props;
+        const { alert } = this.state;
 
-        await createAlert(alert)
+        await createAlert(alert);
         // should close be triggered manually like this
         // but the creation notification would appear automatically ...?
         // OR should the modal visibility be part of QB redux state
         // (maybe check how other modals are implemented)
-        onAlertCreated()
-    }
+        onAlertCreated();
+    };
 
     proceedFromEducationalScreen = () => {
-        MetabaseCookies.setHasSeenAlertSplash(true)
-        this.setState({ hasSeenEducationalScreen: true })
-    }
+        MetabaseCookies.setHasSeenAlertSplash(true);
+        this.setState({ hasSeenEducationalScreen: true });
+    };
 
     render() {
         const {
@@ -108,10 +122,12 @@ export class CreateAlertModalContent extends Component {
             isAdmin,
             user,
             hasLoadedChannelInfo
-        } = this.props
-        const { alert, hasSeenEducationalScreen } = this.state
+        } = this.props;
+        const { alert, hasSeenEducationalScreen } = this.state;
 
-        const channelRequirementsMet = isAdmin ? hasConfiguredAnyChannel : hasConfiguredEmailChannel
+        const channelRequirementsMet = isAdmin
+            ? hasConfiguredAnyChannel
+            : hasConfiguredEmailChannel;
 
         if (hasLoadedChannelInfo && !channelRequirementsMet) {
             return (
@@ -122,22 +138,25 @@ export class CreateAlertModalContent extends Component {
                     channels={isAdmin ? ["email", "Slack"] : ["email"]}
                     fullPageModal
                 />
-            )
+            );
         }
         if (!hasSeenEducationalScreen) {
             return (
                 <ModalContent onClose={onCancel}>
-                    <AlertEducationalScreen onProceed={this.proceedFromEducationalScreen} />
+                    <AlertEducationalScreen
+                        onProceed={this.proceedFromEducationalScreen}
+                    />
                 </ModalContent>
-            )
+            );
         }
 
         // TODO: Remove PulseEdit css hack
         return (
-            <ModalContent
-                onClose={onCancel}
-            >
-                <div className="PulseEdit ml-auto mr-auto mb4" style={{maxWidth: "550px"}}>
+            <ModalContent onClose={onCancel}>
+                <div
+                    className="PulseEdit ml-auto mr-auto mb4"
+                    style={{ maxWidth: "550px" }}
+                >
                     <AlertModalTitle text={t`Let's set up your alert`} />
                     <AlertEditForm
                         alertType={question.alertType()}
@@ -146,22 +165,25 @@ export class CreateAlertModalContent extends Component {
                     />
                     <div className="flex align-center mt4">
                         <div className="flex-full" />
-                        <Button onClick={onCancel} className="mr2">{t`Cancel`}</Button>
+                        <Button
+                            onClick={onCancel}
+                            className="mr2"
+                        >{t`Cancel`}</Button>
                         <ButtonWithStatus
-                            titleForState={{default: t`Done`}}
+                            titleForState={{ default: t`Done` }}
                             onClickOperation={this.onCreateAlert}
                         />
                     </div>
                 </div>
             </ModalContent>
-        )
+        );
     }
 }
 
 export class AlertEducationalScreen extends Component {
     props: {
         onProceed: () => void
-    }
+    };
 
     render() {
         const { onProceed } = this.props;
@@ -176,123 +198,174 @@ export class AlertEducationalScreen extends Component {
                     // @mazameli: needed to do some negative margin spacing to match the designs
                 }
                 <div className="text-normal pt3">
-                    <div className="relative flex align-center pr4" style={{marginLeft: -80}}>
+                    <div
+                        className="relative flex align-center pr4"
+                        style={{ marginLeft: -80 }}
+                    >
                         <RetinaImage src="app/assets/img/alerts/education-illustration-01-raw-data.png" />
-                        <p className={`${classes} ml2 text-left`}>{jt`When a raw data question ${<strong>returns any results</strong>}`}</p>
+                        <p
+                            className={`${classes} ml2 text-left`}
+                        >{jt`When a raw data question ${(
+                            <strong>returns any results</strong>
+                        )}`}</p>
                     </div>
-                    <div className="relative flex align-center flex-reverse pl4" style={{marginTop: -50, marginRight: -80}}>
+                    <div
+                        className="relative flex align-center flex-reverse pl4"
+                        style={{ marginTop: -50, marginRight: -80 }}
+                    >
                         <RetinaImage src="app/assets/img/alerts/education-illustration-02-goal.png" />
-                        <p className={`${classes} mr2 text-right`}>{jt`When a line or bar ${<strong>crosses a goal line</strong>}`}</p>
+                        <p
+                            className={`${classes} mr2 text-right`}
+                        >{jt`When a line or bar ${(
+                            <strong>crosses a goal line</strong>
+                        )}`}</p>
                     </div>
-                    <div className="relative flex align-center" style={{marginTop: -60, marginLeft: -55}}>
+                    <div
+                        className="relative flex align-center"
+                        style={{ marginTop: -60, marginLeft: -55 }}
+                    >
                         <RetinaImage src="app/assets/img/alerts/education-illustration-03-progress.png" />
-                        <p className={`${classes} ml2 text-left`}>{jt`When a progress bar ${<strong>reaches its goal</strong>}`}</p>
+                        <p
+                            className={`${classes} ml2 text-left`}
+                        >{jt`When a progress bar ${(
+                            <strong>reaches its goal</strong>
+                        )}`}</p>
                     </div>
                 </div>
-                <Button primary className="mt4" onClick={onProceed}>{t`Set up an alert`}</Button>
+                <Button
+                    primary
+                    className="mt4"
+                    onClick={onProceed}
+                >{t`Set up an alert`}</Button>
             </div>
-        )
+        );
     }
 }
 
-@connect((state) => ({
-    user: getUser(state),
-    isAdmin: getUserIsAdmin(state),
-    question: getQuestion(state),
-}), { updateAlert, deleteAlert })
+@connect(
+    state => ({
+        user: getUser(state),
+        isAdmin: getUserIsAdmin(state),
+        question: getQuestion(state)
+    }),
+    { updateAlert, deleteAlert }
+)
 export class UpdateAlertModalContent extends Component {
     props: {
         alert: any,
         onCancel: boolean,
-        onAlertUpdated: (any) => void,
-        updateAlert: (any) => void,
-        deleteAlert: (any) => void,
+        onAlertUpdated: any => void,
+        updateAlert: any => void,
+        deleteAlert: any => void,
         isAdmin: boolean
-    }
+    };
 
     constructor(props) {
-        super()
+        super();
         this.state = {
             modifiedAlert: props.alert
-        }
+        };
     }
 
-    onAlertChange = (modifiedAlert) => this.setState({ modifiedAlert })
+    onAlertChange = modifiedAlert => this.setState({ modifiedAlert });
 
     onUpdateAlert = async () => {
-        const { updateAlert, onAlertUpdated } = this.props
-        const { modifiedAlert } = this.state
-        await updateAlert(modifiedAlert)
-        onAlertUpdated()
-    }
+        const { updateAlert, onAlertUpdated } = this.props;
+        const { modifiedAlert } = this.state;
+        await updateAlert(modifiedAlert);
+        onAlertUpdated();
+    };
 
     onDeleteAlert = async () => {
-        const { alert, deleteAlert, onAlertUpdated } = this.props
-        await deleteAlert(alert.id)
-        onAlertUpdated()
-    }
+        const { alert, deleteAlert, onAlertUpdated } = this.props;
+        await deleteAlert(alert.id);
+        onAlertUpdated();
+    };
 
     render() {
-        const { onCancel, question, alert, user, isAdmin } = this.props
-        const { modifiedAlert } = this.state
+        const { onCancel, question, alert, user, isAdmin } = this.props;
+        const { modifiedAlert } = this.state;
 
-        const isCurrentUser = alert.creator.id === user.id
-        const title = isCurrentUser ? t`Edit your alert` : t`Edit alert`
+        const isCurrentUser = alert.creator.id === user.id;
+        const title = isCurrentUser ? t`Edit your alert` : t`Edit alert`;
         // TODO: Remove PulseEdit css hack
         return (
-            <ModalContent
-                onClose={onCancel}
-            >
-                <div className="PulseEdit ml-auto mr-auto mb4" style={{maxWidth: "550px"}}>
+            <ModalContent onClose={onCancel}>
+                <div
+                    className="PulseEdit ml-auto mr-auto mb4"
+                    style={{ maxWidth: "550px" }}
+                >
                     <AlertModalTitle text={title} />
                     <AlertEditForm
                         alertType={question.alertType()}
                         alert={modifiedAlert}
                         onAlertChange={this.onAlertChange}
                     />
-                    { isAdmin && <DeleteAlertSection alert={alert} onDeleteAlert={this.onDeleteAlert} /> }
+                    {isAdmin && (
+                        <DeleteAlertSection
+                            alert={alert}
+                            onDeleteAlert={this.onDeleteAlert}
+                        />
+                    )}
 
                     <div className="flex align-center mt4">
                         <div className="flex-full" />
-                        <Button onClick={onCancel} className="mr2">{t`Cancel`}</Button>
+                        <Button
+                            onClick={onCancel}
+                            className="mr2"
+                        >{t`Cancel`}</Button>
                         <ButtonWithStatus
-                            titleForState={{default: t`Save changes`}}
+                            titleForState={{ default: t`Save changes` }}
                             onClickOperation={this.onUpdateAlert}
                         />
                     </div>
                 </div>
             </ModalContent>
-        )
+        );
     }
 }
 
 export class DeleteAlertSection extends Component {
-    deleteModal: any
+    deleteModal: any;
 
     getConfirmItems() {
         // same as in PulseEdit but with some changes to copy
-        return this.props.alert.channels.map(c =>
-            c.channel_type === "email" ?
-                <span>{jt`This alert will no longer be emailed to ${<strong>{c.recipients.length} {inflect("address", c.recipients.length)}</strong>}.`}</span>
-                : c.channel_type === "slack" ?
-                <span>{jt`Slack channel ${<strong>{c.details && c.details.channel}</strong>} will no longer get this alert.`}</span>
-                :
-                <span>{jt`Channel ${<strong>{c.channel_type}</strong>} will no longer receive this alert.`}</span>
+        return this.props.alert.channels.map(
+            c =>
+                c.channel_type === "email" ? (
+                    <span>{jt`This alert will no longer be emailed to ${(
+                        <strong>
+                            {c.recipients.length}{" "}
+                            {inflect("address", c.recipients.length)}
+                        </strong>
+                    )}.`}</span>
+                ) : c.channel_type === "slack" ? (
+                    <span>{jt`Slack channel ${(
+                        <strong>{c.details && c.details.channel}</strong>
+                    )} will no longer get this alert.`}</span>
+                ) : (
+                    <span>{jt`Channel ${(
+                        <strong>{c.channel_type}</strong>
+                    )} will no longer receive this alert.`}</span>
+                )
         );
     }
 
     render() {
-        const { onDeleteAlert } = this.props
+        const { onDeleteAlert } = this.props;
 
         return (
             <div className="DangerZone mt4 pt4 mb2 p3 rounded bordered relative">
-                <h3 className="text-error absolute top bg-white px1" style={{ marginTop: "-12px" }}>{jt`Danger Zone`}</h3>
+                <h3
+                    className="text-error absolute top bg-white px1"
+                    style={{ marginTop: "-12px" }}
+                >{jt`Danger Zone`}</h3>
                 <div className="ml1">
                     <h4 className="text-bold mb1">{jt`Delete this alert`}</h4>
                     <div className="flex">
                         <p className="h4 pr2">{jt`Stop delivery and delete this alert. There's no undo, so be careful.`}</p>
                         <ModalWithTrigger
-                            ref={(ref) => this.deleteModal = ref}
+                            ref={ref => (this.deleteModal = ref)}
                             triggerClasses="Button Button--danger flex-align-right flex-no-shrink"
                             triggerElement="Delete this Alert"
                         >
@@ -307,40 +380,47 @@ export class DeleteAlertSection extends Component {
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 }
 
-const AlertModalTitle = ({ text }) =>
+const AlertModalTitle = ({ text }) => (
     <div className="ml-auto mr-auto my4 pb2 text-centered">
-        <RetinaImage className="mb3" src="app/assets/img/alerts/alert-bell-confetti-illustration.png" />
-        <h1 className="text-dark">{ text }</h1>
+        <RetinaImage
+            className="mb3"
+            src="app/assets/img/alerts/alert-bell-confetti-illustration.png"
+        />
+        <h1 className="text-dark">{text}</h1>
     </div>
+);
 
-@connect((state) => ({ isAdmin: getUserIsAdmin(state) }), null)
+@connect(state => ({ isAdmin: getUserIsAdmin(state) }), null)
 export class AlertEditForm extends Component {
     props: {
         alertType: AlertType,
         alert: any,
-        onAlertChange: (any) => void,
+        onAlertChange: any => void,
         isAdmin: boolean
-    }
+    };
 
-    onScheduleChange = (schedule) => {
+    onScheduleChange = schedule => {
         const { alert, onAlertChange } = this.props;
 
         // update the same schedule to all channels at once
         onAlertChange({
             ...alert,
-            channels: alert.channels.map((channel) => ({ ...channel, ...schedule }))
-        })
-    }
+            channels: alert.channels.map(channel => ({
+                ...channel,
+                ...schedule
+            }))
+        });
+    };
 
     render() {
-        const { alertType, alert, isAdmin, onAlertChange } = this.props
+        const { alertType, alert, isAdmin, onAlertChange } = this.props;
 
         // the schedule should be same for all channels so we can use the first one
-        const schedule = getScheduleFromChannel(alert.channels[0])
+        const schedule = getScheduleFromChannel(alert.channels[0]);
 
         return (
             <div>
@@ -354,24 +434,24 @@ export class AlertEditForm extends Component {
                     schedule={schedule}
                     onScheduleChange={this.onScheduleChange}
                 />
-                { isAdmin &&
+                {isAdmin && (
                     <AlertEditChannels
                         alert={alert}
                         onAlertChange={onAlertChange}
                     />
-                }
+                )}
             </div>
-        )
+        );
     }
 }
 
 export const AlertGoalToggles = ({ alertType, alert, onAlertChange }) => {
-    const isTimeseries = alertType === ALERT_TYPE_TIMESERIES_GOAL
-    const isProgress = alertType === ALERT_TYPE_PROGRESS_BAR_GOAL
+    const isTimeseries = alertType === ALERT_TYPE_TIMESERIES_GOAL;
+    const isProgress = alertType === ALERT_TYPE_PROGRESS_BAR_GOAL;
 
     if (!isTimeseries && !isProgress) {
         // not a goal alert
-        return null
+        return null;
     }
 
     return (
@@ -379,40 +459,65 @@ export const AlertGoalToggles = ({ alertType, alert, onAlertChange }) => {
             <AlertAboveGoalToggle
                 alert={alert}
                 onAlertChange={onAlertChange}
-                title={isTimeseries ? t`Alert me when the line…` : t`Alert me when the progress bar…`}
-                trueText={isTimeseries ? t`Goes above the goal line` : t`Reaches the goal`}
-                falseText={isTimeseries ? t`Goes below the goal line` : t`Goes below the goal`}
+                title={
+                    isTimeseries
+                        ? t`Alert me when the line…`
+                        : t`Alert me when the progress bar…`
+                }
+                trueText={
+                    isTimeseries
+                        ? t`Goes above the goal line`
+                        : t`Reaches the goal`
+                }
+                falseText={
+                    isTimeseries
+                        ? t`Goes below the goal line`
+                        : t`Goes below the goal`
+                }
             />
             <AlertFirstOnlyToggle
                 alert={alert}
                 onAlertChange={onAlertChange}
-                title={isTimeseries
-                    ? t`The first time it crosses, or every time?`
-                    : t`The first time it reaches the goal, or every time?`
+                title={
+                    isTimeseries
+                        ? t`The first time it crosses, or every time?`
+                        : t`The first time it reaches the goal, or every time?`
                 }
                 trueText={t`The first time`}
-                falseText={t`Every time` }
+                falseText={t`Every time`}
             />
         </div>
-    )
-}
+    );
+};
 
-export const AlertAboveGoalToggle = (props) =>
+export const AlertAboveGoalToggle = props => (
     <AlertSettingToggle {...props} setting="alert_above_goal" />
+);
 
-export const AlertFirstOnlyToggle = (props) =>
+export const AlertFirstOnlyToggle = props => (
     <AlertSettingToggle {...props} setting="alert_first_only" />
+);
 
-export const AlertSettingToggle = ({ alert, onAlertChange, title, trueText, falseText, setting }) =>
+export const AlertSettingToggle = ({
+    alert,
+    onAlertChange,
+    title,
+    trueText,
+    falseText,
+    setting
+}) => (
     <div className="mb4 pb2">
         <h3 className="text-dark mb1">{title}</h3>
         <Radio
             value={alert[setting]}
-            onChange={(value) => onAlertChange({ ...alert, [setting]: value })}
-            options={[{ name: trueText, value: true }, { name: falseText, value: false }]}
+            onChange={value => onAlertChange({ ...alert, [setting]: value })}
+            options={[
+                { name: trueText, value: true },
+                { name: falseText, value: false }
+            ]}
         />
     </div>
-
+);
 
 export class AlertEditSchedule extends Component {
     render() {
@@ -420,10 +525,12 @@ export class AlertEditSchedule extends Component {
 
         return (
             <div>
-                <h3 className="mt4 mb3 text-dark">How often should we check for results?</h3>
+                <h3 className="mt4 mb3 text-dark">
+                    How often should we check for results?
+                </h3>
 
                 <div className="bordered rounded mb2">
-                    { alertType === ALERT_TYPE_ROWS && <RawDataAlertTip /> }
+                    {alertType === ALERT_TYPE_ROWS && <RawDataAlertTip />}
                     <div className="p3 bg-grey-0">
                         <SchedulePicker
                             schedule={schedule}
@@ -434,24 +541,28 @@ export class AlertEditSchedule extends Component {
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 }
 
 @connect(
-    (state) => ({ user: getUser(state), userList: userListSelector(state), formInput: formInputSelector(state) }),
+    state => ({
+        user: getUser(state),
+        userList: userListSelector(state),
+        formInput: formInputSelector(state)
+    }),
     { fetchPulseFormInput, fetchUsers }
 )
 export class AlertEditChannels extends Component {
     props: {
-        onChannelsChange: (any) => void,
+        onChannelsChange: any => void,
         user: any,
         userList: any[],
         // this stupidly named property contains different channel options, nothing else
         formInput: any,
         fetchPulseFormInput: () => void,
         fetchUsers: () => void
-    }
+    };
 
     componentDidMount() {
         this.props.fetchPulseFormInput();
@@ -459,16 +570,21 @@ export class AlertEditChannels extends Component {
     }
 
     // Technically pulse definition is equal to alert definition
-    onSetPulse = (alert) => {
+    onSetPulse = alert => {
         // If the pulse channel has been added, it PulseEditChannels puts the default schedule to it
         // We want to have same schedule for all channels
-        const schedule = getScheduleFromChannel(alert.channels.find((c) => c.channel_type === "email"))
+        const schedule = getScheduleFromChannel(
+            alert.channels.find(c => c.channel_type === "email")
+        );
 
         this.props.onAlertChange({
             ...alert,
-            channels: alert.channels.map((channel) => ({ ...channel, ...schedule }))
-        })
-    }
+            channels: alert.channels.map(channel => ({
+                ...channel,
+                ...schedule
+            }))
+        });
+    };
 
     render() {
         const { alert, user, userList, formInput } = this.props;
@@ -486,20 +602,25 @@ export class AlertEditChannels extends Component {
                         setPulse={this.onSetPulse}
                         hideSchedulePicker={true}
                         emailRecipientText={t`Email alerts to:`}
-                     />
+                    />
                 </div>
             </div>
-        )
+        );
     }
 }
 
 // TODO: Not sure how to translate text with formatting properly
-export const RawDataAlertTip = () =>
+export const RawDataAlertTip = () => (
     <div className="border-row-divider p3 flex align-center">
         <div className="circle flex align-center justify-center bg-grey-0 p2 mr2 text-grey-3">
             <Icon name="lightbulb" size="20" />
         </div>
         <div>
-            {jt`${<strong>Tip:</strong>} This kind of alert is most useful when your saved question doesn’t ${<em>usually</em>} return any results, but you want to know when it does.`}
+            {jt`${(
+                <strong>Tip:</strong>
+            )} This kind of alert is most useful when your saved question doesn’t ${(
+                <em>usually</em>
+            )} return any results, but you want to know when it does.`}
         </div>
     </div>
+);

@@ -7,13 +7,16 @@ import { normal } from "metabase/lib/colors";
 
 const DEFAULT_COLOR_SQUARE_SIZE = 32;
 
-const ColorSquare = ({ color, size }) =>
-    <div style={{
-        width: size,
-        height: size,
-        backgroundColor: color,
-        borderRadius: size / 8
-    }}></div>
+const ColorSquare = ({ color, size }) => (
+    <div
+        style={{
+            width: size,
+            height: size,
+            backgroundColor: color,
+            borderRadius: size / 8
+        }}
+    />
+);
 
 class ColorPicker extends Component {
     static defaultProps = {
@@ -21,7 +24,7 @@ class ColorPicker extends Component {
         size: DEFAULT_COLOR_SQUARE_SIZE,
         triggerSize: DEFAULT_COLOR_SQUARE_SIZE,
         padding: 4
-    }
+    };
 
     static propTypes = {
         colors: PropTypes.array,
@@ -29,10 +32,17 @@ class ColorPicker extends Component {
         size: PropTypes.number,
         triggerSize: PropTypes.number,
         value: PropTypes.string
-    }
+    };
 
-    render () {
-        const { colors, onChange, padding, size, triggerSize, value } = this.props;
+    render() {
+        const {
+            colors,
+            onChange,
+            padding,
+            size,
+            triggerSize,
+            value
+        } = this.props;
         return (
             <div className="inline-block">
                 <PopoverWithTrigger
@@ -53,7 +63,7 @@ class ColorPicker extends Component {
                                 maxWidth: 120
                             }}
                         >
-                            { colors.map((color, index) =>
+                            {colors.map((color, index) => (
                                 <li
                                     className="cursor-pointer"
                                     style={{ padding }}
@@ -65,7 +75,7 @@ class ColorPicker extends Component {
                                 >
                                     <ColorSquare color={color} size={size} />
                                 </li>
-                            )}
+                            ))}
                         </ol>
                     </div>
                 </PopoverWithTrigger>

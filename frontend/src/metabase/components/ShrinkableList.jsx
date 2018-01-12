@@ -21,12 +21,12 @@ export default class ShrinkableList extends Component {
     props: Props;
     state: State = {
         isShrunk: null
-    }
+    };
 
     componentWillReceiveProps() {
         this.setState({
             isShrunk: null
-        })
+        });
     }
 
     componentDidMount() {
@@ -34,12 +34,12 @@ export default class ShrinkableList extends Component {
     }
 
     componentDidUpdate() {
-        const container = ReactDOM.findDOMNode(this)
+        const container = ReactDOM.findDOMNode(this);
         const { isShrunk } = this.state;
         if (container && isShrunk === null) {
             this.setState({
                 isShrunk: container.scrollWidth !== container.offsetWidth
-            })
+            });
         }
     }
 
@@ -48,11 +48,9 @@ export default class ShrinkableList extends Component {
         const { isShrunk } = this.state;
         return (
             <div className={className}>
-                { items.map(item =>
-                    isShrunk ?
-                        renderItemSmall(item)
-                    :
-                        renderItem(item)
+                {items.map(
+                    item =>
+                        isShrunk ? renderItemSmall(item) : renderItem(item)
                 )}
             </div>
         );

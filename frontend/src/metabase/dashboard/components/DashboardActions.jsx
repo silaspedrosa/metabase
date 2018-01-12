@@ -5,19 +5,17 @@ import NightModeIcon from "metabase/components/icons/NightModeIcon";
 import FullscreenIcon from "metabase/components/icons/FullscreenIcon";
 import RefreshWidget from "metabase/dashboard/components/RefreshWidget";
 
-export const getDashboardActions = (
-    {
-        isEditing = false,
-        isEmpty = false,
-        isFullscreen,
-        isNightMode,
-        onNightModeChange,
-        onFullscreenChange,
-        refreshPeriod,
-        refreshElapsed,
-        onRefreshPeriodChange
-    }
-) => {
+export const getDashboardActions = ({
+    isEditing = false,
+    isEmpty = false,
+    isFullscreen,
+    isNightMode,
+    onNightModeChange,
+    onFullscreenChange,
+    refreshPeriod,
+    refreshElapsed,
+    onRefreshPeriodChange
+}) => {
     const buttons = [];
 
     if (!isEditing && !isEmpty) {
@@ -66,7 +64,8 @@ export const getDashboardActions = (
                         key="fullscreen"
                         isFullscreen={isFullscreen}
                         onClick={e =>
-                            onFullscreenChange(!isFullscreen, !e.altKey)}
+                            onFullscreenChange(!isFullscreen, !e.altKey)
+                        }
                     />
                 </span>
             </Tooltip>

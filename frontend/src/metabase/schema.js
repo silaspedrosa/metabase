@@ -1,13 +1,12 @@
-
 // normalizr schema for use in actions/reducers
 
 import { schema } from "normalizr";
 
-export const DatabaseSchema = new schema.Entity('databases');
-export const TableSchema = new schema.Entity('tables');
-export const FieldSchema = new schema.Entity('fields');
-export const SegmentSchema = new schema.Entity('segments');
-export const MetricSchema = new schema.Entity('metrics');
+export const DatabaseSchema = new schema.Entity("databases");
+export const TableSchema = new schema.Entity("tables");
+export const FieldSchema = new schema.Entity("fields");
+export const SegmentSchema = new schema.Entity("segments");
+export const MetricSchema = new schema.Entity("metrics");
 
 DatabaseSchema.define({
     tables: [TableSchema]
@@ -22,13 +21,13 @@ TableSchema.define({
 
 FieldSchema.define({
     target: FieldSchema,
-    table: TableSchema,
+    table: TableSchema
 });
 
 SegmentSchema.define({
-    table: TableSchema,
+    table: TableSchema
 });
 
 MetricSchema.define({
-    table: TableSchema,
+    table: TableSchema
 });

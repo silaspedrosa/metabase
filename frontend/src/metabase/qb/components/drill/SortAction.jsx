@@ -30,8 +30,8 @@ export default ({ question, clicked }: ClickActionProps): ClickAction[] => {
     }
 
     const [sortFieldRef, sortDirection] = query.sorts()[0] || [];
-    const isAlreadySorted = sortFieldRef != null &&
-        Query.isSameField(sortFieldRef, fieldRef);
+    const isAlreadySorted =
+        sortFieldRef != null && Query.isSameField(sortFieldRef, fieldRef);
 
     const actions = [];
     if (

@@ -16,13 +16,12 @@ import type { ConcreteField } from "metabase/meta/types/Query";
 import type Table from "metabase-lib/lib/metadata/Table";
 
 // import type { Section } from "metabase/components/AccordianList";
-export type AccordianListItem = {
-}
+export type AccordianListItem = {};
 
 export type AccordianListSection = {
-    name: ?string;
+    name: ?string,
     items: AccordianListItem[]
-}
+};
 
 type Props = {
     className?: string,
@@ -40,24 +39,29 @@ type Props = {
     enableSubDimensions?: boolean,
 
     hideSectionHeader?: boolean
-}
+};
 
 type State = {
     sections: AccordianListSection[]
-}
+};
 
 export default class FieldList extends Component {
     props: Props;
     state: State = {
         sections: []
-    }
+    };
 
     componentWillMount() {
         this.componentWillReceiveProps(this.props);
     }
 
     componentWillReceiveProps(newProps) {
-        let { tableMetadata, fieldOptions, segmentOptions, hideSectionHeader } = newProps;
+        let {
+            tableMetadata,
+            fieldOptions,
+            segmentOptions,
+            hideSectionHeader
+        } = newProps;
         let tableName = tableMetadata.display_name;
 
         let specialOptions = [];
@@ -69,11 +73,11 @@ export default class FieldList extends Component {
             }));
         }
 
-        const getSectionItems = (sectionOptions) =>
+        const getSectionItems = sectionOptions =>
             sectionOptions.dimensions.map(dimension => ({
                 name: dimension.displayName(),
                 dimension: dimension
-            }))
+            }));
 
         let mainSection = {
             name: hideSectionHeader ? null : singularize(tableName),
@@ -81,12 +85,14 @@ export default class FieldList extends Component {
         };
 
         let fkSections = fieldOptions.fks.map(fkOptions => ({
-            name: hideSectionHeader ? null : stripId(fkOptions.field.display_name),
+            name: hideSectionHeader
+                ? null
+                : stripId(fkOptions.field.display_name),
             items: getSectionItems(fkOptions)
         }));
 
-        let sections = []
-        if (mainSection.items.length > 0 ) {
+        let sections = [];
+        if (mainSection.items.length > 0) {
             sections.push(mainSection);
         }
         sections.push(...fkSections);
@@ -94,63 +100,83 @@ export default class FieldList extends Component {
         this.setState({ sections });
     }
 
-    itemIsSelected = (item) => {
-        return item.dimension && item.dimension.isSameBaseDimension(this.props.field);
-    }
+    itemIsSelected = item => {
+        return (
+            item.dimension &&
+            item.dimension.isSameBaseDimension(this.props.field)
+        );
+    };
 
-    renderItemExtra = (item) => {
-        const { field, enableSubDimensions, tableMetadata: { metadata } } = this.props;
+    renderItemExtra = item => {
+        const {
+            field,
+            enableSubDimensions,
+            tableMetadata: { metadata }
+        } = this.props;
 
         return (
             <div className="Field-extra flex align-center">
-                { item.segment &&
-                    this.renderSegmentTooltip(item.segment)
-                }
-                { item.dimension && item.dimension.tag &&
-                    <span className="h5 text-grey-2 px1">{item.dimension.tag}</span>
-                }
-                { enableSubDimensions && item.dimension && item.dimension.dimensions().length > 0 ?
+                {item.segment && this.renderSegmentTooltip(item.segment)}
+                {item.dimension &&
+                    item.dimension.tag && (
+                        <span className="h5 text-grey-2 px1">
+                            {item.dimension.tag}
+                        </span>
+                    )}
+                {enableSubDimensions &&
+                item.dimension &&
+                item.dimension.dimensions().length > 0 ? (
                     <PopoverWithTrigger
                         className={this.props.className}
                         hasArrow={false}
-                        triggerElement={this.renderSubDimensionTrigger(item.dimension)}
+                        triggerElement={this.renderSubDimensionTrigger(
+                            item.dimension
+                        )}
                         tetherOptions={{
-                            attachment: 'top left',
-                            targetAttachment: 'top right',
-                            targetOffset: '0 0',
-                            constraints: [{ to: 'window', attachment: 'together', pin: ['left', 'right']}]
+                            attachment: "top left",
+                            targetAttachment: "top right",
+                            targetOffset: "0 0",
+                            constraints: [
+                                {
+                                    to: "window",
+                                    attachment: "together",
+                                    pin: ["left", "right"]
+                                }
+                            ]
                         }}
                     >
                         <DimensionPicker
                             dimension={Dimension.parseMBQL(field, metadata)}
                             dimensions={item.dimension.dimensions()}
-                            onChangeDimension={dimension => this.props.onFieldChange(dimension.mbql())}
+                            onChangeDimension={dimension =>
+                                this.props.onFieldChange(dimension.mbql())
+                            }
                         />
                     </PopoverWithTrigger>
-                : null }
+                ) : null}
             </div>
         );
-    }
+    };
 
-    renderItemIcon = (item) => {
+    renderItemIcon = item => {
         let name;
         if (item.segment) {
             name = "staroutline";
         } else if (item.dimension) {
             name = item.dimension.icon();
         }
-        return <Icon name={name || 'unknown'} size={18} />;
-    }
+        return <Icon name={name || "unknown"} size={18} />;
+    };
 
     renderSubDimensionTrigger(dimension) {
         const { field, tableMetadata: { metadata } } = this.props;
-        const subDimension = dimension.isSameBaseDimension(field) ?
-            Dimension.parseMBQL(field, metadata) :
-            dimension.defaultDimension();
+        const subDimension = dimension.isSameBaseDimension(field)
+            ? Dimension.parseMBQL(field, metadata)
+            : dimension.defaultDimension();
         const name = subDimension ? subDimension.subTriggerDisplayName() : null;
         return (
             <div className="FieldList-grouping-trigger flex align-center p1 cursor-pointer">
-                {name && <h4 className="mr1">{name}</h4> }
+                {name && <h4 className="mr1">{name}</h4>}
                 <Icon name="chevronright" size={16} />
             </div>
         );
@@ -160,7 +186,14 @@ export default class FieldList extends Component {
         let { tableMetadata } = this.props;
         return (
             <div className="p1">
-                <Tooltip tooltip={<QueryDefinitionTooltip object={segment} tableMetadata={tableMetadata} />}>
+                <Tooltip
+                    tooltip={
+                        <QueryDefinitionTooltip
+                            object={segment}
+                            tableMetadata={tableMetadata}
+                        />
+                    }
+                >
                     <span className="QuestionTooltipTarget" />
                 </Tooltip>
             </div>
@@ -173,26 +206,33 @@ export default class FieldList extends Component {
         } else {
             return null;
         }
-    }
+    };
 
     renderSectionIcon = (section, sectionIndex) => {
         if (sectionIndex > 0) {
-            return <Icon name="connections" size={18} />
+            return <Icon name="connections" size={18} />;
         } else {
             return <Icon name="table2" size={18} />;
         }
-    }
+    };
 
-    onChange = (item) => {
-        const { field, enableSubDimensions, onFilterChange, onFieldChange} = this.props;
+    onChange = item => {
+        const {
+            field,
+            enableSubDimensions,
+            onFilterChange,
+            onFieldChange
+        } = this.props;
         if (item.segment && onFilterChange) {
             onFilterChange(item.value);
         } else if (field != null && this.itemIsSelected(item)) {
             // ensure if we select the same item we don't reset datetime-field's unit
             onFieldChange(field);
         } else {
-            const dimension = item.dimension.defaultDimension() || item.dimension;
-            const shouldExcludeBinning = !enableSubDimensions && dimension instanceof BinnedDimension
+            const dimension =
+                item.dimension.defaultDimension() || item.dimension;
+            const shouldExcludeBinning =
+                !enableSubDimensions && dimension instanceof BinnedDimension;
 
             if (shouldExcludeBinning) {
                 // If we don't let user choose the sub-dimension, we don't want to treat the field
@@ -203,7 +243,7 @@ export default class FieldList extends Component {
                 onFieldChange(dimension.mbql());
             }
         }
-    }
+    };
 
     render() {
         return (
@@ -219,25 +259,35 @@ export default class FieldList extends Component {
                 getItemClasses={this.getItemClasses}
                 alwaysExpanded={this.props.alwaysExpanded}
             />
-        )
+        );
     }
 }
 
 import cx from "classnames";
 
-export const DimensionPicker = ({ className, dimension, dimensions, onChangeDimension }) => {
+export const DimensionPicker = ({
+    className,
+    dimension,
+    dimensions,
+    onChangeDimension
+}) => {
     return (
         <ul className="px2 py1">
-            { dimensions.map((d, index) =>
+            {dimensions.map((d, index) => (
                 <li
                     key={index}
-                    className={cx("List-item", { "List-item--selected": d.isEqual(dimension) })}
+                    className={cx("List-item", {
+                        "List-item--selected": d.isEqual(dimension)
+                    })}
                 >
-                    <a className="List-item-title full px2 py1 cursor-pointer" onClick={() => onChangeDimension(d)}>
+                    <a
+                        className="List-item-title full px2 py1 cursor-pointer"
+                        onClick={() => onChangeDimension(d)}
+                    >
                         {d.subDisplayName()}
                     </a>
                 </li>
-            )}
+            ))}
         </ul>
-    )
-}
+    );
+};

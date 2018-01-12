@@ -10,12 +10,12 @@ const mapStateToProps = (state, props) => {
     return {
         ...revisionHistorySelectors(state, props),
         entity: props.params.entity,
-        id:     props.params.id
-    }
-}
+        id: props.params.id
+    };
+};
 
 const mapDispatchToProps = {
-    ...actions,
+    ...actions
 };
 
 @connect(mapStateToProps, mapDispatchToProps)
@@ -23,7 +23,7 @@ export default class RevisionHistoryApp extends Component {
     componentWillMount() {
         let { entity, id } = this.props;
 
-        this.props.fetchRevisions({ entity, id })
+        this.props.fetchRevisions({ entity, id });
     }
     render() {
         return (

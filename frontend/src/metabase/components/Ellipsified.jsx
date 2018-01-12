@@ -21,23 +21,43 @@ export default class Ellipsified extends Component {
     componentDidUpdate() {
         // Only show tooltip if title is hidden or ellipsified
         const element = ReactDOM.findDOMNode(this.refs.content);
-        const isTruncated = element && element.offsetWidth < element.scrollWidth;
+        const isTruncated =
+            element && element.offsetWidth < element.scrollWidth;
         if (this.state.isTruncated !== isTruncated) {
             this.setState({ isTruncated });
         }
     }
 
     render() {
-        const { showTooltip, children, style, className, tooltip, alwaysShowTooltip, tooltipMaxWidth } = this.props;
+        const {
+            showTooltip,
+            children,
+            style,
+            className,
+            tooltip,
+            alwaysShowTooltip,
+            tooltipMaxWidth
+        } = this.props;
         const { isTruncated } = this.state;
         return (
             <Tooltip
-                tooltip={tooltip || children || ' '}
+                tooltip={tooltip || children || " "}
                 verticalAttachments={["top", "bottom"]}
-                isEnabled={showTooltip && (isTruncated || alwaysShowTooltip) || false}
+                isEnabled={
+                    (showTooltip && (isTruncated || alwaysShowTooltip)) || false
+                }
                 maxWidth={tooltipMaxWidth}
             >
-                <div ref="content" className={className} style={{ ...style, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}>
+                <div
+                    ref="content"
+                    className={className}
+                    style={{
+                        ...style,
+                        overflow: "hidden",
+                        whiteSpace: "nowrap",
+                        textOverflow: "ellipsis"
+                    }}
+                >
                     {children}
                 </div>
             </Tooltip>

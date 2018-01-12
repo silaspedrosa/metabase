@@ -9,14 +9,14 @@ import { saveCollection, loadCollection } from "../collections";
 
 const mapStateToProps = (state, props) => ({
     error: state.collections.error,
-    collection: state.collections.collection,
+    collection: state.collections.collection
 });
 
 const mapDispatchToProps = {
     loadCollection,
     saveCollection,
     onClose: goBack
-}
+};
 
 @connect(mapStateToProps, mapDispatchToProps)
 export default class CollectionEdit extends Component {

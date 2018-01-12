@@ -35,7 +35,10 @@ export function augmentDatabase(database) {
         table.fields_lookup = createLookupByProperty(table.fields, "id");
         for (let field of table.fields) {
             addFkTargets(field, database.tables_lookup);
-            field.operators_lookup = createLookupByProperty(field.operators, "name");
+            field.operators_lookup = createLookupByProperty(
+                field.operators,
+                "name"
+            );
         }
     }
     return database;
@@ -43,10 +46,14 @@ export function augmentDatabase(database) {
 
 async function loadForeignKeyTables(table) {
     // Load joinable tables
-    await Promise.all(table.fields.filter((f) => f.target != null).map(async (field) => {
-        let targetTable = await MetabaseApi.table_query_metadata({ tableId: field.target.table_id });
-        field.target.table = populateQueryOptions(targetTable);
-    }));
+    await Promise.all(
+        table.fields.filter(f => f.target != null).map(async field => {
+            let targetTable = await MetabaseApi.table_query_metadata({
+                tableId: field.target.table_id
+            });
+            field.target.table = populateQueryOptions(targetTable);
+        })
+    );
     return table;
 }
 

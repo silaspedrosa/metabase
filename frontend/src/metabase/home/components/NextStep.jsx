@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router";
-import { t } from 'c-3po'
+import { t } from "c-3po";
 
 import { SetupApi } from "metabase/services";
 
@@ -15,7 +15,9 @@ export default class NextStep extends Component {
     }
 
     async componentWillMount() {
-        const sections = await SetupApi.admin_checklist(null, { noEvent: true });
+        const sections = await SetupApi.admin_checklist(null, {
+            noEvent: true
+        });
         for (let section of sections) {
             for (let task of section.tasks) {
                 if (task.is_next_step) {
@@ -30,17 +32,24 @@ export default class NextStep extends Component {
         const { next } = this.state;
         if (next) {
             return (
-                <SidebarSection title={t`Setup Tip`} icon="info" extra={
-                    <Link to="/admin/settings" className="text-brand no-decoration">{t`View all`}</Link>
-                }>
+                <SidebarSection
+                    title={t`Setup Tip`}
+                    icon="info"
+                    extra={
+                        <Link
+                            to="/admin/settings"
+                            className="text-brand no-decoration"
+                        >{t`View all`}</Link>
+                    }
+                >
                     <Link to={next.link} className="block p3 no-decoration">
                         <h4 className="text-brand text-bold">{next.title}</h4>
                         <p className="m0 mt1">{next.description}</p>
                     </Link>
                 </SidebarSection>
-            )
+            );
         } else {
-            return <span className="hide" />
+            return <span className="hide" />;
         }
     }
 }

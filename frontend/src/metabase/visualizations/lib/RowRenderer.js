@@ -9,7 +9,6 @@ import { formatValue } from "metabase/lib/formatting";
 import { initChart, forceSortedGroup, makeIndexMap } from "./renderer_utils";
 import { getFriendlyName } from "./utils";
 
-
 export default function rowRenderer(
     element,
     { settings, series, onHoverChange, onVisualizationClick, height }
@@ -27,19 +26,18 @@ export default function rowRenderer(
 
     const colors = settings["graph.colors"];
 
-    const formatDimension = (row) =>
-        formatValue(row[0], { column: cols[0], type: "axis" })
+    const formatDimension = row =>
+        formatValue(row[0], { column: cols[0], type: "axis" });
 
     // dc.js doesn't give us a way to format the row labels from unformatted data, so we have to
     // do it here then construct a mapping to get the original dimension for tooltipsd/clicks
-    const rows = series[0].data.rows.map(row => [
-        formatDimension(row),
-        row[1]
-    ]);
-    const formattedDimensionMap = new Map(rows.map(([formattedDimension], index) => [
-        formattedDimension,
-        series[0].data.rows[index][0]
-    ]))
+    const rows = series[0].data.rows.map(row => [formatDimension(row), row[1]]);
+    const formattedDimensionMap = new Map(
+        rows.map(([formattedDimension], index) => [
+            formattedDimension,
+            series[0].data.rows[index][0]
+        ])
+    );
 
     const dataset = crossfilter(rows);
     const dimension = dataset.dimension(d => d[0]);
@@ -53,19 +51,31 @@ export default function rowRenderer(
 
     chart.on("renderlet.tooltips", chart => {
         if (onHoverChange) {
-            chart.selectAll(".row rect").on("mousemove", (d, i) => {
-                onHoverChange && onHoverChange({
-                    // for single series bar charts, fade the series and highlght the hovered element with CSS
-                    index: -1,
-                    event: d3.event,
-                    data: [
-                        { key: getFriendlyName(cols[0]), value: formattedDimensionMap.get(d.key), col: cols[0] },
-                        { key: getFriendlyName(cols[1]), value: d.value, col: cols[1] }
-                    ]
+            chart
+                .selectAll(".row rect")
+                .on("mousemove", (d, i) => {
+                    onHoverChange &&
+                        onHoverChange({
+                            // for single series bar charts, fade the series and highlght the hovered element with CSS
+                            index: -1,
+                            event: d3.event,
+                            data: [
+                                {
+                                    key: getFriendlyName(cols[0]),
+                                    value: formattedDimensionMap.get(d.key),
+                                    col: cols[0]
+                                },
+                                {
+                                    key: getFriendlyName(cols[1]),
+                                    value: d.value,
+                                    col: cols[1]
+                                }
+                            ]
+                        });
+                })
+                .on("mouseleave", () => {
+                    onHoverChange && onHoverChange(null);
                 });
-            }).on("mouseleave", () => {
-                onHoverChange && onHoverChange(null);
-            });
         }
 
         if (onVisualizationClick) {
@@ -73,18 +83,20 @@ export default function rowRenderer(
                 onVisualizationClick({
                     value: d.value,
                     column: cols[1],
-                    dimensions: [{
-                        value: formattedDimensionMap.get(d.key),
-                        column: cols[0]
-                    }],
+                    dimensions: [
+                        {
+                            value: formattedDimensionMap.get(d.key),
+                            column: cols[0]
+                        }
+                    ],
                     element: this
-                })
+                });
             });
         }
     });
 
     chart
-        .ordinalColors([ colors[0] ])
+        .ordinalColors([colors[0]])
         .x(d3.scale.linear().domain(xDomain))
         .elasticX(true)
         .dimension(dimension)
@@ -131,12 +143,13 @@ export default function rowRenderer(
 
     // cap number of rows to fit
     let rects = chart.selectAll(".row rect")[0];
-    let containerHeight = rects[rects.length - 1].getBoundingClientRect().bottom -
-                          rects[0].getBoundingClientRect().top;
+    let containerHeight =
+        rects[rects.length - 1].getBoundingClientRect().bottom -
+        rects[0].getBoundingClientRect().top;
     let maxTextHeight = Math.max(
-        ...chart.selectAll("g.row text")[0].map(
-            e => e.getBoundingClientRect().height
-        )
+        ...chart
+            .selectAll("g.row text")[0]
+            .map(e => e.getBoundingClientRect().height)
     );
     let rowHeight = maxTextHeight + chart.gap() + labelPadVertical * 2;
     let cap = Math.max(1, Math.floor(containerHeight / rowHeight));

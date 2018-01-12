@@ -14,10 +14,10 @@ export function precision(a) {
         return 0;
     }
     var e = 1;
-    while (Math.round(a / e) !== (a / e)) {
+    while (Math.round(a / e) !== a / e) {
         e /= 10;
     }
-    while (Math.round(a / Math.pow(10, e)) === (a / Math.pow(10, e))) {
+    while (Math.round(a / Math.pow(10, e)) === a / Math.pow(10, e)) {
         e *= 10;
     }
     return e;
@@ -25,8 +25,12 @@ export function precision(a) {
 
 export function decimalCount(a) {
     if (!isFinite(a)) return 0;
-    var e = 1, p = 0;
-    while (Math.round(a * e) / e !== a) { e *= 10; p++; }
+    var e = 1,
+        p = 0;
+    while (Math.round(a * e) / e !== a) {
+        e *= 10;
+        p++;
+    }
     return p;
 }
 
@@ -44,7 +48,11 @@ export function computeNumericDataInverval(xValues) {
 // logTickFormat(chart.xAxis())
 export function logTickFormat(axis) {
     let superscript = "⁰¹²³⁴⁵⁶⁷⁸⁹";
-    let formatPower = (d) => (d + "").split("").map((c) => superscript[c]).join("");
-    let formatTick = (d) =>  10 + formatPower(Math.round(Math.log(d) / Math.LN10));
+    let formatPower = d =>
+        (d + "")
+            .split("")
+            .map(c => superscript[c])
+            .join("");
+    let formatTick = d => 10 + formatPower(Math.round(Math.log(d) / Math.LN10));
     axis.tickFormat(formatTick);
 }

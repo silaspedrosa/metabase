@@ -6,11 +6,20 @@ import Icon from "metabase/components/Icon.jsx";
 
 import cx from "classnames";
 
-const SelectButton = ({ className, children, hasValue = true }) =>
-    <div className={cx(className, "AdminSelect flex align-center", { "text-grey-3": !hasValue })}>
+const SelectButton = ({ className, children, hasValue = true }) => (
+    <div
+        className={cx(className, "AdminSelect flex align-center", {
+            "text-grey-3": !hasValue
+        })}
+    >
         <span className="AdminSelect-content mr1">{children}</span>
-        <Icon className="AdminSelect-chevron flex-align-right" name="chevrondown" size={12} />
+        <Icon
+            className="AdminSelect-chevron flex-align-right"
+            name="chevrondown"
+            size={12}
+        />
     </div>
+);
 
 SelectButton.propTypes = {
     className: PropTypes.string,

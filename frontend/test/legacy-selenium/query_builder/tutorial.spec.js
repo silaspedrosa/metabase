@@ -3,7 +3,6 @@
 // lots of direct DOM manipulation. See also "Ability to dismiss popovers, modals etc" in
 // https://github.com/metabase/metabase/issues/5527
 
-
 import {
     waitForElement,
     waitForElementRemoved,
@@ -38,40 +37,74 @@ describeE2E("tutorial", () => {
 
         await waitForElement(driver, "#QB-TutorialTableImg");
         // a .Modal-backdrop element blocks clicks for a while during transition?
-        await waitForElementRemoved(driver, '.Modal-backdrop');
+        await waitForElementRemoved(driver, ".Modal-backdrop");
         await waitForElementAndClick(driver, ".GuiBuilder-data a");
 
         // select sample dataset db
         try {
             // in a try/catch in case the instance only has one db
-            await waitForElementAndClick(driver, "#DatabaseSchemaPicker .List-section:last-child .List-section-header", 1000);
-        } catch (e) {
-        }
+            await waitForElementAndClick(
+                driver,
+                "#DatabaseSchemaPicker .List-section:last-child .List-section-header",
+                1000
+            );
+        } catch (e) {}
 
         // select orders table
-        await waitForElementAndClick(driver, "#TablePicker .List-item:first-child>a");
+        await waitForElementAndClick(
+            driver,
+            "#TablePicker .List-item:first-child>a"
+        );
 
         // select filters
         await waitForElement(driver, "#QB-TutorialFunnelImg");
-        await waitForElementAndClick(driver, ".GuiBuilder-filtered-by .Query-section:not(.disabled) a");
+        await waitForElementAndClick(
+            driver,
+            ".GuiBuilder-filtered-by .Query-section:not(.disabled) a"
+        );
 
-        await waitForElementAndClick(driver, "#FilterPopover .List-item:first-child>a");
+        await waitForElementAndClick(
+            driver,
+            "#FilterPopover .List-item:first-child>a"
+        );
 
-        await waitForElementAndClick(driver, "input[data-ui-tag='relative-date-input']");
-        await waitForElementAndSendKeys(driver, "#FilterPopover input.border-purple", '10');
-        await waitForElementAndClick(driver, ".Button[data-ui-tag='add-filter']:not(.disabled)");
+        await waitForElementAndClick(
+            driver,
+            "input[data-ui-tag='relative-date-input']"
+        );
+        await waitForElementAndSendKeys(
+            driver,
+            "#FilterPopover input.border-purple",
+            "10"
+        );
+        await waitForElementAndClick(
+            driver,
+            ".Button[data-ui-tag='add-filter']:not(.disabled)"
+        );
 
         // select aggregations
         await waitForElement(driver, "#QB-TutorialCalculatorImg");
         await waitForElementAndClick(driver, "#Query-section-aggregation");
-        await waitForElementAndClick(driver, "#AggregationPopover .List-item:nth-child(2)>a");
+        await waitForElementAndClick(
+            driver,
+            "#AggregationPopover .List-item:nth-child(2)>a"
+        );
 
         // select breakouts
         await waitForElement(driver, "#QB-TutorialBananaImg");
-        await waitForElementAndClick(driver, ".Query-section.Query-section-breakout>div");
+        await waitForElementAndClick(
+            driver,
+            ".Query-section.Query-section-breakout>div"
+        );
 
-        await waitForElementAndClick(driver, "#BreakoutPopover .List-item:first-child .Field-extra>a");
-        await waitForElementAndClick(driver, "#TimeGroupingPopover .List-item:nth-child(4)>a");
+        await waitForElementAndClick(
+            driver,
+            "#BreakoutPopover .List-item:first-child .Field-extra>a"
+        );
+        await waitForElementAndClick(
+            driver,
+            "#TimeGroupingPopover .List-item:nth-child(4)>a"
+        );
 
         // run query
         await waitForElement(driver, "#QB-TutorialRocketImg");
@@ -84,12 +117,18 @@ describeE2E("tutorial", () => {
         await waitForElementAndClick(driver, "#VisualizationTrigger");
         // this step occassionally fails without the timeout
         // await driver.sleep(500);
-        await waitForElementAndClick(driver, "#VisualizationPopover li:nth-child(4)");
+        await waitForElementAndClick(
+            driver,
+            "#VisualizationPopover li:nth-child(4)"
+        );
 
         // end tutorial
         await waitForElement(driver, "#QB-TutorialBoatImg");
         await waitForElementAndClick(driver, ".Modal .Button.Button--primary");
-        await waitForElementAndClick(driver, ".PopoverBody .Button.Button--primary");
+        await waitForElementAndClick(
+            driver,
+            ".PopoverBody .Button.Button--primary"
+        );
 
         await screenshot(driver, "screenshots/setup-tutorial-qb-end.png");
     });

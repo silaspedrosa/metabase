@@ -1,4 +1,4 @@
-import { fetchDataOrError } from 'metabase/dashboard/dashboard';
+import { fetchDataOrError } from "metabase/dashboard/dashboard";
 
 describe("Dashboard", () => {
     describe("fetchDataOrError()", () => {
@@ -19,7 +19,8 @@ describe("Dashboard", () => {
                 status: 504,
                 statusText: "GATEWAY_TIMEOUT",
                 data: {
-                    message: "Failed to load resource: the server responded with a status of 504 (GATEWAY_TIMEOUT)"
+                    message:
+                        "Failed to load resource: the server responded with a status of 504 (GATEWAY_TIMEOUT)"
                 }
             };
 

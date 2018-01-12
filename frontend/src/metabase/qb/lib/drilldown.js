@@ -144,7 +144,8 @@ function breakoutTemplatesMatchDimensions(breakoutTemplates, dimensions) {
     dimensions = [...dimensions];
     return _.all(breakoutTemplates, breakoutTemplate => {
         const index = _.findIndex(dimensions, dimension =>
-            breakoutTemplateMatchesDimension(breakoutTemplate, dimension));
+            breakoutTemplateMatchesDimension(breakoutTemplate, dimension)
+        );
         if (index >= 0) {
             dimensions.splice(index, 1);
             return true;
@@ -160,7 +161,8 @@ function breakoutForBreakoutTemplate(breakoutTemplate, dimensions, table) {
         ? breakoutTemplate[1]
         : breakoutTemplate;
     let dimensionColumns = dimensions.map(d => d.column);
-    let field = _.find(dimensionColumns, fieldFilter) ||
+    let field =
+        _.find(dimensionColumns, fieldFilter) ||
         _.find(table.fields, fieldFilter);
     if (!field) {
         return null;
@@ -168,7 +170,8 @@ function breakoutForBreakoutTemplate(breakoutTemplate, dimensions, table) {
     const fieldRef = getFieldRefFromColumn(dimensions[0].column, field.id);
     if (Array.isArray(breakoutTemplate)) {
         const prevDimension = _.find(dimensions, dimension =>
-            breakoutTemplateMatchesDimension(breakoutTemplate, dimension));
+            breakoutTemplateMatchesDimension(breakoutTemplate, dimension)
+        );
         const breakout = [breakoutTemplate[0], fieldRef];
         for (let i = 2; i < breakoutTemplate.length; i++) {
             const arg = breakoutTemplate[i];

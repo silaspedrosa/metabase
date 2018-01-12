@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { reduxForm } from "redux-form";
 import { push } from "react-router-redux";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import S from "metabase/reference/Reference.css";
 
 import List from "metabase/components/List.jsx";
@@ -15,9 +15,7 @@ import EditableReferenceHeader from "metabase/reference/components/EditableRefer
 import Detail from "metabase/reference/components/Detail.jsx";
 import UsefulQuestions from "metabase/reference/components/UsefulQuestions.jsx";
 
-import {
-    getQuestionUrl
-} from '../utils';
+import { getQuestionUrl } from "../utils";
 
 import {
     getTable,
@@ -31,11 +29,10 @@ import {
     getForeignKeys
 } from "../selectors";
 
-import * as metadataActions from 'metabase/redux/metadata';
-import * as actions from 'metabase/reference/reference';
+import * as metadataActions from "metabase/redux/metadata";
+import * as actions from "metabase/reference/reference";
 
-
-const interestingQuestions = (table) => {
+const interestingQuestions = table => {
     return [
         {
             text: t`Count of ${table.display_name}`,
@@ -51,11 +48,11 @@ const interestingQuestions = (table) => {
             icon: "table2",
             link: getQuestionUrl({
                 dbId: table.db_id,
-                tableId: table.id,
+                tableId: table.id
             })
         }
-    ]
-}
+    ];
+};
 const mapStateToProps = (state, props) => {
     const entity = getTable(state, props) || {};
     const fields = getFields(state, props);
@@ -71,8 +68,8 @@ const mapStateToProps = (state, props) => {
         foreignKeys: getForeignKeys(state, props),
         isEditing: getIsEditing(state, props),
         hasSingleSchema: getHasSingleSchema(state, props),
-        isFormulaExpanded: getIsFormulaExpanded(state, props),
-    }
+        isFormulaExpanded: getIsFormulaExpanded(state, props)
+    };
 };
 
 const mapDispatchToProps = {
@@ -83,12 +80,19 @@ const mapDispatchToProps = {
 
 const validate = (values, props) => {
     return {};
-}
+};
 
 @connect(mapStateToProps, mapDispatchToProps)
 @reduxForm({
-    form: 'details',
-    fields: ['name', 'display_name', 'description', 'revision_message', 'points_of_interest', 'caveats'],
+    form: "details",
+    fields: [
+        "name",
+        "display_name",
+        "description",
+        "revision_message",
+        "points_of_interest",
+        "caveats"
+    ],
     validate
 })
 export default class TableDetail extends Component {
@@ -110,12 +114,19 @@ export default class TableDetail extends Component {
         hasSingleSchema: PropTypes.bool,
         loading: PropTypes.bool,
         loadingError: PropTypes.object,
-        submitting: PropTypes.bool,
+        submitting: PropTypes.bool
     };
 
     render() {
         const {
-            fields: { name, display_name, description, revision_message, points_of_interest, caveats },
+            fields: {
+                name,
+                display_name,
+                description,
+                revision_message,
+                points_of_interest,
+                caveats
+            },
             style,
             entity,
             table,
@@ -128,18 +139,16 @@ export default class TableDetail extends Component {
             hasSingleSchema,
             handleSubmit,
             resetForm,
-            submitting,
+            submitting
         } = this.props;
 
-        const onSubmit = handleSubmit(async (fields) =>
-            await actions.rUpdateTableDetail(fields, this.props)
+        const onSubmit = handleSubmit(
+            async fields => await actions.rUpdateTableDetail(fields, this.props)
         );
 
         return (
-            <form style={style} className="full"
-                onSubmit={onSubmit}
-            >
-                { isEditing &&
+            <form style={style} className="full" onSubmit={onSubmit}>
+                {isEditing && (
                     <EditHeader
                         hasRevisionHistory={false}
                         onSubmit={onSubmit}
@@ -148,13 +157,16 @@ export default class TableDetail extends Component {
                         submitting={submitting}
                         revisionMessageFormField={revision_message}
                     />
-                }
+                )}
                 <EditableReferenceHeader
                     entity={entity}
                     table={table}
                     type="table"
                     headerIcon="table2"
-                    headerLink={getQuestionUrl({ dbId: entity.db_id, tableId: entity.id})}
+                    headerLink={getQuestionUrl({
+                        dbId: entity.db_id,
+                        tableId: entity.id
+                    })}
                     name={t`Details`}
                     user={user}
                     isEditing={isEditing}
@@ -164,60 +176,67 @@ export default class TableDetail extends Component {
                     displayNameFormField={display_name}
                     nameFormField={name}
                 />
-                <LoadingAndErrorWrapper loading={!loadingError && loading} error={loadingError}>
-                { () =>
-                    <div className="wrapper wrapper--trim">
-                        <List>
-                            <li className="relative">
-                                <Detail
-                                    id="description"
-                                    name={t`Description`}
-                                    description={entity.description}
-                                    placeholder={t`No description yet`}
-                                    isEditing={isEditing}
-                                    field={description}
-                                />
-                            </li>
-                            { !isEditing &&
+                <LoadingAndErrorWrapper
+                    loading={!loadingError && loading}
+                    error={loadingError}
+                >
+                    {() => (
+                        <div className="wrapper wrapper--trim">
+                            <List>
                                 <li className="relative">
                                     <Detail
-                                        id="name"
-                                        name={t`Actual name in database`}
-                                        description={entity.name}
-                                        subtitleClass={S.tableActualName}
+                                        id="description"
+                                        name={t`Description`}
+                                        description={entity.description}
+                                        placeholder={t`No description yet`}
+                                        isEditing={isEditing}
+                                        field={description}
                                     />
                                 </li>
-                            }
-                            <li className="relative">
-                                <Detail
-                                    id="points_of_interest"
-                                    name={t`Why this table is interesting`}
-                                    description={entity.points_of_interest}
-                                    placeholder={t`Nothing interesting yet`}
-                                    isEditing={isEditing}
-                                    field={points_of_interest}
-                                    />
-                            </li>
-                            <li className="relative">
-                                <Detail
-                                    id="caveats"
-                                    name={t`Things to be aware of about this table`}
-                                    description={entity.caveats}
-                                    placeholder={t`Nothing to be aware of yet`}
-                                    isEditing={isEditing}
-                                    field={caveats}
-                                />
-                            </li>
-                            { !isEditing &&
+                                {!isEditing && (
+                                    <li className="relative">
+                                        <Detail
+                                            id="name"
+                                            name={t`Actual name in database`}
+                                            description={entity.name}
+                                            subtitleClass={S.tableActualName}
+                                        />
+                                    </li>
+                                )}
                                 <li className="relative">
-                                    <UsefulQuestions questions={interestingQuestions(this.props.table)} />
+                                    <Detail
+                                        id="points_of_interest"
+                                        name={t`Why this table is interesting`}
+                                        description={entity.points_of_interest}
+                                        placeholder={t`Nothing interesting yet`}
+                                        isEditing={isEditing}
+                                        field={points_of_interest}
+                                    />
                                 </li>
-                            }
-                        </List>
-                    </div>
-                }
+                                <li className="relative">
+                                    <Detail
+                                        id="caveats"
+                                        name={t`Things to be aware of about this table`}
+                                        description={entity.caveats}
+                                        placeholder={t`Nothing to be aware of yet`}
+                                        isEditing={isEditing}
+                                        field={caveats}
+                                    />
+                                </li>
+                                {!isEditing && (
+                                    <li className="relative">
+                                        <UsefulQuestions
+                                            questions={interestingQuestions(
+                                                this.props.table
+                                            )}
+                                        />
+                                    </li>
+                                )}
+                            </List>
+                        </div>
+                    )}
                 </LoadingAndErrorWrapper>
             </form>
-        )
+        );
     }
 }

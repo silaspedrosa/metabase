@@ -9,21 +9,21 @@ const QueryDefinition = ({ className, object, tableMetadata }) => {
     const filters = Query.getFilters(object.definition);
     return (
         <div className={className} style={{ pointerEvents: "none" }}>
-            { object.definition.aggregation &&
+            {object.definition.aggregation && (
                 <AggregationWidget
                     aggregation={object.definition.aggregation[0]}
                     tableMetadata={tableMetadata}
                 />
-            }
-            { filters.length > 0 &&
+            )}
+            {filters.length > 0 && (
                 <FilterList
                     filters={filters}
                     tableMetadata={tableMetadata}
                     maxDisplayValues={Infinity}
                 />
-            }
+            )}
         </div>
     );
-}
+};
 
 export default QueryDefinition;

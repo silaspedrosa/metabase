@@ -79,13 +79,15 @@ export default class StructuredQuery extends AtomicQuery {
         this._structuredDatasetQuery = (datasetQuery: StructuredDatasetQuery);
     }
 
-    static newStucturedQuery(
-        {
-            question,
-            databaseId,
-            tableId
-        }: { question: Question, databaseId?: DatabaseId, tableId?: TableId }
-    ) {
+    static newStucturedQuery({
+        question,
+        databaseId,
+        tableId
+    }: {
+        question: Question,
+        databaseId?: DatabaseId,
+        tableId?: TableId
+    }) {
         const datasetQuery = {
             ...STRUCTURED_QUERY_TEMPLATE,
             database: databaseId || null,
@@ -475,9 +477,11 @@ export default class StructuredQuery extends AtomicQuery {
      * @returns whether a new filter can be added or not
      */
     canAddFilter(): boolean {
-        return Q.canAddFilter(this.query()) &&
+        return (
+            Q.canAddFilter(this.query()) &&
             (this.filterFieldOptions().count > 0 ||
-                this.filterSegmentOptions().length > 0);
+                this.filterSegmentOptions().length > 0)
+        );
     }
 
     /**
@@ -551,8 +555,10 @@ export default class StructuredQuery extends AtomicQuery {
     }
     canAddSort(): boolean {
         const sorts = this.sorts();
-        return this.sortOptions().count > 0 &&
-            (sorts.length === 0 || sorts[sorts.length - 1][0] != null);
+        return (
+            this.sortOptions().count > 0 &&
+            (sorts.length === 0 || sorts[sorts.length - 1][0] != null)
+        );
     }
 
     addSort(order_by: OrderBy) {
@@ -663,17 +669,17 @@ export default class StructuredQuery extends AtomicQuery {
     }
 
     expressionDimensions(): Dimension[] {
-        return Object.entries(this.expressions()).map(([
-            expressionName,
-            expression
-        ]) => {
-            return new ExpressionDimension(null, [expressionName]);
-        });
+        return Object.entries(this.expressions()).map(
+            ([expressionName, expression]) => {
+                return new ExpressionDimension(null, [expressionName]);
+            }
+        );
     }
 
     aggregationDimensions() {
         return this.breakouts().map(breakout =>
-            Dimension.parseMBQL(breakout, this._metadata));
+            Dimension.parseMBQL(breakout, this._metadata)
+        );
     }
 
     metricDimensions() {
@@ -729,7 +735,8 @@ export default class StructuredQuery extends AtomicQuery {
     ): StructuredQuery {
         return this.setDatasetQuery(
             updateIn(this._datasetQuery, ["query"], query =>
-                updateFunction(query, ...args))
+                updateFunction(query, ...args)
+            )
         );
     }
 }

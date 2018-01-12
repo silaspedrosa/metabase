@@ -2,7 +2,7 @@ import React from "react";
 import AccordianList from "metabase/components/AccordianList";
 import PopoverWithTrigger from "metabase/components/PopoverWithTrigger";
 
-const DemoPopover = ({ children }) =>
+const DemoPopover = ({ children }) => (
     <PopoverWithTrigger
         triggerElement={<button className="Button">Click me!</button>}
         verticalAttachments={["top"]}
@@ -10,6 +10,7 @@ const DemoPopover = ({ children }) =>
     >
         {children}
     </PopoverWithTrigger>
+);
 
 export const component = AccordianList;
 
@@ -23,30 +24,25 @@ An expandable and searchable list of sections and items.
 const sections = [
     {
         name: "Widgets",
-        items: [
-            { name: "Foo" },
-            { name: "Bar" },
-            { name: "Baz" },
-        ]
+        items: [{ name: "Foo" }, { name: "Bar" }, { name: "Baz" }]
     },
     {
         name: "Doohickeys",
-        items: [
-            { name: "Buz" },
-        ]
+        items: [{ name: "Buz" }]
     }
-]
+];
 
 export const examples = {
-    "Default":
+    Default: (
         <DemoPopover>
             <AccordianList
                 className="text-brand"
                 sections={sections}
                 itemIsSelected={item => item.name === "Foo"}
             />
-        </DemoPopover>,
-    "Always Expanded":
+        </DemoPopover>
+    ),
+    "Always Expanded": (
         <DemoPopover>
             <AccordianList
                 className="text-brand"
@@ -54,8 +50,9 @@ export const examples = {
                 itemIsSelected={item => item.name === "Foo"}
                 alwaysExpanded
             />
-        </DemoPopover>,
-    "Searchable":
+        </DemoPopover>
+    ),
+    Searchable: (
         <DemoPopover>
             <AccordianList
                 className="text-brand"
@@ -63,14 +60,16 @@ export const examples = {
                 itemIsSelected={item => item.name === "Foo"}
                 searchable
             />
-        </DemoPopover>,
-    "Hide Single Section Title":
+        </DemoPopover>
+    ),
+    "Hide Single Section Title": (
         <DemoPopover>
             <AccordianList
                 className="text-brand"
-                sections={sections.slice(0,1)}
+                sections={sections.slice(0, 1)}
                 itemIsSelected={item => item.name === "Foo"}
                 hideSingleSectionTitle
             />
-        </DemoPopover>,
+        </DemoPopover>
+    )
 };

@@ -15,7 +15,6 @@ export function createThunkAction(actionType, actionThunkCreator) {
         var thunk = actionThunkCreator(...actionArgs);
         return async function(dispatch, getState) {
             try {
-
                 let payload = await thunk(dispatch, getState);
                 let dispatchValue = { type: actionType, payload };
                 dispatch(dispatchValue);
@@ -25,14 +24,17 @@ export function createThunkAction(actionType, actionThunkCreator) {
                 dispatch({ type: actionType, payload: error, error: true });
                 throw error;
             }
-        }
+        };
     }
     fn.toString = () => actionType;
     return fn;
 }
 
 // turns string timestamps into moment objects
-export function momentifyTimestamps(object, keys = ["created_at", "updated_at"]) {
+export function momentifyTimestamps(
+    object,
+    keys = ["created_at", "updated_at"]
+) {
     object = { ...object };
     for (let timestamp of keys) {
         if (timestamp in object) {
@@ -51,8 +53,11 @@ export function momentifyArraysTimestamps(array, keys) {
 }
 
 // turns into id indexed map
-export const resourceListToMap = (resources) =>
-    resources.reduce((map, resource) => ({ ...map, [resource.id]: resource }), {});
+export const resourceListToMap = resources =>
+    resources.reduce(
+        (map, resource) => ({ ...map, [resource.id]: resource }),
+        {}
+    );
 
 export const fetchData = async ({
     dispatch,
@@ -63,9 +68,13 @@ export const fetchData = async ({
     reload
 }) => {
     const existingData = getIn(getState(), existingStatePath);
-    const statePath = requestStatePath.concat(['fetch']);
+    const statePath = requestStatePath.concat(["fetch"]);
     try {
-        const requestState = getIn(getState(), ["requests", "states", ...statePath]);
+        const requestState = getIn(getState(), [
+            "requests",
+            "states",
+            ...statePath
+        ]);
         if (!requestState || requestState.error || reload) {
             dispatch(setRequestState({ statePath, state: "LOADING" }));
             const data = await getData();
@@ -73,19 +82,21 @@ export const fetchData = async ({
             // NOTE Atte Keinänen 8/23/17:
             // Dispatch `setRequestState` after clearing the call stack because we want to the actual data to be updated
             // before we notify components via `state.requests.fetches` that fetching the data is completed
-            setTimeout(() => dispatch(setRequestState({ statePath, state: "LOADED" })), 0);
+            setTimeout(
+                () => dispatch(setRequestState({ statePath, state: "LOADED" })),
+                0
+            );
 
             return data;
         }
 
         return existingData;
-    }
-    catch(error) {
+    } catch (error) {
         dispatch(setRequestState({ statePath, error }));
         console.error(error);
         return existingData;
     }
-}
+};
 
 export const updateData = async ({
     dispatch,
@@ -97,23 +108,23 @@ export const updateData = async ({
     putData
 }) => {
     const existingData = getIn(getState(), existingStatePath);
-    const statePath = requestStatePath.concat(['update']);
+    const statePath = requestStatePath.concat(["update"]);
     try {
         dispatch(setRequestState({ statePath, state: "LOADING" }));
         const data = await putData();
         dispatch(setRequestState({ statePath, state: "LOADED" }));
 
-        (dependentRequestStatePaths || [])
-            .forEach(statePath => dispatch(clearRequestState({ statePath })));
+        (dependentRequestStatePaths || []).forEach(statePath =>
+            dispatch(clearRequestState({ statePath }))
+        );
 
         return data;
-    }
-    catch(error) {
+    } catch (error) {
         dispatch(setRequestState({ statePath, error }));
         console.error(error);
         return existingData;
     }
-}
+};
 
 // helper for working with normalizr
 // merge each entity from newEntities with existing entity, if any
@@ -142,7 +153,7 @@ export function handleEntities(actionPattern, entityType, reducer) {
             state = mergeEntities(state, entities);
         }
         return reducer(state, action);
-    }
+    };
 }
 
 // for filtering non-DOM props from redux-form field objects
@@ -162,4 +173,4 @@ export const formDomOnlyProps = ({
     error,
     defaultValue,
     ...domProps
-}) => domProps
+}) => domProps;

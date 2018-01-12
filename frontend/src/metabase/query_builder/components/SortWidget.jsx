@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 import Icon from "metabase/components/Icon.jsx";
-import FieldWidget from './FieldWidget.jsx';
-import SelectionModule from './SelectionModule.jsx';
+import FieldWidget from "./FieldWidget.jsx";
+import SelectionModule from "./SelectionModule.jsx";
 
 import _ from "underscore";
 
@@ -30,8 +30,8 @@ export default class SortWidget extends Component {
 
     componentWillReceiveProps(newProps) {
         this.setState({
-            field: newProps.sort[0],           // id of the field
-            direction: newProps.sort[1]        // sort direction
+            field: newProps.sort[0], // id of the field
+            direction: newProps.sort[1] // sort direction
         });
     }
 
@@ -60,8 +60,8 @@ export default class SortWidget extends Component {
 
     render() {
         var directionOptions = [
-            {key: "ascending", val: "ascending"},
-            {key: "descending", val: "descending"},
+            { key: "ascending", val: "ascending" },
+            { key: "descending", val: "descending" }
         ];
 
         return (
@@ -90,7 +90,7 @@ export default class SortWidget extends Component {
                 />
 
                 <a onClick={this.props.removeOrderBy}>
-                    <Icon name='close' size={12} />
+                    <Icon name="close" size={12} />
                 </a>
             </div>
         );

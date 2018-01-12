@@ -1,27 +1,27 @@
-import React, { Component } from 'react'
-import cxs from 'cxs'
-import { connect } from 'react-redux'
-import { t } from 'c-3po';
-import { saturated } from 'metabase/lib/colors'
+import React, { Component } from "react";
+import cxs from "cxs";
+import { connect } from "react-redux";
+import { t } from "c-3po";
+import { saturated } from "metabase/lib/colors";
 
-import { fetchCardXray, initialize } from 'metabase/xray/xray'
+import { fetchCardXray, initialize } from "metabase/xray/xray";
 import {
     getLoadingStatus,
     getError,
     getXray,
     getIsAlreadyFetched
-} from 'metabase/xray/selectors'
+} from "metabase/xray/selectors";
 
-import { xrayLoadingMessages } from 'metabase/xray/utils'
+import { xrayLoadingMessages } from "metabase/xray/utils";
 
-import Icon from 'metabase/components/Icon'
-import Tooltip from 'metabase/components/Tooltip'
-import LoadingAndErrorWrapper from 'metabase/components/LoadingAndErrorWrapper'
-import Visualization from 'metabase/visualizations/components/Visualization'
+import Icon from "metabase/components/Icon";
+import Tooltip from "metabase/components/Tooltip";
+import LoadingAndErrorWrapper from "metabase/components/LoadingAndErrorWrapper";
+import Visualization from "metabase/visualizations/components/Visualization";
 
-import { XRayPageWrapper, Heading } from 'metabase/xray/components/XRayLayout'
-import Periodicity from 'metabase/xray/components/Periodicity'
-import LoadingAnimation from 'metabase/xray/components/LoadingAnimation'
+import { XRayPageWrapper, Heading } from "metabase/xray/components/XRayLayout";
+import Periodicity from "metabase/xray/components/Periodicity";
+import LoadingAnimation from "metabase/xray/components/LoadingAnimation";
 import { Insights } from "metabase/xray/components/Insights";
 
 const mapStateToProps = state => ({
@@ -29,12 +29,12 @@ const mapStateToProps = state => ({
     isLoading: getLoadingStatus(state),
     isAlreadyFetched: getIsAlreadyFetched(state),
     error: getError(state)
-})
+});
 
 const mapDispatchToProps = {
     initialize,
     fetchCardXray
-}
+};
 
 type Props = {
     initialize: () => void,
@@ -42,16 +42,20 @@ type Props = {
     fetchCardXray: () => void,
     isLoading: boolean,
     xray: {}
-}
+};
 
-const GrowthRateDisplay = ({ period }) =>
+const GrowthRateDisplay = ({ period }) => (
     <div className="Grid-cell">
         <div className="p4 border-right">
             <h4 className="flex align-center">
                 {period.label}
-                { period.description && (
+                {period.description && (
                     <Tooltip tooltip={period.description}>
-                        <Icon name="infooutlined" style={{ marginLeft: 8 }} size={14} />
+                        <Icon
+                            name="infooutlined"
+                            style={{ marginLeft: 8 }}
+                            size={14}
+                        />
                     </Tooltip>
                 )}
             </h4>
@@ -64,14 +68,15 @@ const GrowthRateDisplay = ({ period }) =>
             </h1>
         </div>
     </div>
+);
 
 class CardXRay extends Component {
-    props: Props
+    props: Props;
 
-    componentWillMount () {
-        const { cardId, cost } = this.props.params
-        this.props.initialize()
-        this.props.fetchCardXray(cardId, cost)
+    componentWillMount() {
+        const { cardId, cost } = this.props.params;
+        this.props.initialize();
+        this.props.fetchCardXray(cardId, cost);
     }
 
     componentWillUnmount() {
@@ -81,8 +86,8 @@ class CardXRay extends Component {
         this.props.initialize();
     }
 
-    render () {
-        const { xray, isLoading, isAlreadyFetched, error } = this.props
+    render() {
+        const { xray, isLoading, isAlreadyFetched, error } = this.props;
 
         return (
             <LoadingAndErrorWrapper
@@ -92,35 +97,48 @@ class CardXRay extends Component {
                 loadingMessages={xrayLoadingMessages}
                 loadingScenes={[<LoadingAnimation />]}
             >
-                { () =>
+                {() => (
                     <XRayPageWrapper>
                         <div className="mt4 mb2">
-                            <h1 className="my3">{xray.features.model.name} X-ray</h1>
+                            <h1 className="my3">
+                                {xray.features.model.name} X-ray
+                            </h1>
                         </div>
-                        { xray.features["insights"] &&
+                        {xray.features["insights"] && (
                             <div className="mt4">
                                 <Heading heading="Takeaways" />
                                 <Insights features={xray.features} />
                             </div>
-                        }
+                        )}
                         <Heading heading="Growth rate" />
                         <div className="bg-white bordered rounded shadowed">
                             <div className="Grid Grid--1of4 border-bottom">
-                                { xray.features.DoD.value && (
-                                    <GrowthRateDisplay period={xray.features.DoD} />
+                                {xray.features.DoD.value && (
+                                    <GrowthRateDisplay
+                                        period={xray.features.DoD}
+                                    />
                                 )}
-                                { xray.features.WoW.value && (
-                                    <GrowthRateDisplay period={xray.features.WoW} />
+                                {xray.features.WoW.value && (
+                                    <GrowthRateDisplay
+                                        period={xray.features.WoW}
+                                    />
                                 )}
-                                { xray.features.MoM.value && (
-                                    <GrowthRateDisplay period={xray.features.MoM} />
+                                {xray.features.MoM.value && (
+                                    <GrowthRateDisplay
+                                        period={xray.features.MoM}
+                                    />
                                 )}
-                                { xray.features.YoY.value && (
-                                    <GrowthRateDisplay period={xray.features.YoY} />
+                                {xray.features.YoY.value && (
+                                    <GrowthRateDisplay
+                                        period={xray.features.YoY}
+                                    />
                                 )}
                             </div>
                             <div className="full">
-                                <div className="py1 px2" style={{ height: 320}}>
+                                <div
+                                    className="py1 px2"
+                                    style={{ height: 320 }}
+                                >
                                     <Visualization
                                         series={[
                                             {
@@ -129,13 +147,14 @@ class CardXRay extends Component {
                                             },
                                             {
                                                 card: {
-                                                    display: 'line',
+                                                    display: "line",
                                                     name: t`Growth Trend`,
-                                                    visualization_settings: {
-
-                                                    }
+                                                    visualization_settings: {}
                                                 },
-                                                data: xray.features['linear-regression'].value
+                                                data:
+                                                    xray.features[
+                                                        "linear-regression"
+                                                    ].value
                                             }
                                         ]}
                                         className="full-height"
@@ -144,25 +163,33 @@ class CardXRay extends Component {
                             </div>
                         </div>
 
-                        <Heading heading={xray.features['growth-series'].label} />
+                        <Heading
+                            heading={xray.features["growth-series"].label}
+                        />
                         <div className="full">
-                            <div className="bg-white bordered rounded shadowed" style={{ height: 220}}>
+                            <div
+                                className="bg-white bordered rounded shadowed"
+                                style={{ height: 220 }}
+                            >
                                 <Visualization
                                     series={[
                                         {
                                             card: {
-                                                display: 'line',
+                                                display: "line",
                                                 name: t`Trend`,
-                                                visualization_settings: {
-
-                                                }
+                                                visualization_settings: {}
                                             },
                                             data: {
-                                                ...xray.features['growth-series'].value,
+                                                ...xray.features[
+                                                    "growth-series"
+                                                ].value,
                                                 // multiple row value by 100 to display as a %
-                                                rows: xray.features['growth-series'].value.rows.map(row =>
-                                                    [row[0], row[1]*100]
-                                                )
+                                                rows: xray.features[
+                                                    "growth-series"
+                                                ].value.rows.map(row => [
+                                                    row[0],
+                                                    row[1] * 100
+                                                ])
                                             }
                                         }
                                     ]}
@@ -171,38 +198,56 @@ class CardXRay extends Component {
                             </div>
                         </div>
 
-                        { xray.constituents[0] && (
-                            <Periodicity xray={Object.values(xray.constituents)[0]} />
+                        {xray.constituents[0] && (
+                            <Periodicity
+                                xray={Object.values(xray.constituents)[0]}
+                            />
                         )}
 
-                        <Heading heading={xray.features['seasonal-decomposition'].label} />
+                        <Heading
+                            heading={
+                                xray.features["seasonal-decomposition"].label
+                            }
+                        />
                         <div className="full">
-                            <div className="bg-white bordered rounded shadowed" style={{ height: 220}}>
+                            <div
+                                className="bg-white bordered rounded shadowed"
+                                style={{ height: 220 }}
+                            >
                                 <Visualization
                                     series={[
                                         {
                                             card: {
-                                                display: 'line',
+                                                display: "line",
                                                 name: t`Trend`,
                                                 visualization_settings: {}
                                             },
-                                            data: xray.features['seasonal-decomposition'].value.trend
+                                            data:
+                                                xray.features[
+                                                    "seasonal-decomposition"
+                                                ].value.trend
                                         },
                                         {
                                             card: {
-                                                display: 'line',
+                                                display: "line",
                                                 name: t`Seasonal`,
                                                 visualization_settings: {}
                                             },
-                                            data: xray.features['seasonal-decomposition'].value.seasonal
+                                            data:
+                                                xray.features[
+                                                    "seasonal-decomposition"
+                                                ].value.seasonal
                                         },
                                         {
                                             card: {
-                                                display: 'line',
+                                                display: "line",
                                                 name: t`Residual`,
                                                 visualization_settings: {}
                                             },
-                                            data: xray.features['seasonal-decomposition'].value.residual
+                                            data:
+                                                xray.features[
+                                                    "seasonal-decomposition"
+                                                ].value.residual
                                         }
                                     ]}
                                     className="full-height"
@@ -210,10 +255,10 @@ class CardXRay extends Component {
                             </div>
                         </div>
                     </XRayPageWrapper>
-                }
+                )}
             </LoadingAndErrorWrapper>
-        )
+        );
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CardXRay)
+export default connect(mapStateToProps, mapDispatchToProps)(CardXRay);

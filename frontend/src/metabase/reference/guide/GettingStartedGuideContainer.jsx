@@ -1,23 +1,17 @@
 /* eslint "react/prop-types": "warn" */
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { connect } from 'react-redux';
+import { connect } from "react-redux";
 
-import GettingStartedGuide from "metabase/reference/guide/GettingStartedGuide.jsx"
-import GettingStartedGuideEditForm from "metabase/reference/guide/GettingStartedGuideEditForm.jsx"
+import GettingStartedGuide from "metabase/reference/guide/GettingStartedGuide.jsx";
+import GettingStartedGuideEditForm from "metabase/reference/guide/GettingStartedGuideEditForm.jsx";
 
-import * as metadataActions from 'metabase/redux/metadata';
-import * as actions from 'metabase/reference/reference';
+import * as metadataActions from "metabase/redux/metadata";
+import * as actions from "metabase/reference/reference";
 
-import {
-    getDatabaseId,
-    getIsEditing
-} from '../selectors';
+import { getDatabaseId, getIsEditing } from "../selectors";
 
-
-import {
-    fetchDashboards
-} from 'metabase/dashboards/dashboards';
+import { fetchDashboards } from "metabase/dashboards/dashboards";
 
 const mapStateToProps = (state, props) => ({
     databaseId: getDatabaseId(state, props),
@@ -44,7 +38,7 @@ export default class GettingStartedGuideContainer extends Component {
     }
 
     componentWillMount() {
-        this.fetchContainerData()
+        this.fetchContainerData();
     }
 
     componentWillReceiveProps(newProps) {
@@ -52,17 +46,17 @@ export default class GettingStartedGuideContainer extends Component {
             return;
         }
 
-        actions.clearState(newProps)
+        actions.clearState(newProps);
     }
 
     render() {
         return (
             <div>
-                
-            { this.props.isEditing ? 
-                <GettingStartedGuideEditForm {...this.props} /> :
-                <GettingStartedGuide {...this.props} />
-            }            
+                {this.props.isEditing ? (
+                    <GettingStartedGuideEditForm {...this.props} />
+                ) : (
+                    <GettingStartedGuide {...this.props} />
+                )}
             </div>
         );
     }

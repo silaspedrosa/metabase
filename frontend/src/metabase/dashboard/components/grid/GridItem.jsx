@@ -25,7 +25,7 @@ export default class GridItem extends Component {
             let { dragStartPosition, dragStartScrollTop } = this.state;
             if (handlerName === "onDragStart") {
                 dragStartPosition = { x, y };
-                dragStartScrollTop = document.body.scrollTop
+                dragStartScrollTop = document.body.scrollTop;
                 this.setState({ dragStartPosition, dragStartScrollTop });
             }
 
@@ -34,7 +34,7 @@ export default class GridItem extends Component {
             // compute new position
             let pos = {
                 x: x - dragStartPosition.x,
-                y: y - dragStartPosition.y + scrollTopDelta,
+                y: y - dragStartPosition.y + scrollTopDelta
             };
 
             if (handlerName === "onDragStop") {
@@ -43,21 +43,21 @@ export default class GridItem extends Component {
                 this.setState({ dragging: pos });
             }
 
-            this.props[handlerName](this.props.i, {e, node, position: pos });
+            this.props[handlerName](this.props.i, { e, node, position: pos });
         };
     }
 
     onResizeHandler(handlerName) {
-      return (e, {element, size}) => {
+        return (e, { element, size }) => {
+            if (handlerName === "onResize") {
+                this.setState({ resizing: size });
+            }
+            if (handlerName === "onResizeStop") {
+                this.setState({ resizing: null });
+            }
 
-        if (handlerName === "onResize") {
-            this.setState({ resizing: size });
-        } if (handlerName === "onResizeStop") {
-            this.setState({ resizing: null });
-        }
-
-        this.props[handlerName](this.props.i, {e, element, size});
-      };
+            this.props[handlerName](this.props.i, { e, element, size });
+        };
     }
 
     render() {
@@ -74,7 +74,10 @@ export default class GridItem extends Component {
         }
 
         let style = {
-            width, height, top, left,
+            width,
+            height,
+            top,
+            left,
             position: "absolute"
         };
 
@@ -95,7 +98,10 @@ export default class GridItem extends Component {
                 >
                     {React.cloneElement(child, {
                         style: style,
-                        className: cx(child.props.className, { dragging: !!this.state.dragging, resizing: !!this.state.resizing })
+                        className: cx(child.props.className, {
+                            dragging: !!this.state.dragging,
+                            resizing: !!this.state.resizing
+                        })
                     })}
                 </Resizable>
             </DraggableCore>

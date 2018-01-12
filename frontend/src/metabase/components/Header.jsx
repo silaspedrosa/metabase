@@ -5,7 +5,7 @@ import Input from "metabase/components/Input.jsx";
 import HeaderModal from "metabase/components/HeaderModal.jsx";
 import TitleAndDescription from "metabase/components/TitleAndDescription.jsx";
 import EditBar from "metabase/components/EditBar.jsx";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import { getScrollY } from "metabase/lib/dom";
 
 export default class Header extends Component {
@@ -25,21 +25,23 @@ export default class Header extends Component {
         };
     }
 
-   componentDidMount() {
+    componentDidMount() {
         this.updateHeaderHeight();
-   }
+    }
 
     componentWillUpdate() {
         const modalIsOpen = !!this.props.headerModalMessage;
         if (modalIsOpen) {
-            this.updateHeaderHeight()
+            this.updateHeaderHeight();
         }
     }
 
     updateHeaderHeight() {
         if (!this.refs.header) return;
 
-        const rect = ReactDOM.findDOMNode(this.refs.header).getBoundingClientRect();
+        const rect = ReactDOM.findDOMNode(
+            this.refs.header
+        ).getBoundingClientRect();
         const headerHeight = rect.top + getScrollY();
         if (this.state.headerHeight !== headerHeight) {
             this.setState({ headerHeight });
@@ -58,7 +60,7 @@ export default class Header extends Component {
                     subtitle={this.props.editingSubtitle}
                     buttons={this.props.editingButtons}
                 />
-            )
+            );
         }
     }
 
@@ -79,8 +81,22 @@ export default class Header extends Component {
         if (this.props.isEditingInfo) {
             titleAndDescription = (
                 <div className="Header-title flex flex-column flex-full bordered rounded my1">
-                    <Input className="AdminInput text-bold border-bottom rounded-top h3" type="text" value={this.props.item.name || ""} onChange={this.setItemAttribute.bind(this, "name")}/>
-                    <Input className="AdminInput rounded-bottom h4" type="text" value={this.props.item.description || ""} onChange={this.setItemAttribute.bind(this, "description")} placeholder={t`No description yet`} />
+                    <Input
+                        className="AdminInput text-bold border-bottom rounded-top h3"
+                        type="text"
+                        value={this.props.item.name || ""}
+                        onChange={this.setItemAttribute.bind(this, "name")}
+                    />
+                    <Input
+                        className="AdminInput rounded-bottom h4"
+                        type="text"
+                        value={this.props.item.description || ""}
+                        onChange={this.setItemAttribute.bind(
+                            this,
+                            "description"
+                        )}
+                        placeholder={t`No description yet`}
+                    />
                 </div>
             );
         } else {
@@ -110,23 +126,40 @@ export default class Header extends Component {
             );
         }
 
-        var headerButtons = this.props.headerButtons.map((section, sectionIndex) => {
-            return section && section.length > 0 && (
-                <span key={sectionIndex} className="Header-buttonSection flex align-center">
-                    {section.map((button, buttonIndex) =>
-                        <span key={buttonIndex} className="Header-button">
-                            {button}
+        var headerButtons = this.props.headerButtons.map(
+            (section, sectionIndex) => {
+                return (
+                    section &&
+                    section.length > 0 && (
+                        <span
+                            key={sectionIndex}
+                            className="Header-buttonSection flex align-center"
+                        >
+                            {section.map((button, buttonIndex) => (
+                                <span
+                                    key={buttonIndex}
+                                    className="Header-button"
+                                >
+                                    {button}
+                                </span>
+                            ))}
                         </span>
-                    )}
-                </span>
-            );
-        });
+                    )
+                );
+            }
+        );
 
         return (
             <div>
                 {this.renderEditHeader()}
                 {this.renderHeaderModal()}
-                <div className={"QueryBuilder-section flex align-center " + this.props.headerClassName} ref="header">
+                <div
+                    className={
+                        "QueryBuilder-section flex align-center " +
+                        this.props.headerClassName
+                    }
+                    ref="header"
+                >
                     <div className="Entity py3">
                         {titleAndDescription}
                         {attribution}

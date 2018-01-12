@@ -4,12 +4,15 @@ import React, { Component } from "react";
 
 import TableInteractive from "../components/TableInteractive.jsx";
 import TableSimple from "../components/TableSimple.jsx";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import * as DataGrid from "metabase/lib/data_grid";
 
 import Query from "metabase/lib/query";
 import { isMetric, isDimension } from "metabase/lib/schema_metadata";
-import { columnsAreValid, getFriendlyName } from "metabase/visualizations/lib/utils";
+import {
+    columnsAreValid,
+    getFriendlyName
+} from "metabase/visualizations/lib/utils";
 import ChartSettingOrderedFields from "metabase/visualizations/components/settings/ChartSettingOrderedFields.jsx";
 
 import _ from "underscore";
@@ -24,11 +27,11 @@ type Props = {
     card: Card,
     data: DatasetData,
     settings: VisualizationSettings,
-    isDashboard: boolean,
-}
+    isDashboard: boolean
+};
 type State = {
     data: ?DatasetData
-}
+};
 
 export default class Table extends Component {
     props: Props;
@@ -44,7 +47,7 @@ export default class Table extends Component {
         return true;
     }
 
-    static checkRenderable([{ data: { cols, rows} }]) {
+    static checkRenderable([{ data: { cols, rows } }]) {
         // scalar can always be rendered, nothing needed here
     }
 
@@ -52,15 +55,13 @@ export default class Table extends Component {
         "table.pivot": {
             title: t`Pivot the table`,
             widget: "toggle",
-            getHidden: ([{ card, data }]) => (
-                data && data.cols.length !== 3
-            ),
-            getDefault: ([{ card, data }]) => (
-                (data && data.cols.length === 3) &&
+            getHidden: ([{ card, data }]) => data && data.cols.length !== 3,
+            getDefault: ([{ card, data }]) =>
+                data &&
+                data.cols.length === 3 &&
                 Query.isStructured(card.dataset_query) &&
                 data.cols.filter(isMetric).length === 1 &&
                 data.cols.filter(isDimension).length === 2
-            )
         },
         "table.columns": {
             title: t`Fields to include`,
@@ -68,18 +69,26 @@ export default class Table extends Component {
             getHidden: (series, vizSettings) => vizSettings["table.pivot"],
             isValid: ([{ card, data }]) =>
                 card.visualization_settings["table.columns"] &&
-                columnsAreValid(card.visualization_settings["table.columns"].map(x => x.name), data),
-            getDefault: ([{ data: { cols }}]) => cols.map(col => ({
-                name: col.name,
-                enabled: col.visibility_type !== "details-only"
-            })),
-            getProps: ([{ data: { cols }}]) => ({
-                columnNames: cols.reduce((o, col) => ({ ...o, [col.name]: getFriendlyName(col)}), {})
+                columnsAreValid(
+                    card.visualization_settings["table.columns"].map(
+                        x => x.name
+                    ),
+                    data
+                ),
+            getDefault: ([{ data: { cols } }]) =>
+                cols.map(col => ({
+                    name: col.name,
+                    enabled: col.visibility_type !== "details-only"
+                })),
+            getProps: ([{ data: { cols } }]) => ({
+                columnNames: cols.reduce(
+                    (o, col) => ({ ...o, [col.name]: getFriendlyName(col) }),
+                    {}
+                )
             })
         },
-        "table.column_widths": {
-        },
-    }
+        "table.column_widths": {}
+    };
 
     constructor(props: Props) {
         super(props);
@@ -95,12 +104,21 @@ export default class Table extends Component {
 
     componentWillReceiveProps(newProps: Props) {
         // TODO: remove use of deprecated "card" and "data" props
-        if (newProps.data !== this.props.data || !_.isEqual(newProps.settings, this.props.settings)) {
+        if (
+            newProps.data !== this.props.data ||
+            !_.isEqual(newProps.settings, this.props.settings)
+        ) {
             this._updateData(newProps);
         }
     }
 
-    _updateData({ data, settings }: { data: DatasetData, settings: VisualizationSettings }) {
+    _updateData({
+        data,
+        settings
+    }: {
+        data: DatasetData,
+        settings: VisualizationSettings
+    }) {
         if (settings["table.pivot"]) {
             this.setState({
                 data: DataGrid.pivot(data)
@@ -109,7 +127,7 @@ export default class Table extends Component {
             const { cols, rows, columns } = data;
             const columnIndexes = settings["table.columns"]
                 .filter(f => f.enabled)
-                .map(f => _.findIndex(cols, (c) => c.name === f.name))
+                .map(f => _.findIndex(cols, c => c.name === f.name))
                 .filter(i => i >= 0 && i < cols.length);
 
             this.setState({
@@ -125,9 +143,11 @@ export default class Table extends Component {
     render() {
         const { card, isDashboard, settings } = this.props;
         const { data } = this.state;
-        const sort = getIn(card, ["dataset_query", "query", "order_by"]) || null;
+        const sort =
+            getIn(card, ["dataset_query", "query", "order_by"]) || null;
         const isPivoted = settings["table.pivot"];
-        const isColumnsDisabled = (settings["table.columns"] || []).filter(f => f.enabled).length < 1;
+        const isColumnsDisabled =
+            (settings["table.columns"] || []).filter(f => f.enabled).length < 1;
         const TableComponent = isDashboard ? TableSimple : TableInteractive;
 
         if (!data) {
@@ -136,7 +156,15 @@ export default class Table extends Component {
 
         if (isColumnsDisabled) {
             return (
-                <div className={cx("flex-full px1 pb1 text-centered flex flex-column layout-centered", { "text-slate-light": isDashboard, "text-slate": !isDashboard })} >
+                <div
+                    className={cx(
+                        "flex-full px1 pb1 text-centered flex flex-column layout-centered",
+                        {
+                            "text-slate-light": isDashboard,
+                            "text-slate": !isDashboard
+                        }
+                    )}
+                >
                     <RetinaImage
                         width={99}
                         src="app/assets/img/hidden-field.png"
@@ -147,7 +175,7 @@ export default class Table extends Component {
                         Every field is hidden right now
                     </span>
                 </div>
-            )
+            );
         } else {
             return (
                 // $FlowFixMe
@@ -167,7 +195,9 @@ export default class Table extends Component {
  * It always uses TableSimple which Enzyme is able to render correctly.
  * TableInteractive uses react-virtualized library which requires a real browser viewport.
  */
-export const TestTable = (props: Props) => <Table {...props} isDashboard={true} />
+export const TestTable = (props: Props) => (
+    <Table {...props} isDashboard={true} />
+);
 TestTable.uiName = Table.uiName;
 TestTable.identifier = Table.identifier;
 TestTable.iconName = Table.iconName;

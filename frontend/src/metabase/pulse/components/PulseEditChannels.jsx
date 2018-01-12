@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import _ from "underscore";
 import { assoc, assocIn } from "icepick";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 
 import RecipientPicker from "./RecipientPicker.jsx";
 
@@ -26,8 +26,8 @@ export const CHANNEL_ICONS = {
 };
 
 const CHANNEL_NOUN_PLURAL = {
-    "email": t`Emails`,
-    "slack": t`Slack messages`
+    email: t`Emails`,
+    slack: t`Slack messages`
 };
 
 export default class PulseEditChannels extends Component {
@@ -81,14 +81,23 @@ export default class PulseEditChannels extends Component {
             schedule_frame: "first"
         };
 
-        this.props.setPulse({ ...pulse, channels: pulse.channels.concat(channel) });
+        this.props.setPulse({
+            ...pulse,
+            channels: pulse.channels.concat(channel)
+        });
 
-        MetabaseAnalytics.trackEvent((this.props.pulseId) ? "PulseEdit" : "PulseCreate", "AddChannel", type);
+        MetabaseAnalytics.trackEvent(
+            this.props.pulseId ? "PulseEdit" : "PulseCreate",
+            "AddChannel",
+            type
+        );
     }
 
     removeChannel(index) {
         let { pulse } = this.props;
-        this.props.setPulse(assocIn(pulse, ["channels", index, "enabled"], false));
+        this.props.setPulse(
+            assocIn(pulse, ["channels", index, "enabled"], false)
+        );
     }
 
     onChannelPropertyChange(index, name, value) {
@@ -107,7 +116,7 @@ export default class PulseEditChannels extends Component {
         let channels = [...pulse.channels];
 
         MetabaseAnalytics.trackEvent(
-            (this.props.pulseId) ? "PulseEdit" : "PulseCreate",
+            this.props.pulseId ? "PulseEdit" : "PulseCreate",
             channels[index].channel_type + ":" + changedProp.name,
             changedProp.value
         );
@@ -120,104 +129,178 @@ export default class PulseEditChannels extends Component {
         const { pulse } = this.props;
         if (enable) {
             if (pulse.channels.some(c => c.channel_type === type)) {
-                this.props.setPulse(assoc(pulse, "channels", pulse.channels.map(c =>
-                    c.channel_type === type ? assoc(c, "enabled", true) : c
-                )));
+                this.props.setPulse(
+                    assoc(
+                        pulse,
+                        "channels",
+                        pulse.channels.map(
+                            c =>
+                                c.channel_type === type
+                                    ? assoc(c, "enabled", true)
+                                    : c
+                        )
+                    )
+                );
             } else {
-                this.addChannel(type)
+                this.addChannel(type);
             }
         } else {
-            this.props.setPulse(assoc(pulse, "channels", pulse.channels.map(c =>
-                c.channel_type === type ? assoc(c, "enabled", false) : c
-            )));
+            this.props.setPulse(
+                assoc(
+                    pulse,
+                    "channels",
+                    pulse.channels.map(
+                        c =>
+                            c.channel_type === type
+                                ? assoc(c, "enabled", false)
+                                : c
+                    )
+                )
+            );
 
-            MetabaseAnalytics.trackEvent((this.props.pulseId) ? "PulseEdit" : "PulseCreate", "RemoveChannel", type);
+            MetabaseAnalytics.trackEvent(
+                this.props.pulseId ? "PulseEdit" : "PulseCreate",
+                "RemoveChannel",
+                type
+            );
         }
     }
 
     onTestPulseChannel(channel) {
         // test a single channel
-        return this.props.testPulse({ ...this.props.pulse, channels: [channel] });
+        return this.props.testPulse({
+            ...this.props.pulse,
+            channels: [channel]
+        });
     }
 
     willPulseSkip = () => {
-        let cards = _.pluck(this.props.pulse.cards, 'id');
+        let cards = _.pluck(this.props.pulse.cards, "id");
         let cardPreviews = this.props.cardPreviews;
-        let previews = _.map(cards, function (id) { return _.find(cardPreviews, function(card){ return (id == card.id);})});
-        let types = _.pluck(previews, 'pulse_card_type');
-        let empty = _.isEqual( _.uniq(types), ["empty"]);
-        return (empty && this.props.pulse.skip_if_empty);
-    }
+        let previews = _.map(cards, function(id) {
+            return _.find(cardPreviews, function(card) {
+                return id == card.id;
+            });
+        });
+        let types = _.pluck(previews, "pulse_card_type");
+        let empty = _.isEqual(_.uniq(types), ["empty"]);
+        return empty && this.props.pulse.skip_if_empty;
+    };
 
     renderFields(channel, index, channelSpec) {
         return (
             <div>
-                {channelSpec.fields.map(field =>
+                {channelSpec.fields.map(field => (
                     <div key={field.name} className={field.name}>
-                        <span className="h4 text-bold mr1">{field.displayName}</span>
-                        { field.type === "select" ?
+                        <span className="h4 text-bold mr1">
+                            {field.displayName}
+                        </span>
+                        {field.type === "select" ? (
                             <Select
                                 className="h4 text-bold bg-white"
-                                value={channel.details && channel.details[field.name]}
+                                value={
+                                    channel.details &&
+                                    channel.details[field.name]
+                                }
                                 options={field.options}
                                 optionNameFn={o => o}
                                 optionValueFn={o => o}
                                 // Address #5799 where `details` object is missing for some reason
-                                onChange={(o) => this.onChannelPropertyChange(index, "details", { ...channel.details, [field.name]: o })}
+                                onChange={o =>
+                                    this.onChannelPropertyChange(
+                                        index,
+                                        "details",
+                                        {
+                                            ...channel.details,
+                                            [field.name]: o
+                                        }
+                                    )
+                                }
                             />
-                        : null }
+                        ) : null}
                     </div>
-                )}
+                ))}
             </div>
-        )
+        );
     }
 
     renderChannel(channel, index, channelSpec) {
-        let isValid = this.props.pulseIsValid && channelIsValid(channel, channelSpec);
+        let isValid =
+            this.props.pulseIsValid && channelIsValid(channel, channelSpec);
         return (
             <li key={index} className="py2">
-                { channelSpec.error &&
-                    <div className="pb2 text-bold text-error">{channelSpec.error}</div>
-                }
-                { channelSpec.recipients &&
+                {channelSpec.error && (
+                    <div className="pb2 text-bold text-error">
+                        {channelSpec.error}
+                    </div>
+                )}
+                {channelSpec.recipients && (
                     <div>
-                        <div className="h4 text-bold mb1">{ this.props.emailRecipientText || "To:" }</div>
+                        <div className="h4 text-bold mb1">
+                            {this.props.emailRecipientText || "To:"}
+                        </div>
                         <RecipientPicker
                             isNewPulse={this.props.pulseId === undefined}
                             recipients={channel.recipients}
                             recipientTypes={channelSpec.recipients}
                             users={this.props.userList}
-                            onRecipientsChange={(recipients) => this.onChannelPropertyChange(index, "recipients", recipients)}
+                            onRecipientsChange={recipients =>
+                                this.onChannelPropertyChange(
+                                    index,
+                                    "recipients",
+                                    recipients
+                                )
+                            }
                         />
                     </div>
-                }
-                { channelSpec.fields &&
-                    this.renderFields(channel, index, channelSpec)
-                }
-                { !this.props.hideSchedulePicker && channelSpec.schedules &&
-                    <SchedulePicker
-                        schedule={_.pick(channel, "schedule_day", "schedule_frame", "schedule_hour", "schedule_type") }
-                        scheduleOptions={channelSpec.schedules}
-                        textBeforeInterval={t`Sent`}
-                        textBeforeSendTime={t`${CHANNEL_NOUN_PLURAL[channelSpec && channelSpec.type] || t`Messages`} will be sent at`}
-                        onScheduleChange={this.onChannelScheduleChange.bind(this, index)}
-                    />
-                }
-                { this.props.testPulse &&
+                )}
+                {channelSpec.fields &&
+                    this.renderFields(channel, index, channelSpec)}
+                {!this.props.hideSchedulePicker &&
+                    channelSpec.schedules && (
+                        <SchedulePicker
+                            schedule={_.pick(
+                                channel,
+                                "schedule_day",
+                                "schedule_frame",
+                                "schedule_hour",
+                                "schedule_type"
+                            )}
+                            scheduleOptions={channelSpec.schedules}
+                            textBeforeInterval={t`Sent`}
+                            textBeforeSendTime={t`${CHANNEL_NOUN_PLURAL[
+                                channelSpec && channelSpec.type
+                            ] || t`Messages`} will be sent at`}
+                            onScheduleChange={this.onChannelScheduleChange.bind(
+                                this,
+                                index
+                            )}
+                        />
+                    )}
+                {this.props.testPulse && (
                     <div className="pt2">
                         <ActionButton
-                            actionFn={this.onTestPulseChannel.bind(this, channel)}
+                            actionFn={this.onTestPulseChannel.bind(
+                                this,
+                                channel
+                            )}
                             className={cx("Button", { disabled: !isValid })}
-                            normalText={channelSpec.type === "email" ?
-                                t`Send email now` :
-                                t`Send to ${channelSpec.name} now`}
+                            normalText={
+                                channelSpec.type === "email"
+                                    ? t`Send email now`
+                                    : t`Send to ${channelSpec.name} now`
+                            }
                             activeText={t`Sending…`}
                             failedText={t`Sending failed`}
-                            successText={ this.willPulseSkip() ?  t`Didn’t send because the pulse has no results.` : t`Pulse sent`}
-                            forceActiveStyle={ this.willPulseSkip() }
+                            successText={
+                                this.willPulseSkip()
+                                    ? t`Didn’t send because the pulse has no results.`
+                                    : t`Pulse sent`
+                            }
+                            forceActiveStyle={this.willPulseSkip()}
                         />
                     </div>
-                }
+                )}
             </li>
         );
     }
@@ -225,26 +308,48 @@ export default class PulseEditChannels extends Component {
     renderChannelSection(channelSpec) {
         let { pulse, user } = this.props;
         let channels = pulse.channels
-            .map((c, i) => [c, i]).filter(([c, i]) => c.enabled && c.channel_type === channelSpec.type)
-            .map(([channel, index]) => this.renderChannel(channel, index, channelSpec));
+            .map((c, i) => [c, i])
+            .filter(
+                ([c, i]) => c.enabled && c.channel_type === channelSpec.type
+            )
+            .map(([channel, index]) =>
+                this.renderChannel(channel, index, channelSpec)
+            );
         return (
             <li key={channelSpec.type} className="border-row-divider">
                 <div className="flex align-center p3 border-row-divider">
-                    {CHANNEL_ICONS[channelSpec.type] && <Icon className="mr1 text-grey-2" name={CHANNEL_ICONS[channelSpec.type]} size={28} />}
+                    {CHANNEL_ICONS[channelSpec.type] && (
+                        <Icon
+                            className="mr1 text-grey-2"
+                            name={CHANNEL_ICONS[channelSpec.type]}
+                            size={28}
+                        />
+                    )}
                     <h2>{channelSpec.name}</h2>
-                    <Toggle className="flex-align-right" value={channels.length > 0} onChange={this.toggleChannel.bind(this, channelSpec.type)} />
+                    <Toggle
+                        className="flex-align-right"
+                        value={channels.length > 0}
+                        onChange={this.toggleChannel.bind(
+                            this,
+                            channelSpec.type
+                        )}
+                    />
                 </div>
-                {channels.length > 0 && channelSpec.configured ?
+                {channels.length > 0 && channelSpec.configured ? (
                     <ul className="bg-grey-0 px3">{channels}</ul>
-                : channels.length > 0 && !channelSpec.configured ?
+                ) : channels.length > 0 && !channelSpec.configured ? (
                     <div className="p4 text-centered">
-                        <h3 className="mb2">{t`${channelSpec.name} needs to be set up by an administrator.`}</h3>
-                        <ChannelSetupMessage user={user} channels={[channelSpec.name]} />
+                        <h3 className="mb2">{t`${
+                            channelSpec.name
+                        } needs to be set up by an administrator.`}</h3>
+                        <ChannelSetupMessage
+                            user={user}
+                            channels={[channelSpec.name]}
+                        />
                     </div>
-                : null
-                }
+                ) : null}
             </li>
-        )
+        );
     }
 
     render() {

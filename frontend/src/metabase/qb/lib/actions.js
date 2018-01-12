@@ -251,7 +251,8 @@ export const updateDateTimeFilter = (card, column, start, end): CardObject => {
 
         // find the largest unit with at least MIN_INTERVALS
         while (
-            unit !== getNextUnit(unit) && end.diff(start, unit) < MIN_INTERVALS
+            unit !== getNextUnit(unit) &&
+            end.diff(start, unit) < MIN_INTERVALS
         ) {
             unit = getNextUnit(unit);
         }

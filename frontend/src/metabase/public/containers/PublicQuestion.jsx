@@ -14,7 +14,11 @@ import type { Dataset } from "metabase/meta/types/Dataset";
 import type { ParameterValues } from "metabase/meta/types/Parameter";
 
 import { getParametersBySlug } from "metabase/meta/Parameter";
-import { getParameters, getParametersWithExtras, applyParameters } from "metabase/meta/Card";
+import {
+    getParameters,
+    getParametersWithExtras,
+    applyParameters
+} from "metabase/meta/Card";
 
 import { PublicApi, EmbedApi } from "metabase/services";
 
@@ -24,18 +28,18 @@ import { addParamValues } from "metabase/redux/metadata";
 import { updateIn } from "icepick";
 
 type Props = {
-    params:         { uuid?: string, token?: string },
-    location:       { query: { [key:string]: string }},
-    width:          number,
-    height:         number,
-    setErrorPage:   (error: { status: number }) => void,
-    addParamValues: (any) => void
+    params: { uuid?: string, token?: string },
+    location: { query: { [key: string]: string } },
+    width: number,
+    height: number,
+    setErrorPage: (error: { status: number }) => void,
+    addParamValues: any => void
 };
 
 type State = {
-    card:               ?Card,
-    result:             ?Dataset,
-    parameterValues:    ParameterValues
+    card: ?Card,
+    result: ?Dataset,
+    parameterValues: ParameterValues
 };
 
 const mapDispatchToProps = {
@@ -55,12 +59,16 @@ export default class PublicQuestion extends Component {
             card: null,
             result: null,
             parameterValues: {}
-        }
+        };
     }
 
     // $FlowFixMe
     async componentWillMount() {
-        const { setErrorPage, params: { uuid, token }, location: { query }} = this.props;
+        const {
+            setErrorPage,
+            params: { uuid, token },
+            location: { query }
+        } = this.props;
         try {
             let card;
             if (token) {
@@ -68,7 +76,7 @@ export default class PublicQuestion extends Component {
             } else if (uuid) {
                 card = await PublicApi.card({ uuid });
             } else {
-                throw { status: 404 }
+                throw { status: 404 };
             }
 
             if (card.param_values) {
@@ -82,19 +90,22 @@ export default class PublicQuestion extends Component {
 
             this.setState({ card, parameterValues }, this.run);
         } catch (error) {
-            console.error("error", error)
+            console.error("error", error);
             setErrorPage(error);
         }
     }
 
     setParameterValue = (id: string, value: string) => {
-        this.setState({
-            parameterValues: {
-                ...this.state.parameterValues,
-                [id]: value
-            }
-        }, this.run);
-    }
+        this.setState(
+            {
+                parameterValues: {
+                    ...this.state.parameterValues,
+                    [id]: value
+                }
+            },
+            this.run
+        );
+    };
 
     // $FlowFixMe: setState expects return type void
     run = async (): void => {
@@ -117,21 +128,25 @@ export default class PublicQuestion extends Component {
                 });
             } else if (uuid) {
                 // public links currently apply parameters client-side
-                const datasetQuery = applyParameters(card, parameters, parameterValues);
+                const datasetQuery = applyParameters(
+                    card,
+                    parameters,
+                    parameterValues
+                );
                 newResult = await PublicApi.cardQuery({
                     uuid,
                     parameters: JSON.stringify(datasetQuery.parameters)
-                })
-            } else  {
+                });
+            } else {
                 throw { status: 404 };
             }
 
             this.setState({ result: newResult });
         } catch (error) {
-            console.error("error", error)
+            console.error("error", error);
             setErrorPage(error);
         }
-    }
+    };
 
     render() {
         const { params: { uuid, token } } = this.props;
@@ -144,7 +159,7 @@ export default class PublicQuestion extends Component {
                 token={token}
                 result={result}
             />
-        )
+        );
 
         return (
             <EmbedFrame
@@ -156,23 +171,29 @@ export default class PublicQuestion extends Component {
                 setParameterValue={this.setParameterValue}
             >
                 <LoadingAndErrorWrapper loading={!result}>
-                { () =>
-                    <Visualization
-                        series={[{ card: card, data: result && result.data }]}
-                        className="full flex-full"
-                        onUpdateVisualizationSettings={(settings) =>
-                            this.setState({
-                                // $FlowFixMe
-                                result: updateIn(result, ["card", "visualization_settings"], (s) => ({ ...s, ...settings }))
-                            })
-                        }
-                        gridUnit={12}
-                        showTitle={false}
-                        isDashboard
-                    />
-                }
+                    {() => (
+                        <Visualization
+                            series={[
+                                { card: card, data: result && result.data }
+                            ]}
+                            className="full flex-full"
+                            onUpdateVisualizationSettings={settings =>
+                                this.setState({
+                                    // $FlowFixMe
+                                    result: updateIn(
+                                        result,
+                                        ["card", "visualization_settings"],
+                                        s => ({ ...s, ...settings })
+                                    )
+                                })
+                            }
+                            gridUnit={12}
+                            showTitle={false}
+                            isDashboard
+                        />
+                    )}
                 </LoadingAndErrorWrapper>
             </EmbedFrame>
-        )
+        );
     }
 }

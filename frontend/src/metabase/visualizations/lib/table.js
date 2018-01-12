@@ -4,7 +4,12 @@ import type { DatasetData, Column } from "metabase/meta/types/Dataset";
 import type { ClickObject } from "metabase/meta/types/Visualization";
 import { isNumber, isCoordinate } from "metabase/lib/schema_metadata";
 
-export function getTableCellClickedObject(data: DatasetData, rowIndex: number, columnIndex: number, isPivoted: boolean): ClickObject {
+export function getTableCellClickedObject(
+    data: DatasetData,
+    rowIndex: number,
+    columnIndex: number,
+    isPivoted: boolean
+): ClickObject {
     const { rows, cols } = data;
 
     const column = cols[columnIndex];

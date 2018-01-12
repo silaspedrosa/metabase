@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { t } from 'c-3po'
+import { t } from "c-3po";
 import { push } from "react-router-redux";
 
 import Greeting from "metabase/lib/greeting";
@@ -9,30 +9,27 @@ import Modal from "metabase/components/Modal";
 
 import Activity from "../components/Activity";
 import RecentViews from "../components/RecentViews";
-import Smile from '../components/Smile';
-import NewUserOnboardingModal from '../components/NewUserOnboardingModal';
+import Smile from "../components/Smile";
+import NewUserOnboardingModal from "../components/NewUserOnboardingModal";
 import NextStep from "../components/NextStep";
 
 import * as homepageActions from "../actions";
 import { getActivity, getRecentViews, getUser } from "../selectors";
 
 const mapStateToProps = (state, props) => ({
-    activity:       getActivity(state),
-    recentViews:    getRecentViews(state),
-    user:           getUser(state),
+    activity: getActivity(state),
+    recentViews: getRecentViews(state),
+    user: getUser(state),
     showOnboarding: "new" in props.location.query
-})
-
+});
 
 const mapDispatchToProps = {
     ...homepageActions,
     onChangeLocation: push
-}
-
+};
 
 @connect(mapStateToProps, mapDispatchToProps)
 export default class HomepageApp extends Component {
-
     static propTypes = {
         onChangeLocation: PropTypes.func.isRequired,
         showOnboarding: PropTypes.bool.isRequired,
@@ -46,11 +43,11 @@ export default class HomepageApp extends Component {
     };
 
     constructor(props) {
-        super(props)
+        super(props);
         this.state = {
             greeting: Greeting.sayHello(props.user && props.user.first_name),
-            onboarding: props.showOnboarding,
-        }
+            onboarding: props.showOnboarding
+        };
     }
 
     completeOnboarding() {
@@ -62,14 +59,14 @@ export default class HomepageApp extends Component {
 
         return (
             <div className="full">
-                { this.state.onboarding ?
+                {this.state.onboarding ? (
                     <Modal>
                         <NewUserOnboardingModal
                             user={user}
-                            onClose={() => (this.completeOnboarding())}
+                            onClose={() => this.completeOnboarding()}
                         />
                     </Modal>
-                : null }
+                ) : null}
 
                 <div className="bg-white md-bg-brand text-brand md-text-white md-pl4">
                     <div className="HomepageGreeting">
@@ -86,9 +83,7 @@ export default class HomepageApp extends Component {
                 <div className="flex">
                     <div className="wrapper">
                         <div className="Layout-mainColumn pl2">
-                            <div className="md-pt4 h3 md-h2">
-                                {t`Activity`}
-                            </div>
+                            <div className="md-pt4 h3 md-h2">{t`Activity`}</div>
                             <Activity {...this.props} />
                         </div>
                     </div>

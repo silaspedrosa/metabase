@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import styles from "./Legend.css";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import Tooltip from "metabase/components/Tooltip.jsx";
 
 import LegendItem from "./LegendItem.jsx";
@@ -31,7 +31,9 @@ export default class LegendVertical extends Component {
         } else if (this.state.overflowCount === 0) {
             let overflowCount = 0;
             for (var i = 0; i < this.props.titles.length; i++) {
-                let itemSize = ReactDOM.findDOMNode(this.refs["item"+i]).getBoundingClientRect();
+                let itemSize = ReactDOM.findDOMNode(
+                    this.refs["item" + i]
+                ).getBoundingClientRect();
                 if (size.top > itemSize.top || size.bottom < itemSize.bottom) {
                     overflowCount++;
                 }
@@ -43,52 +45,93 @@ export default class LegendVertical extends Component {
     }
 
     render() {
-        const { className, titles, colors, hovered, onHoverChange } = this.props;
+        const {
+            className,
+            titles,
+            colors,
+            hovered,
+            onHoverChange
+        } = this.props;
         const { overflowCount } = this.state;
         let items, extraItems, extraColors;
         if (overflowCount > 0) {
             items = titles.slice(0, -overflowCount - 1);
             extraItems = titles.slice(-overflowCount - 1);
-            extraColors = colors.slice(-overflowCount - 1).concat(colors.slice(0, -overflowCount - 1));
+            extraColors = colors
+                .slice(-overflowCount - 1)
+                .concat(colors.slice(0, -overflowCount - 1));
         } else {
             items = titles;
         }
         return (
-            <ol ref="container" className={cx(className, styles.Legend, styles.vertical)}>
-                {items.map((title, index) =>
+            <ol
+                ref="container"
+                className={cx(className, styles.Legend, styles.vertical)}
+            >
+                {items.map((title, index) => (
                     <li
                         key={index}
-                        ref={"item"+index}
+                        ref={"item" + index}
                         className="flex flex-no-shrink"
-                        onMouseEnter={(e) => onHoverChange && onHoverChange({
-                            index,
-                            element: ReactDOM.findDOMNode(this.refs["legendItem"+index])
-                        })}
-                        onMouseLeave={(e) => onHoverChange && onHoverChange()}
+                        onMouseEnter={e =>
+                            onHoverChange &&
+                            onHoverChange({
+                                index,
+                                element: ReactDOM.findDOMNode(
+                                    this.refs["legendItem" + index]
+                                )
+                            })
+                        }
+                        onMouseLeave={e => onHoverChange && onHoverChange()}
                     >
                         <LegendItem
-                            ref={"legendItem"+index}
+                            ref={"legendItem" + index}
                             title={Array.isArray(title) ? title[0] : title}
                             color={colors[index % colors.length]}
-                            isMuted={hovered && hovered.index != null && index !== hovered.index}
+                            isMuted={
+                                hovered &&
+                                hovered.index != null &&
+                                index !== hovered.index
+                            }
                             showTooltip={false}
                         />
-                        { Array.isArray(title) &&
-                            <span className={cx("LegendItem","flex-align-right pl1", { muted: hovered && hovered.index != null && index !== hovered.index })}>{title[1]}</span>
-                        }
+                        {Array.isArray(title) && (
+                            <span
+                                className={cx(
+                                    "LegendItem",
+                                    "flex-align-right pl1",
+                                    {
+                                        muted:
+                                            hovered &&
+                                            hovered.index != null &&
+                                            index !== hovered.index
+                                    }
+                                )}
+                            >
+                                {title[1]}
+                            </span>
+                        )}
                     </li>
-                )}
-                {overflowCount > 0 ?
-                    <li key="extra" className="flex flex-no-shrink" >
-                        <Tooltip tooltip={<LegendVertical className="p2" titles={extraItems} colors={extraColors} />}>
+                ))}
+                {overflowCount > 0 ? (
+                    <li key="extra" className="flex flex-no-shrink">
+                        <Tooltip
+                            tooltip={
+                                <LegendVertical
+                                    className="p2"
+                                    titles={extraItems}
+                                    colors={extraColors}
+                                />
+                            }
+                        >
                             <LegendItem
-                                title={(overflowCount + 1) + " " + t`more`}
+                                title={overflowCount + 1 + " " + t`more`}
                                 color="gray"
                                 showTooltip={false}
                             />
                         </Tooltip>
                     </li>
-                : null }
+                ) : null}
             </ol>
         );
     }

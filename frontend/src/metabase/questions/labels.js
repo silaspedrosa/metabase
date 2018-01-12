@@ -1,28 +1,31 @@
-
-import {createAction, createThunkAction, mergeEntities} from "metabase/lib/redux";
-import { reset } from 'redux-form';
+import {
+    createAction,
+    createThunkAction,
+    mergeEntities
+} from "metabase/lib/redux";
+import { reset } from "redux-form";
 import { normalize, schema } from "normalizr";
 
 import MetabaseAnalytics from "metabase/lib/analytics";
 
-const label = new schema.Entity('labels');
+const label = new schema.Entity("labels");
 import { LabelApi } from "metabase/services";
 
 import _ from "underscore";
 
-const LOAD_LABELS = 'metabase/labels/LOAD_LABELS';
-const EDIT_LABEL = 'metabase/labels/EDIT_LABEL';
-const SAVE_LABEL = 'metabase/labels/SAVE_LABEL';
-const DELETE_LABEL = 'metabase/labels/DELETE_LABEL';
+const LOAD_LABELS = "metabase/labels/LOAD_LABELS";
+const EDIT_LABEL = "metabase/labels/EDIT_LABEL";
+const SAVE_LABEL = "metabase/labels/SAVE_LABEL";
+const DELETE_LABEL = "metabase/labels/DELETE_LABEL";
 
 export const loadLabels = createThunkAction(LOAD_LABELS, () => {
     return async (dispatch, getState) => {
         let response = await LabelApi.list();
         return normalize(response, [label]);
-    }
+    };
 });
 
-export const saveLabel = createThunkAction(SAVE_LABEL, (values) => {
+export const saveLabel = createThunkAction(SAVE_LABEL, values => {
     return async (dispatch, getState) => {
         try {
             let response;
@@ -47,10 +50,10 @@ export const saveLabel = createThunkAction(SAVE_LABEL, (values) => {
                 throw { _error: "An unknown error occured" };
             }
         }
-    }
+    };
 });
 
-export const deleteLabel = createThunkAction(DELETE_LABEL, (id) => {
+export const deleteLabel = createThunkAction(DELETE_LABEL, id => {
     return async (dispatch, getState) => {
         try {
             MetabaseAnalytics.trackEvent("Labels", "Delete");
@@ -60,7 +63,7 @@ export const deleteLabel = createThunkAction(DELETE_LABEL, (id) => {
             // TODO: handle error
             return null;
         }
-    }
+    };
 });
 
 export const editLabel = createAction(EDIT_LABEL);

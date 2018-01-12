@@ -3,15 +3,15 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import ReactDOM from "react-dom";
-import { t } from 'c-3po';
-import AggregationWidget_LEGACY from './AggregationWidget.jsx';
-import BreakoutWidget_LEGACY from './BreakoutWidget.jsx';
-import DataSelector from './DataSelector.jsx';
+import { t } from "c-3po";
+import AggregationWidget_LEGACY from "./AggregationWidget.jsx";
+import BreakoutWidget_LEGACY from "./BreakoutWidget.jsx";
+import DataSelector from "./DataSelector.jsx";
 import ExtendedOptions from "./ExtendedOptions.jsx";
-import FilterList from './filters/FilterList.jsx';
-import FilterPopover from './filters/FilterPopover.jsx';
+import FilterList from "./filters/FilterList.jsx";
+import FilterPopover from "./filters/FilterPopover.jsx";
 import Icon from "metabase/components/Icon.jsx";
-import IconBorder from 'metabase/components/IconBorder.jsx';
+import IconBorder from "metabase/components/IconBorder.jsx";
 import PopoverWithTrigger from "metabase/components/PopoverWithTrigger.jsx";
 
 import cx from "classnames";
@@ -20,8 +20,11 @@ import _ from "underscore";
 import type { TableId } from "metabase/meta/types/Table";
 import type { DatabaseId } from "metabase/meta/types/Database";
 import type { DatasetQuery } from "metabase/meta/types/Card";
-import type { TableMetadata, DatabaseMetadata } from "metabase/meta/types/Metadata";
-import type { Children } from 'react';
+import type {
+    TableMetadata,
+    DatabaseMetadata
+} from "metabase/meta/types/Metadata";
+import type { Children } from "react";
 
 import StructuredQuery from "metabase-lib/lib/queries/StructuredQuery";
 
@@ -32,7 +35,7 @@ export type GuiQueryEditorFeatures = {
     breakout?: boolean,
     sort?: boolean,
     limit?: boolean
-}
+};
 
 type Props = {
     children?: Children,
@@ -51,18 +54,18 @@ type Props = {
     setDatasetQuery: (datasetQuery: DatasetQuery) => void,
 
     isShowingTutorial: boolean,
-    isShowingDataReference: boolean,
-}
+    isShowingDataReference: boolean
+};
 
 type State = {
     expanded: boolean
-}
+};
 
 export default class GuiQueryEditor extends Component {
     props: Props;
     state: State = {
         expanded: true
-    }
+    };
 
     static propTypes = {
         databases: PropTypes.array,
@@ -86,19 +89,20 @@ export default class GuiQueryEditor extends Component {
         supportMultipleAggregations: true
     };
 
-    renderAdd(text: ?string, onClick: ?(() => void), targetRefName?: string) {
-        let className = "AddButton text-grey-2 text-bold flex align-center text-grey-4-hover cursor-pointer no-decoration transition-color";
+    renderAdd(text: ?string, onClick: ?() => void, targetRefName?: string) {
+        let className =
+            "AddButton text-grey-2 text-bold flex align-center text-grey-4-hover cursor-pointer no-decoration transition-color";
         if (onClick) {
             return (
                 <a className={className} onClick={onClick}>
-                    { text && <span className="mr1">{text}</span> }
+                    {text && <span className="mr1">{text}</span>}
                     {this.renderAddIcon(targetRefName)}
                 </a>
             );
         } else {
             return (
                 <span className={className}>
-                    { text && <span className="mr1">{text}</span> }
+                    {text && <span className="mr1">{text}</span>}
                     {this.renderAddIcon(targetRefName)}
                 </span>
             );
@@ -110,7 +114,7 @@ export default class GuiQueryEditor extends Component {
             <IconBorder borderRadius="3px" ref={targetRefName}>
                 <Icon name="add" size={14} />
             </IconBorder>
-        )
+        );
     }
 
     renderFilters() {
@@ -131,25 +135,37 @@ export default class GuiQueryEditor extends Component {
                     <FilterList
                         query={query}
                         filters={filters}
-                        removeFilter={(index) => query.removeFilter(index).update(setDatasetQuery)}
-                        updateFilter={(index, filter) => query.updateFilter(index, filter).update(setDatasetQuery)}
+                        removeFilter={index =>
+                            query.removeFilter(index).update(setDatasetQuery)
+                        }
+                        updateFilter={(index, filter) =>
+                            query
+                                .updateFilter(index, filter)
+                                .update(setDatasetQuery)
+                        }
                     />
                 );
             }
 
             if (query.canAddFilter()) {
-                addFilterButton = this.renderAdd((filterList ? null : t`Add filters to narrow your answer`), null, "addFilterTarget");
+                addFilterButton = this.renderAdd(
+                    filterList ? null : t`Add filters to narrow your answer`,
+                    null,
+                    "addFilterTarget"
+                );
             }
         } else {
             enabled = false;
-            addFilterButton = this.renderAdd(t`Add filters to narrow your answer`, null, "addFilterTarget");
+            addFilterButton = this.renderAdd(
+                t`Add filters to narrow your answer`,
+                null,
+                "addFilterTarget"
+            );
         }
 
         return (
             <div className={cx("Query-section", { disabled: !enabled })}>
-                <div className="Query-filters">
-                    {filterList}
-                </div>
+                <div className="Query-filters">{filterList}</div>
                 <div className="mx2">
                     <PopoverWithTrigger
                         id="FilterPopover"
@@ -163,7 +179,9 @@ export default class GuiQueryEditor extends Component {
                         <FilterPopover
                             isNew
                             query={query}
-                            onCommitFilter={(filter) => query.addFilter(filter).update(setDatasetQuery)}
+                            onCommitFilter={filter =>
+                                query.addFilter(filter).update(setDatasetQuery)
+                            }
                             onClose={() => this.refs.filterPopover.close()}
                         />
                     </PopoverWithTrigger>
@@ -173,7 +191,12 @@ export default class GuiQueryEditor extends Component {
     }
 
     renderAggregation() {
-        const { query, features, setDatasetQuery, supportMultipleAggregations } = this.props;
+        const {
+            query,
+            features,
+            setDatasetQuery,
+            supportMultipleAggregations
+        } = this.props;
 
         if (!features.aggregation) {
             return;
@@ -182,7 +205,7 @@ export default class GuiQueryEditor extends Component {
         // aggregation clause.  must have table details available
         if (query.isEditable()) {
             // $FlowFixMe
-            let aggregations: (Aggregation|null)[] = query.aggregations();
+            let aggregations: (Aggregation | null)[] = query.aggregations();
 
             if (aggregations.length === 0) {
                 // add implicit rows aggregation
@@ -198,7 +221,7 @@ export default class GuiQueryEditor extends Component {
             for (const [index, aggregation] of aggregations.entries()) {
                 aggregationList.push(
                     <AggregationWidget
-                        key={"agg"+index}
+                        key={"agg" + index}
                         index={index}
                         aggregation={aggregation}
                         query={query}
@@ -206,13 +229,19 @@ export default class GuiQueryEditor extends Component {
                         addButton={this.renderAdd(null)}
                     />
                 );
-                if (aggregations[index + 1] != null && aggregations[index + 1].length > 0) {
+                if (
+                    aggregations[index + 1] != null &&
+                    aggregations[index + 1].length > 0
+                ) {
                     aggregationList.push(
-                        <span key={"and"+index} className="text-bold">{t`and`}</span>
+                        <span
+                            key={"and" + index}
+                            className="text-bold"
+                        >{t`and`}</span>
                     );
                 }
             }
-            return aggregationList
+            return aggregationList;
         } else {
             // TODO: move this into AggregationWidget?
             return (
@@ -233,7 +262,7 @@ export default class GuiQueryEditor extends Component {
         const breakoutList = [];
 
         // $FlowFixMe
-        const breakouts: (Breakout|null)[] = query.breakouts();
+        const breakouts: (Breakout | null)[] = query.breakouts();
 
         // Placeholder breakout for showing the add button
         if (query.canAddBreakout()) {
@@ -249,25 +278,31 @@ export default class GuiQueryEditor extends Component {
 
             breakoutList.push(
                 <BreakoutWidget
-                    key={"breakout"+i}
+                    key={"breakout" + i}
                     className="View-section-breakout SelectionModule p1"
                     index={i}
                     breakout={breakout}
                     query={query}
                     updateQuery={setDatasetQuery}
-                    addButton={this.renderAdd(i === 0 ? t`Add a grouping` : null)}
+                    addButton={this.renderAdd(
+                        i === 0 ? t`Add a grouping` : null
+                    )}
                 />
             );
 
             if (breakouts[i + 1] != null) {
                 breakoutList.push(
-                    <span key={"and"+i} className="text-bold">{t`and`}</span>
+                    <span key={"and" + i} className="text-bold">{t`and`}</span>
                 );
             }
         }
 
         return (
-            <div className={cx("Query-section Query-section-breakout", { disabled: breakoutList.length === 0 })}>
+            <div
+                className={cx("Query-section Query-section-breakout", {
+                    disabled: breakoutList.length === 0
+                })}
+            >
                 {breakoutList}
             </div>
         );
@@ -277,9 +312,13 @@ export default class GuiQueryEditor extends Component {
         const { query } = this.props;
         const tableMetadata = query.tableMetadata();
         return (
-            <div className={"GuiBuilder-section GuiBuilder-data flex align-center arrow-right"}>
+            <div
+                className={
+                    "GuiBuilder-section GuiBuilder-data flex align-center arrow-right"
+                }
+            >
                 <span className="GuiBuilder-section-label Query-label">{t`Data`}</span>
-                { this.props.features.data ?
+                {this.props.features.data ? (
                     <DataSelector
                         ref="dataSection"
                         includeTables={true}
@@ -288,13 +327,17 @@ export default class GuiQueryEditor extends Component {
                         tables={this.props.tables}
                         setDatabaseFn={this.props.setDatabaseFn}
                         setSourceTableFn={this.props.setSourceTableFn}
-                        isInitiallyOpen={(!query.datasetQuery().database || !query.query().source_table) && !this.props.isShowingTutorial}
+                        isInitiallyOpen={
+                            (!query.datasetQuery().database ||
+                                !query.query().source_table) &&
+                            !this.props.isShowingTutorial
+                        }
                     />
-                    :
+                ) : (
                     <span className="flex align-center px2 py2 text-bold text-grey">
                         {tableMetadata && tableMetadata.display_name}
                     </span>
-                }
+                )}
             </div>
         );
     }
@@ -305,7 +348,10 @@ export default class GuiQueryEditor extends Component {
         }
 
         return (
-            <div className="GuiBuilder-section GuiBuilder-filtered-by flex align-center" ref="filterSection">
+            <div
+                className="GuiBuilder-section GuiBuilder-filtered-by flex align-center"
+                ref="filterSection"
+            >
                 <span className="GuiBuilder-section-label Query-label">{t`Filtered by`}</span>
                 {this.renderFilters()}
             </div>
@@ -319,7 +365,10 @@ export default class GuiQueryEditor extends Component {
         }
 
         return (
-            <div className="GuiBuilder-section GuiBuilder-view flex align-center px1 pr2" ref="viewSection">
+            <div
+                className="GuiBuilder-section GuiBuilder-view flex align-center px1 pr2"
+                ref="viewSection"
+            >
                 <span className="GuiBuilder-section-label Query-label">{t`View`}</span>
                 {this.renderAggregation()}
             </div>
@@ -333,7 +382,10 @@ export default class GuiQueryEditor extends Component {
         }
 
         return (
-            <div className="GuiBuilder-section GuiBuilder-groupedBy flex align-center px1" ref="viewSection">
+            <div
+                className="GuiBuilder-section GuiBuilder-groupedBy flex align-center px1"
+                ref="viewSection"
+            >
                 <span className="GuiBuilder-section-label Query-label">{t`Grouped By`}</span>
                 {this.renderBreakouts()}
             </div>
@@ -347,13 +399,17 @@ export default class GuiQueryEditor extends Component {
         }
 
         // HACK: magic number "5" accounts for the borders between the sections?
-        let contentWidth = ["data", "filter", "view", "groupedBy","sortLimit"].reduce((acc, ref) => {
-            let node = ReactDOM.findDOMNode(this.refs[`${ref}Section`]);
-            return acc + (node ? node.offsetWidth : 0);
-        }, 0) + 5;
+        let contentWidth =
+            ["data", "filter", "view", "groupedBy", "sortLimit"].reduce(
+                (acc, ref) => {
+                    let node = ReactDOM.findDOMNode(this.refs[`${ref}Section`]);
+                    return acc + (node ? node.offsetWidth : 0);
+                },
+                0
+            ) + 5;
         let guiBuilderWidth = guiBuilder.offsetWidth;
 
-        let expanded = (contentWidth < guiBuilderWidth);
+        let expanded = contentWidth < guiBuilderWidth;
         if (this.state.expanded !== expanded) {
             this.setState({ expanded });
         }
@@ -361,14 +417,22 @@ export default class GuiQueryEditor extends Component {
 
     render() {
         const { databases, query } = this.props;
-        const datasetQuery = query.datasetQuery()
-        const readOnly = datasetQuery.database != null && !_.findWhere(databases, { id: datasetQuery.database });
+        const datasetQuery = query.datasetQuery();
+        const readOnly =
+            datasetQuery.database != null &&
+            !_.findWhere(databases, { id: datasetQuery.database });
         if (readOnly) {
-            return <div className="border-bottom border-med" />
+            return <div className="border-bottom border-med" />;
         }
 
         return (
-            <div className={cx("GuiBuilder rounded shadowed", { "GuiBuilder--expand": this.state.expanded, disabled: readOnly })} ref="guiBuilder">
+            <div
+                className={cx("GuiBuilder rounded shadowed", {
+                    "GuiBuilder--expand": this.state.expanded,
+                    disabled: readOnly
+                })}
+                ref="guiBuilder"
+            >
                 <div className="GuiBuilder-row flex">
                     {this.renderDataSection()}
                     {this.renderFilterSection()}
@@ -376,35 +440,56 @@ export default class GuiQueryEditor extends Component {
                 <div className="GuiBuilder-row flex flex-full">
                     {this.renderViewSection()}
                     {this.renderGroupedBySection()}
-                    <div className="flex-full"></div>
+                    <div className="flex-full" />
                     {this.props.children}
-                    <ExtendedOptions
-                        {...this.props}
-                    />
+                    <ExtendedOptions {...this.props} />
                 </div>
             </div>
         );
     }
 }
 
-export const AggregationWidget = ({ index, aggregation, query, updateQuery, addButton }: Object) =>
+export const AggregationWidget = ({
+    index,
+    aggregation,
+    query,
+    updateQuery,
+    addButton
+}: Object) => (
     <AggregationWidget_LEGACY
         query={query}
         aggregation={aggregation}
         tableMetadata={query.tableMetadata()}
         customFields={query.expressions()}
-        updateAggregation={(aggregation) => query.updateAggregation(index, aggregation).update(updateQuery)}
-        removeAggregation={query.canRemoveAggregation() ? (() => query.removeAggregation(index).update(updateQuery)) : null}
+        updateAggregation={aggregation =>
+            query.updateAggregation(index, aggregation).update(updateQuery)
+        }
+        removeAggregation={
+            query.canRemoveAggregation()
+                ? () => query.removeAggregation(index).update(updateQuery)
+                : null
+        }
         addButton={addButton}
     />
+);
 
-export const BreakoutWidget = ({ className, index, breakout, query, updateQuery, addButton }: Object) =>
+export const BreakoutWidget = ({
+    className,
+    index,
+    breakout,
+    query,
+    updateQuery,
+    addButton
+}: Object) => (
     <BreakoutWidget_LEGACY
         className={className}
         field={breakout}
         fieldOptions={query.breakoutOptions(breakout)}
         customFieldOptions={query.expressions()}
         tableMetadata={query.tableMetadata()}
-        setField={(field) => query.updateBreakout(index, field).update(updateQuery)}
+        setField={field =>
+            query.updateBreakout(index, field).update(updateQuery)
+        }
         addButton={addButton}
     />
+);

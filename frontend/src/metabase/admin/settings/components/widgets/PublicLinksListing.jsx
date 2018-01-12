@@ -7,7 +7,7 @@ import Link from "metabase/components/Link";
 import ExternalLink from "metabase/components/ExternalLink";
 import Confirm from "metabase/components/Confirm";
 import LoadingAndErrorWrapper from "metabase/components/LoadingAndErrorWrapper";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import { CardApi, DashboardApi } from "metabase/services";
 import * as Urls from "metabase/lib/urls";
 
@@ -20,16 +20,16 @@ type PublicLink = {
 };
 
 type Props = {
-    load:           () => Promise<PublicLink[]>,
-    revoke?:        (link: PublicLink) => Promise<void>,
-    getUrl:         (link: PublicLink) => string,
-    getPublicUrl?:  (link: PublicLink) => string,
+    load: () => Promise<PublicLink[]>,
+    revoke?: (link: PublicLink) => Promise<void>,
+    getUrl: (link: PublicLink) => string,
+    getPublicUrl?: (link: PublicLink) => string,
     noLinksMessage: string,
     type: string
 };
 
 type State = {
-    list: ?PublicLink[],
+    list: ?(PublicLink[]),
     error: ?any
 };
 
@@ -66,12 +66,12 @@ export default class PublicLinksListing extends Component {
             await this.props.revoke(link);
             this.load();
         } catch (error) {
-            alert(error)
+            alert(error);
         }
     }
 
     trackEvent(label: string) {
-        MetabaseAnalytics.trackEvent(`Admin ${this.props.type}`, label)
+        MetabaseAnalytics.trackEvent(`Admin ${this.props.type}`, label);
     }
 
     render() {
@@ -84,72 +84,75 @@ export default class PublicLinksListing extends Component {
 
         return (
             <LoadingAndErrorWrapper loading={!list} error={error}>
-            { () =>
-                <table className="ContentTable">
-                    <thead>
-                        <tr>
-                            <th>{t`Name`}</th>
-                            { getPublicUrl &&
-                                <th>{t`Public Link`}</th>
-                            }
-                            { revoke &&
-                                <th>{t`Revoke Link`}</th>
-                            }
-                        </tr>
-                    </thead>
-                    <tbody>
-                        { list && list.map(link =>
+                {() => (
+                    <table className="ContentTable">
+                        <thead>
                             <tr>
-                                <td>
-                                    <Link
-                                        to={getUrl(link)}
-                                        onClick={() =>
-                                            this.trackEvent('Entity Link Clicked')
-                                        }
-                                    >
-                                        {link.name}
-                                    </Link>
-                                </td>
-                                { getPublicUrl &&
-                                    <td>
-                                        <ExternalLink
-                                            href={getPublicUrl(link)}
-                                            onClick={() =>
-                                                this.trackEvent('Public Link Clicked')
-                                            }
-                                        >
-                                            {getPublicUrl(link)}
-                                        </ExternalLink>
-                                    </td>
-                                }
-                                { revoke &&
-                                    <td className="flex layout-centered">
-                                        <Confirm
-                                            title={t`Disable this link?`}
-                                            content={t`They won't work any more, and can't be restored, but you can create new links.`}
-                                            action={() => {
-                                                this.revoke(link)
-                                                this.trackEvent('Revoked link')
-                                            }}
-                                        >
-                                            <Icon
-                                                name="close"
-                                                className="text-grey-2 text-grey-4-hover cursor-pointer"
-                                            />
-                                        </Confirm>
-                                    </td>
-                                }
+                                <th>{t`Name`}</th>
+                                {getPublicUrl && <th>{t`Public Link`}</th>}
+                                {revoke && <th>{t`Revoke Link`}</th>}
                             </tr>
-                        ) }
-                    </tbody>
-                </table>
-            }
+                        </thead>
+                        <tbody>
+                            {list &&
+                                list.map(link => (
+                                    <tr>
+                                        <td>
+                                            <Link
+                                                to={getUrl(link)}
+                                                onClick={() =>
+                                                    this.trackEvent(
+                                                        "Entity Link Clicked"
+                                                    )
+                                                }
+                                            >
+                                                {link.name}
+                                            </Link>
+                                        </td>
+                                        {getPublicUrl && (
+                                            <td>
+                                                <ExternalLink
+                                                    href={getPublicUrl(link)}
+                                                    onClick={() =>
+                                                        this.trackEvent(
+                                                            "Public Link Clicked"
+                                                        )
+                                                    }
+                                                >
+                                                    {getPublicUrl(link)}
+                                                </ExternalLink>
+                                            </td>
+                                        )}
+                                        {revoke && (
+                                            <td className="flex layout-centered">
+                                                <Confirm
+                                                    title={t`Disable this link?`}
+                                                    content={t`They won't work any more, and can't be restored, but you can create new links.`}
+                                                    action={() => {
+                                                        this.revoke(link);
+                                                        this.trackEvent(
+                                                            "Revoked link"
+                                                        );
+                                                    }}
+                                                >
+                                                    <Icon
+                                                        name="close"
+                                                        className="text-grey-2 text-grey-4-hover cursor-pointer"
+                                                    />
+                                                </Confirm>
+                                            </td>
+                                        )}
+                                    </tr>
+                                ))}
+                        </tbody>
+                    </table>
+                )}
             </LoadingAndErrorWrapper>
         );
     }
 }
 
-export const PublicLinksDashboardListing = () =>
+export const PublicLinksDashboardListing = () => (
     <PublicLinksListing
         load={DashboardApi.listPublic}
         revoke={DashboardApi.deletePublicLink}
@@ -157,9 +160,10 @@ export const PublicLinksDashboardListing = () =>
         getUrl={({ id }) => Urls.dashboard(id)}
         getPublicUrl={({ public_uuid }) => Urls.publicDashboard(public_uuid)}
         noLinksMessage={t`No dashboards have been publicly shared yet.`}
-    />;
+    />
+);
 
-export const PublicLinksQuestionListing = () =>
+export const PublicLinksQuestionListing = () => (
     <PublicLinksListing
         load={CardApi.listPublic}
         revoke={CardApi.deletePublicLink}
@@ -167,9 +171,10 @@ export const PublicLinksQuestionListing = () =>
         getUrl={({ id }) => Urls.question(id)}
         getPublicUrl={({ public_uuid }) => Urls.publicCard(public_uuid)}
         noLinksMessage={t`No questions have been publicly shared yet.`}
-    />;
+    />
+);
 
-export const EmbeddedDashboardListing = () =>
+export const EmbeddedDashboardListing = () => (
     <div className="bordered rounded full" style={{ maxWidth: 820 }}>
         <PublicLinksListing
             load={DashboardApi.listEmbeddable}
@@ -178,8 +183,9 @@ export const EmbeddedDashboardListing = () =>
             noLinksMessage={t`No dashboards have been embedded yet.`}
         />
     </div>
+);
 
-export const EmbeddedQuestionListing = () =>
+export const EmbeddedQuestionListing = () => (
     <div className="bordered rounded full" style={{ maxWidth: 820 }}>
         <PublicLinksListing
             load={CardApi.listEmbeddable}
@@ -188,3 +194,4 @@ export const EmbeddedQuestionListing = () =>
             noLinksMessage={t`No questions have been embedded yet.`}
         />
     </div>
+);

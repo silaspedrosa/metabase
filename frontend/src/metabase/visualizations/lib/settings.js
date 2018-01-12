@@ -1,5 +1,5 @@
 import { getVisualizationRaw } from "metabase/visualizations";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import {
     columnsAreValid,
     getChartTypeFromData,
@@ -33,8 +33,8 @@ const WIDGETS = {
     field: ChartSettingFieldPicker,
     fields: ChartSettingFieldsPicker,
     color: ChartSettingColorPicker,
-    colors: ChartSettingColorsPicker,
-}
+    colors: ChartSettingColorsPicker
+};
 
 export function getDefaultColumns(series) {
     if (series[0].card.display === "scatter") {
@@ -52,7 +52,7 @@ function getDefaultScatterColumns([{ data: { cols, rows } }]) {
             dimensions: [dimensions[0].name],
             metrics: [dimensions[1].name],
             bubble: metrics.length === 1 ? metrics[0].name : null
-        }
+        };
     } else {
         return {
             dimensions: [null],
@@ -70,7 +70,10 @@ function getDefaultLineAreaBarColumns([{ data: { cols, rows } }]) {
             if (isDate(dimensions[1]) && !isDate(dimensions[0])) {
                 // if the series dimension is a date but the axis dimension is not then swap them
                 dimensions.reverse();
-            } else if (getColumnCardinality(cols, rows, 1) > getColumnCardinality(cols, rows, 0)) {
+            } else if (
+                getColumnCardinality(cols, rows, 1) >
+                getColumnCardinality(cols, rows, 0)
+            ) {
                 // if the series dimension is higher cardinality than the axis dimension then swap them
                 dimensions.reverse();
             }
@@ -124,11 +127,19 @@ export function getOptionFromColumn(col) {
 }
 
 export function metricSetting(id) {
-    return fieldSetting(id, isMetric, (series) => getDefaultDimensionAndMetric(series).metric)
+    return fieldSetting(
+        id,
+        isMetric,
+        series => getDefaultDimensionAndMetric(series).metric
+    );
 }
 
 export function dimensionSetting(id) {
-    return fieldSetting(id, isDimension, (series) => getDefaultDimensionAndMetric(series).dimension)
+    return fieldSetting(
+        id,
+        isDimension,
+        series => getDefaultDimensionAndMetric(series).dimension
+    );
 }
 
 export function fieldSetting(id, filter, getDefault) {
@@ -137,9 +148,9 @@ export function fieldSetting(id, filter, getDefault) {
         isValid: ([{ card, data }], vizSettings) =>
             columnsAreValid(card.visualization_settings[id], data, filter),
         getDefault: getDefault,
-        getProps: ([{ card, data: { cols }}]) => ({
+        getProps: ([{ card, data: { cols } }]) => ({
             options: cols.filter(filter).map(getOptionFromColumn)
-        }),
+        })
     };
 }
 
@@ -147,17 +158,19 @@ const COMMON_SETTINGS = {
     "card.title": {
         title: t`Title`,
         widget: "input",
-        getDefault: (series) => series.length === 1 ? series[0].card.name : null,
+        getDefault: series =>
+            series.length === 1 ? series[0].card.name : null,
         dashboard: true,
         useRawSeries: true
     },
     "card.description": {
         title: t`Description`,
         widget: "input",
-        getDefault: (series) => series.length === 1 ? series[0].card.description : null,
+        getDefault: series =>
+            series.length === 1 ? series[0].card.description : null,
         dashboard: true,
         useRawSeries: true
-    },
+    }
 };
 
 function getSetting(settingDefs, id, vizSettings, series) {
@@ -179,37 +192,42 @@ function getSetting(settingDefs, id, vizSettings, series) {
 
     try {
         if (settingDef.getValue) {
-            return vizSettings[id] = settingDef.getValue(series, vizSettings);
+            return (vizSettings[id] = settingDef.getValue(series, vizSettings));
         }
 
         if (visualization_settings[id] !== undefined) {
-            if (!settingDef.isValid || settingDef.isValid(series, vizSettings)) {
-                return vizSettings[id] = visualization_settings[id];
+            if (
+                !settingDef.isValid ||
+                settingDef.isValid(series, vizSettings)
+            ) {
+                return (vizSettings[id] = visualization_settings[id]);
             }
         }
 
         if (settingDef.getDefault) {
-            return vizSettings[id] = settingDef.getDefault(series, vizSettings);
+            return (vizSettings[id] = settingDef.getDefault(
+                series,
+                vizSettings
+            ));
         }
 
         if ("default" in settingDef) {
-            return vizSettings[id] = settingDef.default;
+            return (vizSettings[id] = settingDef.default);
         }
     } catch (e) {
         console.error("Error getting setting", id, e);
     }
-    return vizSettings[id] = undefined;
+    return (vizSettings[id] = undefined);
 }
-
 
 function getSettingDefintionsForSeries(series) {
     const { CardVisualization } = getVisualizationRaw(series);
     const definitions = {
         ...COMMON_SETTINGS,
         ...(CardVisualization.settings || {})
-    }
+    };
     for (const id in definitions) {
-        definitions[id].id = id
+        definitions[id].id = id;
     }
     return definitions;
 }
@@ -226,13 +244,13 @@ export function getSettings(series) {
 function getSettingWidget(settingDef, vizSettings, series, onChangeSettings) {
     const id = settingDef.id;
     const value = vizSettings[id];
-    const onChange = (value) => {
+    const onChange = value => {
         const newSettings = { [id]: value };
-        for (const id of (settingDef.writeDependencies || [])) {
+        for (const id of settingDef.writeDependencies || []) {
             newSettings[id] = vizSettings[id];
         }
-        onChangeSettings(newSettings)
-    }
+        onChangeSettings(newSettings);
+    };
     if (settingDef.useRawSeries && series._raw) {
         series = series._raw;
     }
@@ -240,26 +258,44 @@ function getSettingWidget(settingDef, vizSettings, series, onChangeSettings) {
         ...settingDef,
         id: id,
         value: value,
-        title: settingDef.getTitle ? settingDef.getTitle(series, vizSettings) : settingDef.title,
-        hidden: settingDef.getHidden ? settingDef.getHidden(series, vizSettings) : false,
-        disabled: settingDef.getDisabled ? settingDef.getDisabled(series, vizSettings) : false,
+        title: settingDef.getTitle
+            ? settingDef.getTitle(series, vizSettings)
+            : settingDef.title,
+        hidden: settingDef.getHidden
+            ? settingDef.getHidden(series, vizSettings)
+            : false,
+        disabled: settingDef.getDisabled
+            ? settingDef.getDisabled(series, vizSettings)
+            : false,
         props: {
             ...(settingDef.props ? settingDef.props : {}),
-            ...(settingDef.getProps ? settingDef.getProps(series, vizSettings, onChange) : {})
+            ...(settingDef.getProps
+                ? settingDef.getProps(series, vizSettings, onChange)
+                : {})
         },
-        widget: typeof settingDef.widget === "string" ?
-            WIDGETS[settingDef.widget] :
-            settingDef.widget,
+        widget:
+            typeof settingDef.widget === "string"
+                ? WIDGETS[settingDef.widget]
+                : settingDef.widget,
         onChange
     };
 }
 
-export function getSettingsWidgets(series, onChangeSettings, isDashboard = false) {
+export function getSettingsWidgets(
+    series,
+    onChangeSettings,
+    isDashboard = false
+) {
     const vizSettings = getSettings(series);
-    return Object.values(getSettingDefintionsForSeries(series)).map(settingDef =>
-        getSettingWidget(settingDef, vizSettings, series, onChangeSettings)
-    ).filter(widget =>
-        widget.widget && !widget.hidden &&
-        (widget.dashboard === undefined || widget.dashboard === isDashboard)
-    );
+    return Object.values(getSettingDefintionsForSeries(series))
+        .map(settingDef =>
+            getSettingWidget(settingDef, vizSettings, series, onChangeSettings)
+        )
+        .filter(
+            widget =>
+                widget.widget &&
+                !widget.hidden &&
+                (widget.dashboard === undefined ||
+                    widget.dashboard === isDashboard)
+        );
 }

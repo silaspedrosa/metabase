@@ -2,9 +2,9 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-import { List } from 'react-virtualized'
+import { List } from "react-virtualized";
 import "react-virtualized/styles.css";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import ColumnarSelector from "metabase/components/ColumnarSelector.jsx";
 import Icon from "metabase/components/Icon.jsx";
 import PopoverWithTrigger from "metabase/components/PopoverWithTrigger.jsx";
@@ -26,10 +26,9 @@ export default class Select extends Component {
 }
 
 class BrowserSelect extends Component {
-
     state = {
         inputValue: ""
-    }
+    };
 
     static propTypes = {
         children: PropTypes.array.isRequired,
@@ -47,18 +46,22 @@ class BrowserSelect extends Component {
         rowHeight: PropTypes.number,
         // TODO - @kdoh
         // we should not allow this
-        className: PropTypes.string,
-    }
+        className: PropTypes.string
+    };
     static defaultProps = {
         className: "",
         width: 320,
         height: 320,
-        rowHeight: 40,
-    }
+        rowHeight: 40
+    };
 
     isSelected(otherValue) {
         const { value } = this.props;
-        return (value === otherValue || ((value == null || value === "") && (otherValue == null || otherValue === "")))
+        return (
+            value === otherValue ||
+            ((value == null || value === "") &&
+                (otherValue == null || otherValue === ""))
+        );
     }
 
     render() {
@@ -76,7 +79,7 @@ class BrowserSelect extends Component {
             rowHeight
         } = this.props;
 
-        let children = this.props.children
+        let children = this.props.children;
 
         let selectedName;
         for (const child of children) {
@@ -91,51 +94,63 @@ class BrowserSelect extends Component {
         const { inputValue } = this.state;
         let filter = () => true;
         if (searchProp && inputValue) {
-            filter = (child) => {
+            filter = child => {
                 let childValue = String(child.props[searchProp] || "");
                 if (!inputValue) {
                     return false;
                 } else if (searchCaseInsensitive) {
-                    return childValue.toLowerCase().startsWith(inputValue.toLowerCase())
+                    return childValue
+                        .toLowerCase()
+                        .startsWith(inputValue.toLowerCase());
                 } else {
                     return childValue.startsWith(inputValue);
                 }
-            }
+            };
         }
 
         // make sure we filter by the search query
-        children = children.filter(filter)
+        children = children.filter(filter);
 
         return (
             <PopoverWithTrigger
                 ref="popover"
                 className={className}
-                triggerElement={triggerElement || <SelectButton hasValue={!!value}>{selectedName}</SelectButton>}
+                triggerElement={
+                    triggerElement || (
+                        <SelectButton hasValue={!!value}>
+                            {selectedName}
+                        </SelectButton>
+                    )
+                }
                 triggerClasses={className}
                 verticalAttachments={["top"]}
                 isInitiallyOpen={isInitiallyOpen}
             >
                 <div className="flex flex-column">
-                    { searchProp &&
+                    {searchProp && (
                         <input
                             className="AdminSelect m1 flex-full"
                             value={inputValue}
-                            onChange={(e) => this.setState({ inputValue: e.target.value })}
+                            onChange={e =>
+                                this.setState({ inputValue: e.target.value })
+                            }
                             autoFocus
                         />
-                    }
+                    )}
                     <List
                         width={width}
                         height={
                             // check to see if the height of the number of rows is less than the provided (or default)
                             // height. if so, set the height to the number of rows * the row height so that
                             // large blank spaces at the bottom are prevented
-                            children.length * rowHeight < height ? children.length * rowHeight : height
+                            children.length * rowHeight < height
+                                ? children.length * rowHeight
+                                : height
                         }
                         rowHeight={rowHeight}
                         rowCount={children.length}
-                        rowRenderer={({index, key, style}) => {
-                            const child = children[index]
+                        rowRenderer={({ index, key, style }) => {
+                            const child = children[index];
 
                             /*
                              * for each child we need to add props based on
@@ -143,18 +158,28 @@ class BrowserSelect extends Component {
                              * status, so we use cloneElement here
                             * */
                             return (
-                                <div key={key} style={style} onClick={e => e.stopPropagation()}>
+                                <div
+                                    key={key}
+                                    style={style}
+                                    onClick={e => e.stopPropagation()}
+                                >
                                     {React.cloneElement(children[index], {
-                                        selected: this.isSelected(child.props.value),
+                                        selected: this.isSelected(
+                                            child.props.value
+                                        ),
                                         onClick: () => {
                                             if (!child.props.disabled) {
-                                                onChange({ target: { value: child.props.value }});
+                                                onChange({
+                                                    target: {
+                                                        value: child.props.value
+                                                    }
+                                                });
                                             }
-                                            this.refs.popover.close()
+                                            this.refs.popover.close();
                                         }
                                     })}
                                 </div>
-                            )
+                            );
                         }}
                     />
                 </div>
@@ -163,50 +188,70 @@ class BrowserSelect extends Component {
     }
 }
 
-export const SelectButton = ({ hasValue, children }) =>
-    <div className={"AdminSelect flex align-center " + (!hasValue ? " text-grey-3" : "")}>
+export const SelectButton = ({ hasValue, children }) => (
+    <div
+        className={
+            "AdminSelect flex align-center " + (!hasValue ? " text-grey-3" : "")
+        }
+    >
         <span className="AdminSelect-content mr1">{children}</span>
-        <Icon className="AdminSelect-chevron flex-align-right" name="chevrondown" size={12} />
+        <Icon
+            className="AdminSelect-chevron flex-align-right"
+            name="chevrondown"
+            size={12}
+        />
     </div>
+);
 
 SelectButton.propTypes = {
     hasValue: PropTypes.bool,
-    children: PropTypes.any,
+    children: PropTypes.any
 };
 
 export class Option extends Component {
     static propTypes = {
-        children:   PropTypes.any,
-        selected:   PropTypes.bool,
-        disabled:   PropTypes.bool,
-        onClick:    PropTypes.func,
-        icon:       PropTypes.string,
-        iconColor:  PropTypes.string,
-        iconSize:   PropTypes.number,
+        children: PropTypes.any,
+        selected: PropTypes.bool,
+        disabled: PropTypes.bool,
+        onClick: PropTypes.func,
+        icon: PropTypes.string,
+        iconColor: PropTypes.string,
+        iconSize: PropTypes.number
     };
 
     render() {
-        const { children, selected, disabled, icon, iconColor, iconSize, onClick } = this.props;
+        const {
+            children,
+            selected,
+            disabled,
+            icon,
+            iconColor,
+            iconSize,
+            onClick
+        } = this.props;
         return (
             <div
                 onClick={onClick}
-                className={cx("ColumnarSelector-row flex align-center cursor-pointer no-decoration relative", {
-                    "ColumnarSelector-row--selected": selected,
-                    "disabled": disabled
-                })}
+                className={cx(
+                    "ColumnarSelector-row flex align-center cursor-pointer no-decoration relative",
+                    {
+                        "ColumnarSelector-row--selected": selected,
+                        disabled: disabled
+                    }
+                )}
             >
-                <Icon name="check" size={14} style={{ position: 'absolute' }} />
-                { icon &&
+                <Icon name="check" size={14} style={{ position: "absolute" }} />
+                {icon && (
                     <Icon
                         name={icon}
                         size={iconSize}
                         style={{
-                            position: 'absolute',
+                            position: "absolute",
                             color: iconColor,
                             visibility: !selected ? "visible" : "hidden"
                         }}
                     />
-                }
+                )}
                 <span className="ml4 no-decoration">{children}</span>
             </div>
         );
@@ -235,9 +280,9 @@ class LegacySelect extends Component {
         placeholder: "",
         emptyPlaceholder: t`Nothing to select`,
         disabledOptionIds: [],
-        optionNameFn: (option) => option.name,
-        optionValueFn: (option) => option,
-        isInitiallyOpen: false,
+        optionNameFn: option => option.name,
+        optionValueFn: option => option,
+        isInitiallyOpen: false
     };
 
     toggle() {
@@ -245,34 +290,66 @@ class LegacySelect extends Component {
     }
 
     render() {
-        const { className, value, values, onChange, options, disabledOptionIds, optionNameFn, optionValueFn, placeholder, emptyPlaceholder, isInitiallyOpen, disabled } = this.props;
+        const {
+            className,
+            value,
+            values,
+            onChange,
+            options,
+            disabledOptionIds,
+            optionNameFn,
+            optionValueFn,
+            placeholder,
+            emptyPlaceholder,
+            isInitiallyOpen,
+            disabled
+        } = this.props;
 
-        var selectedName = value ?
-            optionNameFn(value) :
-            options && options.length > 0 ?
-                placeholder :
-                emptyPlaceholder;
+        var selectedName = value
+            ? optionNameFn(value)
+            : options && options.length > 0 ? placeholder : emptyPlaceholder;
 
         var triggerElement = (
-            <div className={cx("flex align-center", !value && (!values || values.length === 0) ? " text-grey-2" : "")}>
-                { values && values.length !== 0 ?
+            <div
+                className={cx(
+                    "flex align-center",
+                    !value && (!values || values.length === 0)
+                        ? " text-grey-2"
+                        : ""
+                )}
+            >
+                {values && values.length !== 0 ? (
                     values
                         .map(value => optionNameFn(value))
                         .sort()
-                        .map((name, index) => <span key={index} className="mr1">{`${name}${index !== (values.length - 1) ? ',   ' : ''}`}</span>) :
+                        .map((name, index) => (
+                            <span key={index} className="mr1">{`${name}${
+                                index !== values.length - 1 ? ",   " : ""
+                            }`}</span>
+                        ))
+                ) : (
                     <span className="mr1">{selectedName}</span>
-                }
-                <Icon className="flex-align-right" name="chevrondown" size={12}/>
+                )}
+                <Icon
+                    className="flex-align-right"
+                    name="chevrondown"
+                    size={12}
+                />
             </div>
         );
 
         var sections = {};
-        options.forEach(function (option) {
+        options.forEach(function(option) {
             var sectionName = option.section || "";
-            sections[sectionName] = sections[sectionName] || { title: sectionName || undefined, items: [] };
+            sections[sectionName] = sections[sectionName] || {
+                title: sectionName || undefined,
+                items: []
+            };
             sections[sectionName].items.push(option);
         });
-        sections = Object.keys(sections).map((sectionName) => sections[sectionName]);
+        sections = Object.keys(sections).map(
+            sectionName => sections[sectionName]
+        );
 
         var columns = [
             {
@@ -281,8 +358,8 @@ class LegacySelect extends Component {
                 sections: sections,
                 disabledOptionIds: disabledOptionIds,
                 itemTitleFn: optionNameFn,
-                itemDescriptionFn: (item) => item.description,
-                itemSelectFn: (item) => {
+                itemDescriptionFn: item => item.description,
+                itemSelectFn: item => {
                     onChange(optionValueFn(item));
                     if (!values) {
                         this.toggle();
@@ -298,14 +375,15 @@ class LegacySelect extends Component {
                 ref="popover"
                 className={className}
                 triggerElement={triggerElement}
-                triggerClasses={this.props.triggerClasses || cx("AdminSelect", this.props.className)}
+                triggerClasses={
+                    this.props.triggerClasses ||
+                    cx("AdminSelect", this.props.className)
+                }
                 isInitiallyOpen={isInitiallyOpen}
                 disabled={disablePopover}
             >
-                <div onClick={(e) => e.stopPropagation()}>
-                    <ColumnarSelector
-                        columns={columns}
-                    />
+                <div onClick={e => e.stopPropagation()}>
+                    <ColumnarSelector columns={columns} />
                 </div>
             </PopoverWithTrigger>
         );

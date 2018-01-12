@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 import ModalContent from "metabase/components/ModalContent.jsx";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 
 export default class QuestionSavedModal extends Component {
     static propTypes = {
@@ -19,8 +19,14 @@ export default class QuestionSavedModal extends Component {
                 className="Modal-content Modal-content--small NewForm"
             >
                 <div className="Form-inputs mb4">
-                    <button className="Button Button--primary" onClick={this.props.addToDashboardFn}>{t`Yes please!`}</button>
-                    <button className="Button ml3" onClick={this.props.onClose}>{t`Not now`}</button>
+                    <button
+                        className="Button Button--primary"
+                        onClick={this.props.addToDashboardFn}
+                    >{t`Yes please!`}</button>
+                    <button
+                        className="Button ml3"
+                        onClick={this.props.onClose}
+                    >{t`Not now`}</button>
                 </div>
             </ModalContent>
         );

@@ -1,7 +1,7 @@
 /* eslint "react/prop-types": "warn" */
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 
 import Icon from "metabase/components/Icon.jsx";
 
@@ -20,15 +20,18 @@ export default class PulseListChannel extends Component {
         channel: PropTypes.object.isRequired,
         channelSpec: PropTypes.object,
         user: PropTypes.object.isRequired,
-        savePulse: PropTypes.func.isRequired,
+        savePulse: PropTypes.func.isRequired
     };
 
     subscribe() {
         let { pulse, channel, user } = this.props;
         this.props.savePulse({
             ...pulse,
-            channels: pulse.channels.map(c => c !== channel ? c :
-                { ...c, recipients: [...c.recipients, user]}
+            channels: pulse.channels.map(
+                c =>
+                    c !== channel
+                        ? c
+                        : { ...c, recipients: [...c.recipients, user] }
             )
         });
     }
@@ -37,8 +40,16 @@ export default class PulseListChannel extends Component {
         let { pulse, channel, user } = this.props;
         this.props.savePulse({
             ...pulse,
-            channels: pulse.channels.map(c => c !== channel ? c :
-                { ...c, recipients: c.recipients.filter(r => r.id !== user.id)}
+            channels: pulse.channels.map(
+                c =>
+                    c !== channel
+                        ? c
+                        : {
+                              ...c,
+                              recipients: c.recipients.filter(
+                                  r => r.id !== user.id
+                              )
+                          }
             )
         });
     }
@@ -47,9 +58,14 @@ export default class PulseListChannel extends Component {
         let { channel, channelSpec } = this.props;
 
         let channelIcon = null;
-        let channelVerb = channelSpec && channelSpec.displayName || channel.channel_type;
+        let channelVerb =
+            (channelSpec && channelSpec.displayName) || channel.channel_type;
         let channelSchedule = channel.schedule_type;
-        let channelTarget = channel.recipients && (channel.recipients.length + " " + inflect("people", channel.recipients.length));
+        let channelTarget =
+            channel.recipients &&
+            channel.recipients.length +
+                " " +
+                inflect("people", channel.recipients.length);
 
         if (channel.channel_type === "email") {
             channelIcon = "mail";
@@ -58,16 +74,25 @@ export default class PulseListChannel extends Component {
             channelIcon = "slack";
             channelVerb = t`Slack'd`;
             // Address #5799 where `details` object is missing for some reason
-            channelTarget = channel.details ? channel.details.channel : t`No channel`;
+            channelTarget = channel.details
+                ? channel.details.channel
+                : t`No channel`;
         }
 
         return (
             <div className="h4 text-grey-4 py2 flex align-center">
-                { channelIcon && <Icon className="mr1" name={channelIcon} size={24}/> }
+                {channelIcon && (
+                    <Icon className="mr1" name={channelIcon} size={24} />
+                )}
                 <span>
                     {channelVerb + " "}
                     <strong>{channelSchedule}</strong>
-                    {channelTarget && <span>{" " + t`to` + " "}<strong>{channelTarget}</strong></span>}
+                    {channelTarget && (
+                        <span>
+                            {" " + t`to` + " "}
+                            <strong>{channelTarget}</strong>
+                        </span>
+                    )}
                 </span>
             </div>
         );
@@ -83,22 +108,34 @@ export default class PulseListChannel extends Component {
         }
         return (
             <div className="py2 flex align-center">
-                { this.renderChannelSchedule() }
-                { subscribable &&
+                {this.renderChannelSchedule()}
+                {subscribable && (
                     <div className="flex-align-right">
-                        { subscribed ?
+                        {subscribed ? (
                             <div className="flex align-center rounded bg-green text-white text-bold">
-                                <div className="pl2">{t`You get this ${channel.channel_type}`}</div>
-                                <Icon className="p2 text-grey-1 text-white-hover cursor-pointer" name="close" size={12} onClick={this.unsubscribe}/>
+                                <div className="pl2">{t`You get this ${
+                                    channel.channel_type
+                                }`}</div>
+                                <Icon
+                                    className="p2 text-grey-1 text-white-hover cursor-pointer"
+                                    name="close"
+                                    size={12}
+                                    onClick={this.unsubscribe}
+                                />
                             </div>
-                        : !pulse.read_only ?
-                            <div className="flex align-center rounded bordered bg-white text-default text-bold cursor-pointer" onClick={this.subscribe}>
-                                <Icon className="p2" name="add" size={12}/>
-                                <div className="pr2">{t`Get this ${channel.channel_type}`}</div>
+                        ) : !pulse.read_only ? (
+                            <div
+                                className="flex align-center rounded bordered bg-white text-default text-bold cursor-pointer"
+                                onClick={this.subscribe}
+                            >
+                                <Icon className="p2" name="add" size={12} />
+                                <div className="pr2">{t`Get this ${
+                                    channel.channel_type
+                                }`}</div>
                             </div>
-                        : null }
+                        ) : null}
                     </div>
-                }
+                )}
             </div>
         );
     }

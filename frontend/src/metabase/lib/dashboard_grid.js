@@ -13,7 +13,7 @@ type DashCardPosition = {
     row: number,
     sizeY: number,
     sizeX: number
-}
+};
 
 // returns the first available position from left to right, top to bottom,
 // based on the existing cards,  item size, and grid width
@@ -63,11 +63,16 @@ function printGrid(cards, width) {
     for (let card of cards) {
         for (let col = card.col; col < card.col + card.sizeX; col++) {
             for (let row = card.row; row < card.row + card.sizeY; row++) {
-                grid[row] = grid[row] || Array(width).join(".").split(".").map(() => 0);
+                grid[row] =
+                    grid[row] ||
+                    Array(width)
+                        .join(".")
+                        .split(".")
+                        .map(() => 0);
                 grid[row][col]++;
             }
         }
     }
-    console.log("\n"+grid.map(row => row.join(".")).join("\n")+"\n");
+    console.log("\n" + grid.map(row => row.join(".")).join("\n") + "\n");
 }
 /*eslint-enable */

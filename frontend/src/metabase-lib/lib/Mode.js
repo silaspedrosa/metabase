@@ -42,14 +42,16 @@ export default class Mode {
     actions(settings): ClickAction[] {
         return _.flatten(
             this._queryMode.actions.map(actionCreator =>
-                actionCreator({ question: this._question, settings }))
+                actionCreator({ question: this._question, settings })
+            )
         );
     }
 
     actionsForClick(clicked: ?ClickObject, settings): ClickAction[] {
         return _.flatten(
             this._queryMode.drills.map(actionCreator =>
-                actionCreator({ question: this._question, settings, clicked }))
+                actionCreator({ question: this._question, settings, clicked })
+            )
         );
     }
 }

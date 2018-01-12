@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 
 import ActionButton from "metabase/components/ActionButton.jsx";
 import ModalContent from "metabase/components/ModalContent.jsx";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import cx from "classnames";
 
 export default class ObjectRetireModal extends Component {
@@ -17,9 +17,10 @@ export default class ObjectRetireModal extends Component {
     async handleSubmit() {
         const { object, objectType } = this.props;
         let payload = {
-            revision_message: ReactDOM.findDOMNode(this.refs.revision_message).value
+            revision_message: ReactDOM.findDOMNode(this.refs.revision_message)
+                .value
         };
-        payload[objectType+"Id"] = object.id;
+        payload[objectType + "Id"] = object.id;
 
         await this.props.onRetire(payload);
         this.props.onClose();
@@ -41,7 +42,9 @@ export default class ObjectRetireModal extends Component {
                             ref="revision_message"
                             className="input full"
                             placeholder={t`This will show up in the activity feed and in an email that will be sent to anyone on your team who created something that uses this ${objectType}.`}
-                            onChange={(e) => this.setState({ valid: !!e.target.value })}
+                            onChange={e =>
+                                this.setState({ valid: !!e.target.value })
+                            }
                         />
                     </div>
 
@@ -51,7 +54,10 @@ export default class ObjectRetireModal extends Component {
                         </a>
                         <ActionButton
                             actionFn={this.handleSubmit.bind(this)}
-                            className={cx("Button ml2", { "Button--danger": valid, "disabled": !valid })}
+                            className={cx("Button ml2", {
+                                "Button--danger": valid,
+                                disabled: !valid
+                            })}
                             normalText={t`Retire`}
                             activeText={t`Retiring…`}
                             failedText={t`Failed`}

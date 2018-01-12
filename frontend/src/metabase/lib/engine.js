@@ -1,4 +1,3 @@
-
 export function getEngineNativeType(engine) {
     switch (engine) {
         case "mongo":
@@ -39,7 +38,20 @@ export function formatJsonQuery(query, engine) {
     }
 }
 
-const GA_ORDERED_PARAMS = ["ids", "start-date", "end-date", "metrics", "dimensions", "sort", "filters", "segment", "samplingLevel", "include-empty-rows", "start-index", "max-results"];
+const GA_ORDERED_PARAMS = [
+    "ids",
+    "start-date",
+    "end-date",
+    "metrics",
+    "dimensions",
+    "sort",
+    "filters",
+    "segment",
+    "samplingLevel",
+    "include-empty-rows",
+    "start-index",
+    "max-results"
+];
 
 // does 3 things: removes null values, sorts the keys by the order in the documentation, and formats with 2 space indents
 function formatGAQuery(query) {

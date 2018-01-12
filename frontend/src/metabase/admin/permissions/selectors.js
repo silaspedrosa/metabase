@@ -1,12 +1,16 @@
 /* @flow weak */
 
-import { createSelector } from 'reselect';
+import { createSelector } from "reselect";
 
 import { push } from "react-router-redux";
 
 import MetabaseAnalytics from "metabase/lib/analytics";
-import { t } from 'c-3po';
-import { isDefaultGroup, isAdminGroup, isMetaBotGroup } from "metabase/lib/groups";
+import { t } from "c-3po";
+import {
+    isDefaultGroup,
+    isAdminGroup,
+    isMetaBotGroup
+} from "metabase/lib/groups";
 
 import _ from "underscore";
 import { getIn, assocIn } from "icepick";
@@ -31,15 +35,20 @@ import type { DatabaseId } from "metabase/meta/types/Database";
 import type { SchemaName } from "metabase/meta/types/Table";
 import type { Group, GroupsPermissions } from "metabase/meta/types/Permissions";
 
-const getPermissions = (state) => state.admin.permissions.permissions;
-const getOriginalPermissions = (state) => state.admin.permissions.originalPermissions;
+const getPermissions = state => state.admin.permissions.permissions;
+const getOriginalPermissions = state =>
+    state.admin.permissions.originalPermissions;
 
-const getDatabaseId = (state, props) => props.params.databaseId ? parseInt(props.params.databaseId) : null
-const getSchemaName = (state, props) => props.params.schemaName
-
+const getDatabaseId = (state, props) =>
+    props.params.databaseId ? parseInt(props.params.databaseId) : null;
+const getSchemaName = (state, props) => props.params.schemaName;
 
 // reorder groups to be in this order
-const SPECIAL_GROUP_FILTERS = [isAdminGroup, isDefaultGroup, isMetaBotGroup].reverse();
+const SPECIAL_GROUP_FILTERS = [
+    isAdminGroup,
+    isDefaultGroup,
+    isMetaBotGroup
+].reverse();
 
 function getTooltipForGroup(group) {
     if (isAdminGroup(group)) {
@@ -53,59 +62,92 @@ function getTooltipForGroup(group) {
 }
 
 export const getGroups = createSelector(
-    (state) => state.admin.permissions.groups,
-    (groups) => {
+    state => state.admin.permissions.groups,
+    groups => {
         let orderedGroups = groups ? [...groups] : [];
         for (let groupFilter of SPECIAL_GROUP_FILTERS) {
             let index = _.findIndex(orderedGroups, groupFilter);
             if (index >= 0) {
-                orderedGroups.unshift(...orderedGroups.splice(index, 1))
+                orderedGroups.unshift(...orderedGroups.splice(index, 1));
             }
         }
         return orderedGroups.map(group => ({
             ...group,
             tooltip: getTooltipForGroup(group)
-        }))
+        }));
     }
 );
 
 export const getIsDirty = createSelector(
-    getPermissions, getOriginalPermissions,
+    getPermissions,
+    getOriginalPermissions,
     (permissions, originalPermissions) =>
         JSON.stringify(permissions) !== JSON.stringify(originalPermissions)
-)
+);
 
-export const getSaveError = (state) => state.admin.permissions.saveError;
-
+export const getSaveError = state => state.admin.permissions.saveError;
 
 // these are all the permission levels ordered by level of access
 const PERM_LEVELS = ["write", "read", "all", "controlled", "none"];
 function hasGreaterPermissions(a, b) {
-    return (PERM_LEVELS.indexOf(a) - PERM_LEVELS.indexOf(b)) < 0
+    return PERM_LEVELS.indexOf(a) - PERM_LEVELS.indexOf(b) < 0;
 }
 
-function getPermissionWarning(getter, entityType, defaultGroup, permissions, groupId, entityId, value) {
+function getPermissionWarning(
+    getter,
+    entityType,
+    defaultGroup,
+    permissions,
+    groupId,
+    entityId,
+    value
+) {
     if (!defaultGroup || groupId === defaultGroup.id) {
         return null;
     }
     let perm = value || getter(permissions, groupId, entityId);
     let defaultPerm = getter(permissions, defaultGroup.id, entityId);
     if (perm === "controlled" && defaultPerm === "controlled") {
-        return t`The "${defaultGroup.name}" group may have access to a different set of ${entityType} than this group, which may give this group additional access to some ${entityType}.`;
+        return t`The "${
+            defaultGroup.name
+        }" group may have access to a different set of ${entityType} than this group, which may give this group additional access to some ${entityType}.`;
     }
     if (hasGreaterPermissions(defaultPerm, perm)) {
-        return t`The "${defaultGroup.name}" group has a higher level of access than this, which will override this setting. You should limit or revoke the "${defaultGroup.name}" group's access to this item.`;
+        return t`The "${
+            defaultGroup.name
+        }" group has a higher level of access than this, which will override this setting. You should limit or revoke the "${
+            defaultGroup.name
+        }" group's access to this item.`;
     }
     return null;
 }
 
-function getPermissionWarningModal(entityType, getter, defaultGroup, permissions, groupId, entityId, value) {
-    let permissionWarning = getPermissionWarning(entityType, getter, defaultGroup, permissions, groupId, entityId, value);
+function getPermissionWarningModal(
+    entityType,
+    getter,
+    defaultGroup,
+    permissions,
+    groupId,
+    entityId,
+    value
+) {
+    let permissionWarning = getPermissionWarning(
+        entityType,
+        getter,
+        defaultGroup,
+        permissions,
+        groupId,
+        entityId,
+        value
+    );
     if (permissionWarning) {
         return {
-            title: t`${value === "controlled" ? "Limit" : "Revoke"} access even though "${defaultGroup.name}" has greater access?`,
+            title: t`${
+                value === "controlled" ? "Limit" : "Revoke"
+            } access even though "${defaultGroup.name}" has greater access?`,
             message: permissionWarning,
-            confirmButtonText: (value === "controlled" ? t`Limit access` : t`Revoke access`),
+            confirmButtonText:
+                value === "controlled" ? t`Limit access` : t`Revoke access`,
             cancelButtonText: t`Cancel`
         };
     }
@@ -122,7 +164,8 @@ function getControlledDatabaseWarningModal(permissions, groupId, entityId) {
 }
 
 function getRawQueryWarningModal(permissions, groupId, entityId, value) {
-    if (value === "write" &&
+    if (
+        value === "write" &&
         getNativePermission(permissions, groupId, entityId) !== "write" &&
         getSchemasPermission(permissions, groupId, entityId) !== "all"
     ) {
@@ -138,21 +181,31 @@ function getRawQueryWarningModal(permissions, groupId, entityId, value) {
 // If the user is revoking an access to every single table of a database for a specific user group,
 // warn the user that the access to raw queries will be revoked as well.
 // This warning will only be shown if the user is editing the permissions of individual tables.
-function getRevokingAccessToAllTablesWarningModal(database, permissions, groupId, entityId, value) {
-    if (value === "none" &&
+function getRevokingAccessToAllTablesWarningModal(
+    database,
+    permissions,
+    groupId,
+    entityId,
+    value
+) {
+    if (
+        value === "none" &&
         getSchemasPermission(permissions, groupId, entityId) === "controlled" &&
         getNativePermission(permissions, groupId, entityId) !== "none"
     ) {
         // allTableEntityIds contains tables from all schemas
-        const allTableEntityIds = database.tables.map((table) => ({
+        const allTableEntityIds = database.tables.map(table => ({
             databaseId: table.db_id,
             schemaName: table.schema || "",
             tableId: table.id
         }));
 
         // Show the warning only if user tries to revoke access to the very last table of all schemas
-        const afterChangesNoAccessToAnyTable = _.every(allTableEntityIds, (id) =>
-            getFieldsPermission(permissions, groupId, id) === "none" || _.isEqual(id, entityId)
+        const afterChangesNoAccessToAnyTable = _.every(
+            allTableEntityIds,
+            id =>
+                getFieldsPermission(permissions, groupId, id) === "none" ||
+                _.isEqual(id, entityId)
         );
         if (afterChangesNoAccessToAnyTable) {
             return {
@@ -181,12 +234,11 @@ const OPTION_RED = {
     bgColor: "#FDF3F3"
 };
 
-
 const OPTION_ALL = {
     ...OPTION_GREEN,
     value: "all",
     title: t`Grant unrestricted access`,
-    tooltip: t`Unrestricted access`,
+    tooltip: t`Unrestricted access`
 };
 
 const OPTION_CONTROLLED = {
@@ -194,14 +246,14 @@ const OPTION_CONTROLLED = {
     value: "controlled",
     title: t`Limit access`,
     tooltip: t`Limited access`,
-    icon: "permissionsLimited",
+    icon: "permissionsLimited"
 };
 
 const OPTION_NONE = {
     ...OPTION_RED,
     value: "none",
     title: t`Revoke access`,
-    tooltip: t`No access`,
+    tooltip: t`No access`
 };
 
 const OPTION_NATIVE_WRITE = {
@@ -209,33 +261,43 @@ const OPTION_NATIVE_WRITE = {
     value: "write",
     title: t`Write raw queries`,
     tooltip: t`Can write raw queries`,
-    icon: "sql",
+    icon: "sql"
 };
 
 const OPTION_NATIVE_READ = {
     ...OPTION_YELLOW,
     value: "read",
     title: t`View raw queries`,
-    tooltip: t`Can view raw queries`,
+    tooltip: t`Can view raw queries`
 };
 
 const OPTION_COLLECTION_WRITE = {
     ...OPTION_GREEN,
     value: "write",
     title: t`Curate collection`,
-    tooltip: t`Can add and remove questions from this collection`,
+    tooltip: t`Can add and remove questions from this collection`
 };
 
 const OPTION_COLLECTION_READ = {
     ...OPTION_YELLOW,
     value: "read",
     title: t`View collection`,
-    tooltip: t`Can view questions in this collection`,
+    tooltip: t`Can view questions in this collection`
 };
 
 export const getTablesPermissionsGrid = createSelector(
-    getMetadata, getGroups, getPermissions, getDatabaseId, getSchemaName,
-    (metadata: Metadata, groups: Array<Group>, permissions: GroupsPermissions, databaseId: DatabaseId, schemaName: SchemaName) => {
+    getMetadata,
+    getGroups,
+    getPermissions,
+    getDatabaseId,
+    getSchemaName,
+    (
+        metadata: Metadata,
+        groups: Array<Group>,
+        permissions: GroupsPermissions,
+        databaseId: DatabaseId,
+        schemaName: SchemaName
+    ) => {
         const database = metadata.databases[databaseId];
 
         if (!groups || !permissions || !database) {
@@ -248,38 +310,90 @@ export const getTablesPermissionsGrid = createSelector(
         return {
             type: "table",
             icon: "table",
-            crumbs: database.schemaNames().length > 1 ? [
-                [t`Databases`, "/admin/permissions/databases"],
-                [database.name, "/admin/permissions/databases/"+database.id+"/schemas"],
-                [schemaName]
-            ] : [
-                [t`Databases`, "/admin/permissions/databases"],
-                [database.name],
-            ],
+            crumbs:
+                database.schemaNames().length > 1
+                    ? [
+                          [t`Databases`, "/admin/permissions/databases"],
+                          [
+                              database.name,
+                              "/admin/permissions/databases/" +
+                                  database.id +
+                                  "/schemas"
+                          ],
+                          [schemaName]
+                      ]
+                    : [
+                          [t`Databases`, "/admin/permissions/databases"],
+                          [database.name]
+                      ],
             groups,
             permissions: {
-                "fields": {
+                fields: {
                     header: t`Data Access`,
                     options(groupId, entityId) {
-                        return [OPTION_ALL, OPTION_NONE]
+                        return [OPTION_ALL, OPTION_NONE];
                     },
                     getter(groupId, entityId) {
-                        return getFieldsPermission(permissions, groupId, entityId);
+                        return getFieldsPermission(
+                            permissions,
+                            groupId,
+                            entityId
+                        );
                     },
                     updater(groupId, entityId, value) {
-                        MetabaseAnalytics.trackEvent("Permissions", "fields", value);
-                        let updatedPermissions = updateFieldsPermission(permissions, groupId, entityId, value, metadata);
-                        return inferAndUpdateEntityPermissions(updatedPermissions, groupId, entityId, metadata);
+                        MetabaseAnalytics.trackEvent(
+                            "Permissions",
+                            "fields",
+                            value
+                        );
+                        let updatedPermissions = updateFieldsPermission(
+                            permissions,
+                            groupId,
+                            entityId,
+                            value,
+                            metadata
+                        );
+                        return inferAndUpdateEntityPermissions(
+                            updatedPermissions,
+                            groupId,
+                            entityId,
+                            metadata
+                        );
                     },
                     confirm(groupId, entityId, value) {
                         return [
-                            getPermissionWarningModal(getFieldsPermission, "fields", defaultGroup, permissions, groupId, entityId, value),
-                            getControlledDatabaseWarningModal(permissions, groupId, entityId),
-                            getRevokingAccessToAllTablesWarningModal(database, permissions, groupId, entityId, value)
+                            getPermissionWarningModal(
+                                getFieldsPermission,
+                                "fields",
+                                defaultGroup,
+                                permissions,
+                                groupId,
+                                entityId,
+                                value
+                            ),
+                            getControlledDatabaseWarningModal(
+                                permissions,
+                                groupId,
+                                entityId
+                            ),
+                            getRevokingAccessToAllTablesWarningModal(
+                                database,
+                                permissions,
+                                groupId,
+                                entityId,
+                                value
+                            )
                         ];
                     },
                     warning(groupId, entityId) {
-                        return getPermissionWarning(getFieldsPermission, "fields", defaultGroup, permissions, groupId, entityId);
+                        return getPermissionWarning(
+                            getFieldsPermission,
+                            "fields",
+                            defaultGroup,
+                            permissions,
+                            groupId,
+                            entityId
+                        );
                     }
                 }
             },
@@ -297,8 +411,16 @@ export const getTablesPermissionsGrid = createSelector(
 );
 
 export const getSchemasPermissionsGrid = createSelector(
-    getMetadata, getGroups, getPermissions, getDatabaseId,
-    (metadata: Metadata, groups: Array<Group>, permissions: GroupsPermissions, databaseId: DatabaseId) => {
+    getMetadata,
+    getGroups,
+    getPermissions,
+    getDatabaseId,
+    (
+        metadata: Metadata,
+        groups: Array<Group>,
+        permissions: GroupsPermissions,
+        databaseId: DatabaseId
+    ) => {
         const database = metadata.databases[databaseId];
 
         if (!groups || !permissions || !database) {
@@ -313,36 +435,78 @@ export const getSchemasPermissionsGrid = createSelector(
             icon: "folder",
             crumbs: [
                 [t`Databases`, "/admin/permissions/databases"],
-                [database.name],
+                [database.name]
             ],
             groups,
             permissions: {
-                "tables": {
+                tables: {
                     header: t`Data Access`,
                     options(groupId, entityId) {
-                        return [OPTION_ALL, OPTION_CONTROLLED, OPTION_NONE]
+                        return [OPTION_ALL, OPTION_CONTROLLED, OPTION_NONE];
                     },
                     getter(groupId, entityId) {
-                        return getTablesPermission(permissions, groupId, entityId);
+                        return getTablesPermission(
+                            permissions,
+                            groupId,
+                            entityId
+                        );
                     },
                     updater(groupId, entityId, value) {
-                        MetabaseAnalytics.trackEvent("Permissions", "tables", value);
-                        let updatedPermissions = updateTablesPermission(permissions, groupId, entityId, value, metadata);
-                        return inferAndUpdateEntityPermissions(updatedPermissions, groupId, entityId, metadata);
+                        MetabaseAnalytics.trackEvent(
+                            "Permissions",
+                            "tables",
+                            value
+                        );
+                        let updatedPermissions = updateTablesPermission(
+                            permissions,
+                            groupId,
+                            entityId,
+                            value,
+                            metadata
+                        );
+                        return inferAndUpdateEntityPermissions(
+                            updatedPermissions,
+                            groupId,
+                            entityId,
+                            metadata
+                        );
                     },
                     postAction(groupId, { databaseId, schemaName }, value) {
                         if (value === "controlled") {
-                            return push(`/admin/permissions/databases/${databaseId}/schemas/${encodeURIComponent(schemaName)}/tables`);
+                            return push(
+                                `/admin/permissions/databases/${databaseId}/schemas/${encodeURIComponent(
+                                    schemaName
+                                )}/tables`
+                            );
                         }
                     },
                     confirm(groupId, entityId, value) {
                         return [
-                            getPermissionWarningModal(getTablesPermission, "tables", defaultGroup, permissions, groupId, entityId, value),
-                            getControlledDatabaseWarningModal(permissions, groupId, entityId)
+                            getPermissionWarningModal(
+                                getTablesPermission,
+                                "tables",
+                                defaultGroup,
+                                permissions,
+                                groupId,
+                                entityId,
+                                value
+                            ),
+                            getControlledDatabaseWarningModal(
+                                permissions,
+                                groupId,
+                                entityId
+                            )
                         ];
                     },
                     warning(groupId, entityId) {
-                        return getPermissionWarning(getTablesPermission, "tables", defaultGroup, permissions, groupId, entityId);
+                        return getPermissionWarning(
+                            getTablesPermission,
+                            "tables",
+                            defaultGroup,
+                            permissions,
+                            groupId,
+                            entityId
+                        );
                     }
                 }
             },
@@ -352,15 +516,26 @@ export const getSchemasPermissionsGrid = createSelector(
                     schemaName
                 },
                 name: schemaName,
-                link: { name: t`View tables`, url: `/admin/permissions/databases/${databaseId}/schemas/${encodeURIComponent(schemaName)}/tables`}
+                link: {
+                    name: t`View tables`,
+                    url: `/admin/permissions/databases/${databaseId}/schemas/${encodeURIComponent(
+                        schemaName
+                    )}/tables`
+                }
             }))
-        }
+        };
     }
 );
 
 export const getDatabasesPermissionsGrid = createSelector(
-    getMetadata, getGroups, getPermissions,
-    (metadata: Metadata, groups: Array<Group>, permissions: GroupsPermissions) => {
+    getMetadata,
+    getGroups,
+    getPermissions,
+    (
+        metadata: Metadata,
+        groups: Array<Group>,
+        permissions: GroupsPermissions
+    ) => {
         if (!groups || !permissions || !metadata) {
             return null;
         }
@@ -373,66 +548,152 @@ export const getDatabasesPermissionsGrid = createSelector(
             icon: "database",
             groups,
             permissions: {
-                "schemas": {
+                schemas: {
                     header: t`Data Access`,
                     options(groupId, entityId) {
-                        return [OPTION_ALL, OPTION_CONTROLLED, OPTION_NONE]
+                        return [OPTION_ALL, OPTION_CONTROLLED, OPTION_NONE];
                     },
                     getter(groupId, entityId) {
-                        return getSchemasPermission(permissions, groupId, entityId);
+                        return getSchemasPermission(
+                            permissions,
+                            groupId,
+                            entityId
+                        );
                     },
                     updater(groupId, entityId, value) {
-                        MetabaseAnalytics.trackEvent("Permissions", "schemas", value);
-                        return updateSchemasPermission(permissions, groupId, entityId, value, metadata)
+                        MetabaseAnalytics.trackEvent(
+                            "Permissions",
+                            "schemas",
+                            value
+                        );
+                        return updateSchemasPermission(
+                            permissions,
+                            groupId,
+                            entityId,
+                            value,
+                            metadata
+                        );
                     },
                     postAction(groupId, { databaseId }, value) {
                         if (value === "controlled") {
                             let database = metadata.databases[databaseId];
-                            let schemas = database ? database.schemaNames() : [];
-                            if (schemas.length === 0 || (schemas.length === 1 && schemas[0] === "")) {
-                                return push(`/admin/permissions/databases/${databaseId}/tables`);
+                            let schemas = database
+                                ? database.schemaNames()
+                                : [];
+                            if (
+                                schemas.length === 0 ||
+                                (schemas.length === 1 && schemas[0] === "")
+                            ) {
+                                return push(
+                                    `/admin/permissions/databases/${databaseId}/tables`
+                                );
                             } else if (schemas.length === 1) {
-                                return push(`/admin/permissions/databases/${databaseId}/schemas/${schemas[0]}/tables`);
+                                return push(
+                                    `/admin/permissions/databases/${databaseId}/schemas/${
+                                        schemas[0]
+                                    }/tables`
+                                );
                             } else {
-                                return push(`/admin/permissions/databases/${databaseId}/schemas`);
+                                return push(
+                                    `/admin/permissions/databases/${databaseId}/schemas`
+                                );
                             }
                         }
                     },
                     confirm(groupId, entityId, value) {
                         return [
-                            getPermissionWarningModal(getSchemasPermission, "schemas", defaultGroup, permissions, groupId, entityId, value),
+                            getPermissionWarningModal(
+                                getSchemasPermission,
+                                "schemas",
+                                defaultGroup,
+                                permissions,
+                                groupId,
+                                entityId,
+                                value
+                            )
                         ];
                     },
                     warning(groupId, entityId) {
-                        return getPermissionWarning(getSchemasPermission, "schemas", defaultGroup, permissions, groupId, entityId);
+                        return getPermissionWarning(
+                            getSchemasPermission,
+                            "schemas",
+                            defaultGroup,
+                            permissions,
+                            groupId,
+                            entityId
+                        );
                     }
                 },
-                "native": {
+                native: {
                     header: t`SQL Queries`,
                     options(groupId, entityId) {
-                        if (getSchemasPermission(permissions, groupId, entityId) === "none") {
+                        if (
+                            getSchemasPermission(
+                                permissions,
+                                groupId,
+                                entityId
+                            ) === "none"
+                        ) {
                             return [OPTION_NONE];
                         } else {
-                            return [OPTION_NATIVE_WRITE, OPTION_NATIVE_READ, OPTION_NONE];
+                            return [
+                                OPTION_NATIVE_WRITE,
+                                OPTION_NATIVE_READ,
+                                OPTION_NONE
+                            ];
                         }
                     },
                     getter(groupId, entityId) {
-                        return getNativePermission(permissions, groupId, entityId);
+                        return getNativePermission(
+                            permissions,
+                            groupId,
+                            entityId
+                        );
                     },
                     updater(groupId, entityId, value) {
-                        MetabaseAnalytics.trackEvent("Permissions", "native", value);
-                        return updateNativePermission(permissions, groupId, entityId, value, metadata);
+                        MetabaseAnalytics.trackEvent(
+                            "Permissions",
+                            "native",
+                            value
+                        );
+                        return updateNativePermission(
+                            permissions,
+                            groupId,
+                            entityId,
+                            value,
+                            metadata
+                        );
                     },
                     confirm(groupId, entityId, value) {
                         return [
-                            getPermissionWarningModal(getNativePermission, null, defaultGroup, permissions, groupId, entityId, value),
-                            getRawQueryWarningModal(permissions, groupId, entityId, value)
+                            getPermissionWarningModal(
+                                getNativePermission,
+                                null,
+                                defaultGroup,
+                                permissions,
+                                groupId,
+                                entityId,
+                                value
+                            ),
+                            getRawQueryWarningModal(
+                                permissions,
+                                groupId,
+                                entityId,
+                                value
+                            )
                         ];
                     },
                     warning(groupId, entityId) {
-                        return getPermissionWarning(getNativePermission, null, defaultGroup, permissions, groupId, entityId);
+                        return getPermissionWarning(
+                            getNativePermission,
+                            null,
+                            defaultGroup,
+                            permissions,
+                            groupId,
+                            entityId
+                        );
                     }
-                },
+                }
             },
             entities: databases.map(database => {
                 let schemas = database.schemaNames();
@@ -442,24 +703,41 @@ export const getDatabasesPermissionsGrid = createSelector(
                     },
                     name: database.name,
                     link:
-                        schemas.length === 0 || (schemas.length === 1 && schemas[0] === "") ?
-                            { name: t`View tables`, url: `/admin/permissions/databases/${database.id}/tables` }
-                        : schemas.length === 1 ?
-                            { name: t`View tables`, url: `/admin/permissions/databases/${database.id}/schemas/${schemas[0]}/tables` }
-                        :
-                            { name: t`View schemas`, url: `/admin/permissions/databases/${database.id}/schemas`}
-                }
+                        schemas.length === 0 ||
+                        (schemas.length === 1 && schemas[0] === "")
+                            ? {
+                                  name: t`View tables`,
+                                  url: `/admin/permissions/databases/${
+                                      database.id
+                                  }/tables`
+                              }
+                            : schemas.length === 1
+                              ? {
+                                    name: t`View tables`,
+                                    url: `/admin/permissions/databases/${
+                                        database.id
+                                    }/schemas/${schemas[0]}/tables`
+                                }
+                              : {
+                                    name: t`View schemas`,
+                                    url: `/admin/permissions/databases/${
+                                        database.id
+                                    }/schemas`
+                                }
+                };
             })
-        }
+        };
     }
 );
 
-const getCollections = (state) => state.admin.permissions.collections;
+const getCollections = state => state.admin.permissions.collections;
 const getCollectionPermission = (permissions, groupId, { collectionId }) =>
     getIn(permissions, [groupId, collectionId]);
 
 export const getCollectionsPermissionsGrid = createSelector(
-    getCollections, getGroups, getPermissions,
+    getCollections,
+    getGroups,
+    getPermissions,
     (collections, groups: Array<Group>, permissions: GroupsPermissions) => {
         if (!groups || !permissions || !collections) {
             return null;
@@ -472,25 +750,52 @@ export const getCollectionsPermissionsGrid = createSelector(
             icon: "collection",
             groups,
             permissions: {
-                "access": {
+                access: {
                     options(groupId, entityId) {
-                        return [OPTION_COLLECTION_WRITE, OPTION_COLLECTION_READ, OPTION_NONE];
+                        return [
+                            OPTION_COLLECTION_WRITE,
+                            OPTION_COLLECTION_READ,
+                            OPTION_NONE
+                        ];
                     },
                     getter(groupId, entityId) {
-                        return getCollectionPermission(permissions, groupId, entityId);
+                        return getCollectionPermission(
+                            permissions,
+                            groupId,
+                            entityId
+                        );
                     },
                     updater(groupId, { collectionId }, value) {
-                        return assocIn(permissions, [groupId, collectionId], value);
+                        return assocIn(
+                            permissions,
+                            [groupId, collectionId],
+                            value
+                        );
                     },
                     confirm(groupId, entityId, value) {
                         return [
-                            getPermissionWarningModal(getCollectionPermission, null, defaultGroup, permissions, groupId, entityId, value)
+                            getPermissionWarningModal(
+                                getCollectionPermission,
+                                null,
+                                defaultGroup,
+                                permissions,
+                                groupId,
+                                entityId,
+                                value
+                            )
                         ];
                     },
                     warning(groupId, entityId) {
-                        return getPermissionWarning(getCollectionPermission, null, defaultGroup, permissions, groupId, entityId);
+                        return getPermissionWarning(
+                            getCollectionPermission,
+                            null,
+                            defaultGroup,
+                            permissions,
+                            groupId,
+                            entityId
+                        );
                     }
-                },
+                }
             },
             entities: collections.map(collection => {
                 return {
@@ -498,14 +803,21 @@ export const getCollectionsPermissionsGrid = createSelector(
                         collectionId: collection.id
                     },
                     name: collection.name
-                }
+                };
             })
-        }
+        };
     }
 );
 
 export const getDiff = createSelector(
-    getMetadata, getGroups, getPermissions, getOriginalPermissions,
-    (metadata: Metadata, groups: Array<Group>, permissions: GroupsPermissions, originalPermissions: GroupsPermissions) =>
-        diffPermissions(permissions, originalPermissions, groups, metadata)
+    getMetadata,
+    getGroups,
+    getPermissions,
+    getOriginalPermissions,
+    (
+        metadata: Metadata,
+        groups: Array<Group>,
+        permissions: GroupsPermissions,
+        originalPermissions: GroupsPermissions
+    ) => diffPermissions(permissions, originalPermissions, groups, metadata)
 );

@@ -48,7 +48,8 @@ describe("StructuredQuery behavioral tests", () => {
 
         const queryWithBreakout = query.addBreakout(breakoutDimension.mbql());
 
-        const filterDimensionOptions = queryWithBreakout.filterFieldOptions().dimensions;
+        const filterDimensionOptions = queryWithBreakout.filterFieldOptions()
+            .dimensions;
         const filterDimension = filterDimensionOptions.find(
             d => d.field().id === ORDERS_TOTAL_FIELD_ID
         );
@@ -122,9 +123,8 @@ describe("StructuredQuery unit tests", () => {
 
             it("retains the correct database id when setting a new table", () => {
                 expect(
-                    query
-                        .setTable(metadata.tables[PRODUCT_TABLE_ID])
-                        .table().database.id
+                    query.setTable(metadata.tables[PRODUCT_TABLE_ID]).table()
+                        .database.id
                 ).toBe(DATABASE_ID);
             });
         });
@@ -356,9 +356,8 @@ describe("StructuredQuery unit tests", () => {
                     queryWithBreakout.breakoutOptions().dimensions.length
                 ).toBe(4);
                 expect(
-                    queryWithBreakout.breakoutOptions(
-                        breakout
-                    ).dimensions.length
+                    queryWithBreakout.breakoutOptions(breakout).dimensions
+                        .length
                 ).toBe(5);
             });
         });

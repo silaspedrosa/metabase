@@ -1,6 +1,6 @@
 import LeafletMap from "./LeafletMap.jsx";
 import L from "leaflet";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import d3 from "d3";
 
 import { rangeForValue } from "metabase/lib/dataset";
@@ -20,14 +20,21 @@ export default class LeafletGridHeatMap extends LeafletMap {
             const { gridLayer } = this;
             const { points, min, max } = this.props;
 
-            const { latitudeColumn, longitudeColumn } = this._getLatLonColumns();
+            const {
+                latitudeColumn,
+                longitudeColumn
+            } = this._getLatLonColumns();
             if (!latitudeColumn.binning_info || !longitudeColumn.binning_info) {
-                throw new Error(t`Grid map requires binned longitude/latitude.`);
+                throw new Error(
+                    t`Grid map requires binned longitude/latitude.`
+                );
             }
 
-            const color = d3.scale.linear().domain([min,max])
+            const color = d3.scale
+                .linear()
+                .domain([min, max])
                 .interpolate(d3.interpolateHcl)
-                .range([d3.rgb("#00FF00"), d3.rgb('#FF0000')]);
+                .range([d3.rgb("#00FF00"), d3.rgb("#FF0000")]);
 
             let gridSquares = gridLayer.getLayers();
             let totalSquares = Math.max(points.length, gridSquares.length);
@@ -43,8 +50,14 @@ export default class LeafletGridHeatMap extends LeafletMap {
 
                 if (i < points.length) {
                     gridSquares[i].setStyle({ color: color(points[i][2]) });
-                    const [latMin, latMax] = rangeForValue(points[i][0], latitudeColumn);
-                    const [lonMin, lonMax] = rangeForValue(points[i][1], longitudeColumn);
+                    const [latMin, latMax] = rangeForValue(
+                        points[i][0],
+                        latitudeColumn
+                    );
+                    const [lonMin, lonMax] = rangeForValue(
+                        points[i][1],
+                        longitudeColumn
+                    );
                     gridSquares[i].setBounds([
                         [latMin, lonMin],
                         [latMax, lonMax]
@@ -57,8 +70,8 @@ export default class LeafletGridHeatMap extends LeafletMap {
         }
     }
 
-    _createGridSquare = (index) => {
-        const bounds = [[54.559322, -5.767822], [56.1210604, -3.021240]];
+    _createGridSquare = index => {
+        const bounds = [[54.559322, -5.767822], [56.1210604, -3.02124]];
         const gridSquare = L.rectangle(bounds, {
             color: "red",
             weight: 1,
@@ -70,7 +83,7 @@ export default class LeafletGridHeatMap extends LeafletMap {
         gridSquare.on("mousemove", this._onHoverChange.bind(this, index));
         gridSquare.on("mouseout", this._onHoverChange.bind(this, null));
         return gridSquare;
-    }
+    };
 
     _clickForPoint(index, e) {
         const { points } = this.props;
@@ -83,15 +96,15 @@ export default class LeafletGridHeatMap extends LeafletMap {
             dimensions: [
                 {
                     value: point[0],
-                    column: latitudeColumn,
+                    column: latitudeColumn
                 },
                 {
                     value: point[1],
-                    column: longitudeColumn,
+                    column: longitudeColumn
                 }
             ],
             event: e.originalEvent
-        }
+        };
     }
 
     _onVisualizationClick(index, e) {

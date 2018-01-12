@@ -9,36 +9,48 @@ import { connect } from "react-redux";
  */
 
 const mapStateToProps = (state, props) => ({
-    user: getUser(state, props),
+    user: getUser(state, props)
 });
 
 @connect(mapStateToProps, null)
 class AdminAwareEmptyState extends Component {
     render() {
-        const {user, title, message, adminMessage, icon, image, imageHeight, imageClassName, action, adminAction, link, adminLink, onActionClick, smallDescription = false} = this.props;
-         return (
-             <EmptyState
+        const {
+            user,
+            title,
+            message,
+            adminMessage,
+            icon,
+            image,
+            imageHeight,
+            imageClassName,
+            action,
+            adminAction,
+            link,
+            adminLink,
+            onActionClick,
+            smallDescription = false
+        } = this.props;
+        return (
+            <EmptyState
                 title={title}
-                message={user && user.is_superuser ?
-                    adminMessage || message :
-                    message
+                message={
+                    user && user.is_superuser
+                        ? adminMessage || message
+                        : message
                 }
                 icon={icon}
                 image={image}
-                action={user && user.is_superuser ?
-                    adminAction || action :
-                    action
+                action={
+                    user && user.is_superuser ? adminAction || action : action
                 }
-                link={user && user.is_superuser ?
-                    adminLink || link :
-                    link
-                }
+                link={user && user.is_superuser ? adminLink || link : link}
                 imageHeight={imageHeight}
                 imageClassName={imageClassName}
                 onActionClick={onActionClick}
                 smallDescription={smallDescription}
             />
-         )
+        );
     }
 }
 

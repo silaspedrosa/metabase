@@ -22,7 +22,7 @@ const mapDispatchToProps = {
 const mapStateToProps = (state, props) => ({
     ...segmentEditSelectors(state, props),
     metadata: getMetadata(state, props)
-})
+});
 
 @connect(mapStateToProps, mapDispatchToProps)
 export default class SegmentApp extends Component {
@@ -32,7 +32,9 @@ export default class SegmentApp extends Component {
         let tableId;
         if (params.id) {
             const segmentId = parseInt(params.id);
-            const { payload: segment } = await this.props.getSegment({ segmentId });
+            const { payload: segment } = await this.props.getSegment({
+                segmentId
+            });
             tableId = segment.table_id;
         } else if (location.query.table) {
             tableId = parseInt(location.query.table);
@@ -49,15 +51,24 @@ export default class SegmentApp extends Component {
         let { tableMetadata } = this.props;
         if (segment.id != null) {
             await this.props.updateSegment(segment);
-            this.props.clearRequestState({statePath: ['metadata', 'segments']});
+            this.props.clearRequestState({
+                statePath: ["metadata", "segments"]
+            });
             MetabaseAnalytics.trackEvent("Data Model", "Segment Updated");
         } else {
             await this.props.createSegment(segment);
-            this.props.clearRequestState({statePath: ['metadata', 'segments']});
+            this.props.clearRequestState({
+                statePath: ["metadata", "segments"]
+            });
             MetabaseAnalytics.trackEvent("Data Model", "Segment Created");
         }
 
-        this.props.onChangeLocation("/admin/datamodel/database/" + tableMetadata.db_id + "/table/" + tableMetadata.id);
+        this.props.onChangeLocation(
+            "/admin/datamodel/database/" +
+                tableMetadata.db_id +
+                "/table/" +
+                tableMetadata.id
+        );
     }
 
     render() {

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 import Icon from "metabase/components/Icon.jsx";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import { inflect } from "metabase/lib/formatting";
 
 import _ from "underscore";
@@ -22,7 +22,9 @@ export default class MetadataSchemaList extends Component {
     updateSearchText(event) {
         this.setState({
             searchText: event.target.value,
-            searchRegex: event.target.value ? new RegExp(RegExp.escape(event.target.value), "i") : null
+            searchRegex: event.target.value
+                ? new RegExp(RegExp.escape(event.target.value), "i")
+                : null
         });
     }
 
@@ -30,11 +32,13 @@ export default class MetadataSchemaList extends Component {
         const { schemas, selectedSchema } = this.props;
         const { searchRegex } = this.state;
 
-        let filteredSchemas = searchRegex ? schemas.filter((s) => searchRegex.test(s.name)) : schemas;
+        let filteredSchemas = searchRegex
+            ? schemas.filter(s => searchRegex.test(s.name))
+            : schemas;
         return (
             <div className="MetadataEditor-table-list AdminList flex-no-shrink">
                 <div className="AdminList-search">
-                    <Icon name="search" size={16}/>
+                    <Icon name="search" size={16} />
                     <input
                         className="AdminInput pl4 border-bottom"
                         type="text"
@@ -44,14 +48,29 @@ export default class MetadataSchemaList extends Component {
                     />
                 </div>
                 <ul className="AdminList-items">
-                    <li className="AdminList-section">{filteredSchemas.length} {inflect("schema", filteredSchemas.length)}</li>
-                    {filteredSchemas.map(schema =>
+                    <li className="AdminList-section">
+                        {filteredSchemas.length}{" "}
+                        {inflect("schema", filteredSchemas.length)}
+                    </li>
+                    {filteredSchemas.map(schema => (
                         <li key={schema.name}>
-                            <a className={cx("AdminList-item flex align-center no-decoration", { selected: selectedSchema && selectedSchema.name === schema.name })} onClick={() => this.props.onChangeSchema(schema)}>
+                            <a
+                                className={cx(
+                                    "AdminList-item flex align-center no-decoration",
+                                    {
+                                        selected:
+                                            selectedSchema &&
+                                            selectedSchema.name === schema.name
+                                    }
+                                )}
+                                onClick={() =>
+                                    this.props.onChangeSchema(schema)
+                                }
+                            >
                                 {schema.name}
                             </a>
                         </li>
-                    )}
+                    ))}
                 </ul>
             </div>
         );

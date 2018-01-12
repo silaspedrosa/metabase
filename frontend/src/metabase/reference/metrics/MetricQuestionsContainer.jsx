@@ -1,14 +1,14 @@
 /* eslint "react/prop-types": "warn" */
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { connect } from 'react-redux';
+import { connect } from "react-redux";
 
-import MetricSidebar from './MetricSidebar.jsx';
-import SidebarLayout from 'metabase/components/SidebarLayout.jsx';
-import MetricQuestions from "metabase/reference/metrics/MetricQuestions.jsx"
+import MetricSidebar from "./MetricSidebar.jsx";
+import SidebarLayout from "metabase/components/SidebarLayout.jsx";
+import MetricQuestions from "metabase/reference/metrics/MetricQuestions.jsx";
 
-import * as metadataActions from 'metabase/redux/metadata';
-import * as actions from 'metabase/reference/reference';
+import * as metadataActions from "metabase/redux/metadata";
+import * as actions from "metabase/reference/reference";
 
 import {
     getUser,
@@ -16,11 +16,9 @@ import {
     getMetricId,
     getDatabaseId,
     getIsEditing
-} from '../selectors';
+} from "../selectors";
 
-import {
-    loadEntities
-} from 'metabase/questions/questions';
+import { loadEntities } from "metabase/questions/questions";
 
 const mapStateToProps = (state, props) => ({
     user: getUser(state, props),
@@ -48,12 +46,15 @@ export default class MetricQuestionsContainer extends Component {
         isEditing: PropTypes.bool
     };
 
-    async fetchContainerData(){
-        await actions.wrappedFetchMetricQuestions(this.props, this.props.metricId);
+    async fetchContainerData() {
+        await actions.wrappedFetchMetricQuestions(
+            this.props,
+            this.props.metricId
+        );
     }
 
     componentWillMount() {
-        this.fetchContainerData()
+        this.fetchContainerData();
     }
 
     componentWillReceiveProps(newProps) {
@@ -61,21 +62,17 @@ export default class MetricQuestionsContainer extends Component {
             return;
         }
 
-        actions.clearState(newProps)
+        actions.clearState(newProps);
     }
 
     render() {
-        const {
-            user,
-            metric,
-            isEditing
-        } = this.props;
+        const { user, metric, isEditing } = this.props;
 
         return (
             <SidebarLayout
                 className="flex-full relative"
-                style={ isEditing ? { paddingTop: '43px' } : {}}
-                sidebar={<MetricSidebar metric={metric} user={user}/>}
+                style={isEditing ? { paddingTop: "43px" } : {}}
+                sidebar={<MetricSidebar metric={metric} user={user} />}
             >
                 <MetricQuestions {...this.props} />
             </SidebarLayout>

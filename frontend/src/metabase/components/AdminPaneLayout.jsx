@@ -8,23 +8,23 @@ const AdminPaneTitle = ({
     buttonText,
     buttonAction,
     buttonDisabled
-}) =>
+}) => (
     <section className="clearfix px2">
-        { buttonText && buttonAction ?
+        {buttonText && buttonAction ? (
             <button
-                className={cx(
-                    "Button float-right",
-                    {"Button--primary": !buttonDisabled }
-                )}
+                className={cx("Button float-right", {
+                    "Button--primary": !buttonDisabled
+                })}
                 disabled={buttonDisabled}
                 onClick={buttonAction}
             >
                 {buttonText}
             </button>
-        : null }
+        ) : null}
         <h2 className="PageTitle">{title}</h2>
-        { description && <p className="text-measure">{description}</p> }
+        {description && <p className="text-measure">{description}</p>}
     </section>
+);
 
 const AdminPaneLayout = ({
     title,
@@ -33,7 +33,7 @@ const AdminPaneLayout = ({
     buttonAction,
     buttonDisabled,
     children
-}) =>
+}) => (
     <div className="wrapper">
         <AdminPaneTitle
             title={title}
@@ -44,5 +44,6 @@ const AdminPaneLayout = ({
         />
         {children}
     </div>
+);
 
 export default AdminPaneLayout;

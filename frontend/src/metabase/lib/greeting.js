@@ -1,4 +1,4 @@
-import { t } from 'c-3po'
+import { t } from "c-3po";
 
 const greetingPrefixes = [
     t`Hey there`,
@@ -17,27 +17,30 @@ const subheadPrefixes = [
 var Greeting = {
     simpleGreeting: function() {
         // TODO - this can result in an undefined thing
-        const randomIndex = Math.floor(Math.random() * (greetingPrefixes.length - 1));
+        const randomIndex = Math.floor(
+            Math.random() * (greetingPrefixes.length - 1)
+        );
         return greetingPrefixes[randomIndex];
     },
 
-	sayHello: function(personalization) {
-        if(personalization) {
+    sayHello: function(personalization) {
+        if (personalization) {
             var g = Greeting.simpleGreeting();
-            if (g === t`How's it going`){
-                return g + ', ' + personalization + '?';
+            if (g === t`How's it going`) {
+                return g + ", " + personalization + "?";
             } else {
-                return g + ', ' + personalization;
+                return g + ", " + personalization;
             }
-
         } else {
-        	return Greeting.simpleGreeting();
+            return Greeting.simpleGreeting();
         }
     },
 
     encourageCuriosity: function() {
         // TODO - this can result in an undefined thing
-        const randomIndex = Math.floor(Math.random() * (subheadPrefixes.length - 1));
+        const randomIndex = Math.floor(
+            Math.random() * (subheadPrefixes.length - 1)
+        );
 
         return subheadPrefixes[randomIndex];
     }

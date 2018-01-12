@@ -27,9 +27,9 @@ export type QueryParams = {
 
 /* Metabase API error object returned by the backend */
 export type ApiError = {
-    status: number, // HTTP status
+    status: number // HTTP status
     // TODO: incomplete
-}
+};
 
 // FIXME: actual moment.js type
 export type Moment = {

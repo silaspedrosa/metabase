@@ -5,9 +5,9 @@ import _ from "underscore";
 import { createAction, createThunkAction } from "metabase/lib/redux";
 import MetabaseAnalytics from "metabase/lib/analytics";
 
-const ADD_UNDO = 'metabase/questions/ADD_UNDO';
-const DISMISS_UNDO = 'metabase/questions/DISMISS_UNDO';
-const PERFORM_UNDO = 'metabase/questions/PERFORM_UNDO';
+const ADD_UNDO = "metabase/questions/ADD_UNDO";
+const DISMISS_UNDO = "metabase/questions/DISMISS_UNDO";
+const PERFORM_UNDO = "metabase/questions/PERFORM_UNDO";
 
 let nextUndoId = 0;
 
@@ -21,7 +21,7 @@ export function createUndo({ type, message, action }) {
     };
 }
 
-export const addUndo = createThunkAction(ADD_UNDO, (undo) => {
+export const addUndo = createThunkAction(ADD_UNDO, undo => {
     return (dispatch, getState) => {
         let id = nextUndoId++;
         setTimeout(() => dispatch(dismissUndo(id, false)), 5000);
@@ -29,21 +29,22 @@ export const addUndo = createThunkAction(ADD_UNDO, (undo) => {
     };
 });
 
-export const dismissUndo = createAction(DISMISS_UNDO, (undoId, track = true) => {
-    if (track) {
-        MetabaseAnalytics.trackEvent("Undo", "Dismiss Undo");
+export const dismissUndo = createAction(
+    DISMISS_UNDO,
+    (undoId, track = true) => {
+        if (track) {
+            MetabaseAnalytics.trackEvent("Undo", "Dismiss Undo");
+        }
+        return undoId;
     }
-    return undoId;
-});
+);
 
-export const performUndo = createThunkAction(PERFORM_UNDO, (undoId) => {
+export const performUndo = createThunkAction(PERFORM_UNDO, undoId => {
     return (dispatch, getState) => {
         MetabaseAnalytics.trackEvent("Undo", "Perform Undo");
         let undo = _.findWhere(getState().undo, { id: undoId });
         if (undo) {
-            undo.actions.map(action =>
-                dispatch(action)
-            );
+            undo.actions.map(action => dispatch(action));
             dispatch(dismissUndo(undoId, false));
         }
     };
@@ -58,7 +59,11 @@ export default function(state = [], { type, payload, error }) {
             }
             let previous = state[state.length - 1];
             // if last undo was same type then merge them
-            if (previous && payload.type != null && payload.type === previous.type) {
+            if (
+                previous &&
+                payload.type != null &&
+                payload.type === previous.type
+            ) {
                 return state.slice(0, -1).concat({
                     ...payload,
                     count: previous.count + payload.count,

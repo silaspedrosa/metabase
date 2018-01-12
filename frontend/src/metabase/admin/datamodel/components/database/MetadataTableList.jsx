@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 import ProgressBar from "metabase/components/ProgressBar.jsx";
 import Icon from "metabase/components/Icon.jsx";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import { inflect } from "metabase/lib/formatting";
 
 import _ from "underscore";
@@ -30,7 +30,9 @@ export default class MetadataTableList extends Component {
     updateSearchText(event) {
         this.setState({
             searchText: event.target.value,
-            searchRegex: event.target.value ? new RegExp(RegExp.escape(event.target.value), "i") : null
+            searchRegex: event.target.value
+                ? new RegExp(RegExp.escape(event.target.value), "i")
+                : null
         });
     }
 
@@ -41,17 +43,32 @@ export default class MetadataTableList extends Component {
 
         if (this.props.tables) {
             var tables = _.sortBy(this.props.tables, "display_name");
-            _.each(tables, (table) => {
+            _.each(tables, table => {
                 var row = (
                     <li key={table.id}>
-                        <a className={cx("AdminList-item flex align-center no-decoration", { selected: this.props.tableId === table.id })} onClick={this.props.selectTable.bind(null, table)}>
+                        <a
+                            className={cx(
+                                "AdminList-item flex align-center no-decoration",
+                                {
+                                    selected: this.props.tableId === table.id
+                                }
+                            )}
+                            onClick={this.props.selectTable.bind(null, table)}
+                        >
                             {table.display_name}
-                            <ProgressBar className="ProgressBar ProgressBar--mini flex-align-right" percentage={table.metadataStrength} />
+                            <ProgressBar
+                                className="ProgressBar ProgressBar--mini flex-align-right"
+                                percentage={table.metadataStrength}
+                            />
                         </a>
                     </li>
                 );
                 var regex = this.state.searchRegex;
-                if (!regex || regex.test(table.display_name) || regex.test(table.name)) {
+                if (
+                    !regex ||
+                    regex.test(table.display_name) ||
+                    regex.test(table.name)
+                ) {
                     if (table.visibility_type) {
                         hiddenTables.push(row);
                     } else {
@@ -62,19 +79,31 @@ export default class MetadataTableList extends Component {
         }
 
         if (queryableTables.length > 0) {
-            queryableTablesHeader = <li className="AdminList-section">{queryableTables.length} Queryable {inflect("Table", queryableTables.length)}</li>;
+            queryableTablesHeader = (
+                <li className="AdminList-section">
+                    {queryableTables.length} Queryable{" "}
+                    {inflect("Table", queryableTables.length)}
+                </li>
+            );
         }
         if (hiddenTables.length > 0) {
-            hiddenTablesHeader = <li className="AdminList-section">{hiddenTables.length} Hidden {inflect("Table", hiddenTables.length)}</li>;
+            hiddenTablesHeader = (
+                <li className="AdminList-section">
+                    {hiddenTables.length} Hidden{" "}
+                    {inflect("Table", hiddenTables.length)}
+                </li>
+            );
         }
         if (queryableTables.length === 0 && hiddenTables.length === 0) {
-            queryableTablesHeader = <li className="AdminList-section">0 Tables</li>;
+            queryableTablesHeader = (
+                <li className="AdminList-section">0 Tables</li>
+            );
         }
 
         return (
             <div className="MetadataEditor-table-list AdminList flex-no-shrink">
                 <div className="AdminList-search">
-                    <Icon name="search" size={16}/>
+                    <Icon name="search" size={16} />
                     <input
                         className="AdminInput pl4 border-bottom"
                         type="text"
@@ -83,15 +112,24 @@ export default class MetadataTableList extends Component {
                         onChange={this.updateSearchText}
                     />
                 </div>
-                { (this.props.onBack || this.props.schema) &&
+                {(this.props.onBack || this.props.schema) && (
                     <h4 className="p2 border-bottom">
-                        { this.props.onBack &&
-                            <span className="text-brand cursor-pointer" onClick={this.props.onBack}><Icon name="chevronleft" size={10}/>{t`Schemas`}</span>
-                        }
-                        { this.props.onBack && this.props.schema && <span className="mx1">-</span>}
-                        { this.props.schema && <span> {this.props.schema.name}</span>}
+                        {this.props.onBack && (
+                            <span
+                                className="text-brand cursor-pointer"
+                                onClick={this.props.onBack}
+                            >
+                                <Icon name="chevronleft" size={10} />
+                                {t`Schemas`}
+                            </span>
+                        )}
+                        {this.props.onBack &&
+                            this.props.schema && <span className="mx1">-</span>}
+                        {this.props.schema && (
+                            <span> {this.props.schema.name}</span>
+                        )}
                     </h4>
-                }
+                )}
 
                 <ul className="AdminList-items">
                     {queryableTablesHeader}

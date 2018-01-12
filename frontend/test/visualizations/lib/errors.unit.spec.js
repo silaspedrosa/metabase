@@ -1,6 +1,6 @@
-import { MinRowsError } from 'metabase/visualizations/lib/errors';
+import { MinRowsError } from "metabase/visualizations/lib/errors";
 
-describe('MinRowsError', () => {
+describe("MinRowsError", () => {
     it("should be an instanceof Error", () => {
         expect(new MinRowsError(1, 0) instanceof Error).toBe(true);
     });

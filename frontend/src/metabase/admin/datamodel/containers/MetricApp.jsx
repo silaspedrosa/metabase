@@ -16,13 +16,13 @@ const mapDispatchToProps = {
     ...actions,
     fetchTableMetadata,
     clearRequestState,
-    onChangeLocation: push,
+    onChangeLocation: push
 };
 
 const mapStateToProps = (state, props) => ({
     ...metricEditSelectors(state, props),
     metadata: getMetadata(state, props)
-})
+});
 
 @connect(mapStateToProps, mapDispatchToProps)
 export default class MetricApp extends Component {
@@ -32,7 +32,9 @@ export default class MetricApp extends Component {
         let tableId;
         if (params.id) {
             const metricId = parseInt(params.id);
-            const { payload: metric } = await this.props.getMetric({ metricId });
+            const { payload: metric } = await this.props.getMetric({
+                metricId
+            });
             tableId = metric.table_id;
         } else if (location.query.table) {
             tableId = parseInt(location.query.table);
@@ -49,15 +51,24 @@ export default class MetricApp extends Component {
         let { tableMetadata } = this.props;
         if (metric.id != null) {
             await this.props.updateMetric(metric);
-            this.props.clearRequestState({statePath: ['metadata', 'metrics']});
+            this.props.clearRequestState({
+                statePath: ["metadata", "metrics"]
+            });
             MetabaseAnalytics.trackEvent("Data Model", "Metric Updated");
         } else {
             await this.props.createMetric(metric);
-            this.props.clearRequestState({statePath: ['metadata', 'metrics']});
+            this.props.clearRequestState({
+                statePath: ["metadata", "metrics"]
+            });
             MetabaseAnalytics.trackEvent("Data Model", "Metric Created");
         }
 
-        this.props.onChangeLocation("/admin/datamodel/database/" + tableMetadata.db_id + "/table/" + tableMetadata.id);
+        this.props.onChangeLocation(
+            "/admin/datamodel/database/" +
+                tableMetadata.db_id +
+                "/table/" +
+                tableMetadata.id
+        );
     }
 
     render() {

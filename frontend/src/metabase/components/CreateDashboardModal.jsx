@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import FormField from "metabase/components/FormField.jsx";
 import ModalContent from "metabase/components/ModalContent.jsx";
 import Button from "metabase/components/Button.jsx";
@@ -36,12 +36,14 @@ export default class CreateDashboardModal extends Component {
         event.preventDefault();
 
         var name = this.state.name && this.state.name.trim();
-        var description = this.state.description && this.state.description.trim();
+        var description =
+            this.state.description && this.state.description.trim();
 
         // populate a new Dash object
         var newDash = {
-            name: (name && name.length > 0) ? name : null,
-            description: (description && description.length > 0) ? description : null
+            name: name && name.length > 0 ? name : null,
+            description:
+                description && description.length > 0 ? description : null
         };
 
         // create a new dashboard
@@ -57,29 +59,30 @@ export default class CreateDashboardModal extends Component {
         var formError;
         if (this.state.errors) {
             var errorMessage = t`Server error encountered`;
-            if (this.state.errors.data &&
-                this.state.errors.data.message) {
+            if (this.state.errors.data && this.state.errors.data.message) {
                 errorMessage = this.state.errors.data.message;
             }
 
             // TODO: timeout display?
-            formError = (
-                <span className="text-error px2">{errorMessage}</span>
-            );
+            formError = <span className="text-error px2">{errorMessage}</span>;
         }
 
         var name = this.state.name && this.state.name.trim();
 
-        var formReady = (name !== null && name !== "");
+        var formReady = name !== null && name !== "";
 
         return (
             <ModalContent
                 id="CreateDashboardModal"
-                title= {t`Create dashboard`}
+                title={t`Create dashboard`}
                 footer={[
                     formError,
                     <Button onClick={this.props.onClose}>{t`Cancel`}</Button>,
-                    <Button primary={formReady} disabled={!formReady} onClick={this.createNewDash}>{t`Create`}</Button>
+                    <Button
+                        primary={formReady}
+                        disabled={!formReady}
+                        onClick={this.createNewDash}
+                    >{t`Create`}</Button>
                 ]}
                 onClose={this.props.onClose}
             >
@@ -90,7 +93,14 @@ export default class CreateDashboardModal extends Component {
                             fieldName="name"
                             errors={this.state.errors}
                         >
-                            <input className="Form-input full" name="name" placeholder={t`What is the name of your dashboard?`} value={this.state.name} onChange={this.setName} autoFocus />
+                            <input
+                                className="Form-input full"
+                                name="name"
+                                placeholder={t`What is the name of your dashboard?`}
+                                value={this.state.name}
+                                onChange={this.setName}
+                                autoFocus
+                            />
                         </FormField>
 
                         <FormField
@@ -98,7 +108,13 @@ export default class CreateDashboardModal extends Component {
                             fieldName="description"
                             errors={this.state.errors}
                         >
-                            <input className="Form-input full" name="description" placeholder={t`It's optional but oh, so helpful`}  value={this.state.description} onChange={this.setDescription} />
+                            <input
+                                className="Form-input full"
+                                name="description"
+                                placeholder={t`It's optional but oh, so helpful`}
+                                value={this.state.description}
+                                onChange={this.setDescription}
+                            />
                         </FormField>
                     </div>
                 </form>

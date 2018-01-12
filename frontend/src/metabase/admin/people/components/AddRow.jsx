@@ -1,8 +1,17 @@
 import React from "react";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import cx from "classnames";
 
-const AddRow = ({ value, isValid, placeholder, onKeyDown, onChange, onDone, onCancel, children }) =>
+const AddRow = ({
+    value,
+    isValid,
+    placeholder,
+    onKeyDown,
+    onChange,
+    onDone,
+    onCancel,
+    children
+}) => (
     <div className="my2 pl1 p1 bordered border-brand rounded relative flex align-center">
         {children}
         <input
@@ -17,9 +26,14 @@ const AddRow = ({ value, isValid, placeholder, onKeyDown, onChange, onDone, onCa
         <span className="link no-decoration cursor-pointer" onClick={onCancel}>
             {t`Cancel`}
         </span>
-        <button className={cx("Button ml2", {"Button--primary": !!isValid})} disabled={!isValid} onClick={onDone}>
+        <button
+            className={cx("Button ml2", { "Button--primary": !!isValid })}
+            disabled={!isValid}
+            onClick={onDone}
+        >
             {t`Add`}
         </button>
     </div>
+);
 
 export default AddRow;

@@ -56,9 +56,11 @@ export default class NativeQuery extends AtomicQuery {
     /* Query superclass methods */
 
     canRun() {
-        return this.databaseId() != null &&
+        return (
+            this.databaseId() != null &&
             this.queryText().length > 0 &&
-            (!this.requiresTable() || this.collection());
+            (!this.requiresTable() || this.collection())
+        );
     }
 
     isEmpty() {
@@ -115,8 +117,10 @@ export default class NativeQuery extends AtomicQuery {
 
     supportsNativeParameters(): boolean {
         const database = this.database();
-        return database != null &&
-            _.contains(database.features, "native-parameters");
+        return (
+            database != null &&
+            _.contains(database.features, "native-parameters")
+        );
     }
 
     table(): ?Table {
@@ -201,7 +205,8 @@ export default class NativeQuery extends AtomicQuery {
             // a variable name can optionally end with :start or :end which is not considered part of the actual variable name
             // expected pattern is like mustache templates, so we are looking for something like {{category}} or {{date:start}}
             // anything that doesn't match our rule is ignored, so {{&foo!}} would simply be ignored
-            let match, re = /\{\{\s*([A-Za-z0-9_]+?)\s*\}\}/g;
+            let match,
+                re = /\{\{\s*([A-Za-z0-9_]+?)\s*\}\}/g;
             while ((match = re.exec(queryText)) != null) {
                 tags.push(match[1]);
             }

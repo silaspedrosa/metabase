@@ -1,9 +1,9 @@
-import React from 'react'
-import Visualization from 'metabase/visualizations/components/Visualization'
+import React from "react";
+import Visualization from "metabase/visualizations/components/Visualization";
 
-import { normal } from 'metabase/lib/colors'
+import { normal } from "metabase/lib/colors";
 
-const Histogram = ({ histogram, color, showAxis }) =>
+const Histogram = ({ histogram, color, showAxis }) => (
     <Visualization
         className="full-height"
         series={[
@@ -26,11 +26,11 @@ const Histogram = ({ histogram, color, showAxis }) =>
         ]}
         showTitle={false}
     />
+);
 
 Histogram.defaultProps = {
     color: [normal.blue],
     showAxis: true
-}
+};
 
-export default Histogram
-
+export default Histogram;

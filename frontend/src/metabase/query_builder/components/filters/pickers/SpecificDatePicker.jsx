@@ -1,8 +1,8 @@
 /* @flow */
 
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import Calendar from "metabase/components/Calendar";
 import Input from "metabase/components/Input";
 import Icon from "metabase/components/Icon";
@@ -19,13 +19,13 @@ const DATE_TIME_FORMAT = "YYYY-MM-DDTHH:mm:ss";
 type Props = {
     value: ?string,
     onChange: (value: ?string) => void,
-    calendar?: bool,
-    hideTimeSelectors?: bool
-}
+    calendar?: boolean,
+    hideTimeSelectors?: boolean
+};
 
 type State = {
-    showCalendar: bool
-}
+    showCalendar: boolean
+};
 
 export default class SpecificDatePicker extends Component {
     props: Props;
@@ -36,12 +36,12 @@ export default class SpecificDatePicker extends Component {
 
         this.state = {
             showCalendar: true
-        }
+        };
     }
 
     static propTypes = {
         value: PropTypes.string,
-        onChange: PropTypes.func.isRequired,
+        onChange: PropTypes.func.isRequired
     };
 
     onChange = (date: ?string, hours: ?number, minutes: ?number) => {
@@ -65,7 +65,7 @@ export default class SpecificDatePicker extends Component {
         } else {
             this.props.onChange(m.format(DATE_FORMAT));
         }
-    }
+    };
 
     render() {
         const { value, calendar, hideTimeSelectors } = this.props;
@@ -84,91 +84,114 @@ export default class SpecificDatePicker extends Component {
         return (
             <div>
                 <div className="flex align-center mb1">
-                    <div className={cx('border-top border-bottom full border-left', { 'border-right': !calendar })}>
+                    <div
+                        className={cx(
+                            "border-top border-bottom full border-left",
+                            {
+                                "border-right": !calendar
+                            }
+                        )}
+                    >
                         <Input
                             placeholder={moment().format("MM/DD/YYYY")}
                             className="borderless full p2 h3"
                             style={{
-                                outline: 'none'
+                                outline: "none"
                             }}
                             value={date ? date.format("MM/DD/YYYY") : ""}
                             onBlurChange={({ target: { value } }) => {
                                 let date = moment(value, "MM/DD/YYYY");
                                 if (date.isValid()) {
-                                    this.onChange(date, hours, minutes)
+                                    this.onChange(date, hours, minutes);
                                 } else {
-                                    this.onChange(null)
+                                    this.onChange(null);
                                 }
                             }}
                             ref="value"
                         />
                     </div>
-                    { calendar &&
+                    {calendar && (
                         <div className="border-right border-bottom border-top p2">
                             <Tooltip
                                 tooltip={
-                                    showCalendar ? t`Hide calendar` : t`Show calendar`
+                                    showCalendar
+                                        ? t`Hide calendar`
+                                        : t`Show calendar`
                                 }
                                 children={
                                     <Icon
                                         className="text-purple-hover cursor-pointer"
-                                        name='calendar'
-                                        onClick={() => this.setState({ showCalendar: !this.state.showCalendar })}
+                                        name="calendar"
+                                        onClick={() =>
+                                            this.setState({
+                                                showCalendar: !this.state
+                                                    .showCalendar
+                                            })
+                                        }
                                     />
                                 }
                             />
                         </div>
-                    }
+                    )}
                 </div>
 
-                { calendar &&
+                {calendar && (
                     <ExpandingContent open={showCalendar}>
                         <Calendar
                             selected={date}
                             initial={date || moment()}
-                            onChange={(value) => this.onChange(value, hours, minutes)}
+                            onChange={value =>
+                                this.onChange(value, hours, minutes)
+                            }
                             isRangePicker={false}
                         />
                     </ExpandingContent>
-                }
+                )}
 
-                { !hideTimeSelectors &&
-                    <div className={cx({'py2': calendar}, {'mb3': !calendar})}>
-                        { hours == null || minutes == null ?
+                {!hideTimeSelectors && (
+                    <div className={cx({ py2: calendar }, { mb3: !calendar })}>
+                        {hours == null || minutes == null ? (
                             <div
                                 className="text-purple-hover cursor-pointer flex align-center"
-                                onClick={() => this.onChange(date, 12, 30) }
+                                onClick={() => this.onChange(date, 12, 30)}
                             >
-                                <Icon
-                                    className="mr1"
-                                    name='clock'
-                                />
+                                <Icon className="mr1" name="clock" />
                                 Add a time
                             </div>
-                            :
+                        ) : (
                             <HoursMinutes
                                 clear={() => this.onChange(date, null, null)}
                                 hours={hours}
                                 minutes={minutes}
-                                onChangeHours={hours => this.onChange(date, hours, minutes)}
-                                onChangeMinutes={minutes => this.onChange(date, hours, minutes)}
+                                onChangeHours={hours =>
+                                    this.onChange(date, hours, minutes)
+                                }
+                                onChangeMinutes={minutes =>
+                                    this.onChange(date, hours, minutes)
+                                }
                             />
-                        }
+                        )}
                     </div>
-                }
+                )}
             </div>
-        )
+        );
     }
 }
 
-const HoursMinutes = ({ hours, minutes, onChangeHours, onChangeMinutes, clear }) =>
+const HoursMinutes = ({
+    hours,
+    minutes,
+    onChangeHours,
+    onChangeMinutes,
+    clear
+}) => (
     <div className="flex align-center">
         <NumericInput
             className="input"
             size={2}
             maxLength={2}
-            value={(hours % 12) === 0 ? "12" : String(hours % 12)}
-            onChange={(value) => onChangeHours((hours >= 12 ? 12 : 0) + value) }
+            value={hours % 12 === 0 ? "12" : String(hours % 12)}
+            onChange={value => onChangeHours((hours >= 12 ? 12 : 0) + value)}
         />
         <span className="px1">:</span>
         <NumericInput
@@ -176,15 +199,32 @@ const HoursMinutes = ({ hours, minutes, onChangeHours, onChangeMinutes, clear })
             size={2}
             maxLength={2}
             value={minutes}
-            onChange={(value) => onChangeMinutes(value) }
+            onChange={value => onChangeMinutes(value)}
         />
         <div className="flex align-center pl1">
-            <span className={cx("text-purple-hover mr1", { "text-purple": hours < 12, "cursor-pointer": hours >= 12 })} onClick={hours >= 12 ? () => onChangeHours(hours - 12) : null}>AM</span>
-            <span className={cx("text-purple-hover mr1", { "text-purple": hours >= 12, "cursor-pointer": hours < 12 })} onClick={hours < 12 ? () => onChangeHours(hours + 12) : null}>PM</span>
+            <span
+                className={cx("text-purple-hover mr1", {
+                    "text-purple": hours < 12,
+                    "cursor-pointer": hours >= 12
+                })}
+                onClick={hours >= 12 ? () => onChangeHours(hours - 12) : null}
+            >
+                AM
+            </span>
+            <span
+                className={cx("text-purple-hover mr1", {
+                    "text-purple": hours >= 12,
+                    "cursor-pointer": hours < 12
+                })}
+                onClick={hours < 12 ? () => onChangeHours(hours + 12) : null}
+            >
+                PM
+            </span>
         </div>
         <Icon
             className="text-grey-2 cursor-pointer text-grey-4-hover ml-auto"
             name="close"
-            onClick={() => clear() }
+            onClick={() => clear()}
         />
     </div>
+);

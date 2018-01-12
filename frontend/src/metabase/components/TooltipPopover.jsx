@@ -9,19 +9,18 @@ import Popover from "./Popover.jsx";
 // we use the number of words as an approximation
 const CONDITIONAL_WORD_COUNT = 10;
 
-const wordCount = (string) => string.split(' ').length;
+const wordCount = string => string.split(" ").length;
 
 const TooltipPopover = ({ children, maxWidth, ...props }) => {
-
     let popoverContent;
 
-    if (typeof children === "string")  {
+    if (typeof children === "string") {
         const needsSpace = wordCount(children) > CONDITIONAL_WORD_COUNT;
         popoverContent = (
             <div
                 className={cx(
-                    { 'py1 px2': !needsSpace },
-                    { 'py2 px3': needsSpace }
+                    { "py1 px2": !needsSpace },
+                    { "py2 px3": needsSpace }
                 )}
                 style={{
                     maxWidth: maxWidth || "12em",
@@ -36,14 +35,10 @@ const TooltipPopover = ({ children, maxWidth, ...props }) => {
     }
 
     return (
-        <Popover
-            className="PopoverBody--tooltip"
-            targetOffsetY={10}
-            {...props}
-        >
+        <Popover className="PopoverBody--tooltip" targetOffsetY={10} {...props}>
             {popoverContent}
         </Popover>
-    )
-}
+    );
+};
 
 export default pure(TooltipPopover);

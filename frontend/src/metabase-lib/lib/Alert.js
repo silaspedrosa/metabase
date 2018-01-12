@@ -10,13 +10,14 @@ export type AlertType =
 export const getDefaultAlert = (question, user) => {
     const alertType = question.alertType();
 
-    const typeDependentAlertFields = alertType === ALERT_TYPE_ROWS
-        ? { alert_condition: "rows", alert_first_only: false }
-        : {
-              alert_condition: "goal",
-              alert_first_only: true,
-              alert_above_goal: true
-          };
+    const typeDependentAlertFields =
+        alertType === ALERT_TYPE_ROWS
+            ? { alert_condition: "rows", alert_first_only: false }
+            : {
+                  alert_condition: "goal",
+                  alert_first_only: true,
+                  alert_above_goal: true
+              };
 
     const defaultEmailChannel = {
         enabled: true,

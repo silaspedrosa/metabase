@@ -40,16 +40,22 @@ export default class Tooltip extends Component {
         elem.addEventListener("mousedown", this._onMouseDown, true);
         elem.addEventListener("mouseup", this._onMouseUp, true);
 
-        this._element = document.createElement('div');
+        this._element = document.createElement("div");
         this.componentDidUpdate();
     }
 
     componentDidUpdate() {
         const { isEnabled, tooltip } = this.props;
-        const isOpen = this.props.isOpen != null ? this.props.isOpen : this.state.isOpen;
+        const isOpen =
+            this.props.isOpen != null ? this.props.isOpen : this.state.isOpen;
         if (tooltip && isEnabled && isOpen) {
             ReactDOM.render(
-                <TooltipPopover isOpen={true} target={this} {...this.props} children={this.props.tooltip} />,
+                <TooltipPopover
+                    isOpen={true}
+                    target={this}
+                    {...this.props}
+                    children={this.props.tooltip}
+                />,
                 this._element
             );
         } else {
@@ -67,24 +73,25 @@ export default class Tooltip extends Component {
         clearTimeout(this.timer);
     }
 
-    _onMouseEnter = (e) => {
+    _onMouseEnter = e => {
         this.setState({ isOpen: true, isHovered: true });
-    }
+    };
 
-    _onMouseLeave = (e) => {
+    _onMouseLeave = e => {
         this.setState({ isOpen: false, isHovered: false });
-    }
+    };
 
-    _onMouseDown = (e) => {
+    _onMouseDown = e => {
         this.setState({ isOpen: false });
-    }
+    };
 
-    _onMouseUp = (e) => {
+    _onMouseUp = e => {
         // This is in a timeout to ensure the component has a chance to fully unmount
-        this.timer = setTimeout(() =>
-                this.setState({ isOpen: this.state.isHovered })
-            , 0);
-    }
+        this.timer = setTimeout(
+            () => this.setState({ isOpen: this.state.isHovered }),
+            0
+        );
+    };
 
     render() {
         return React.Children.only(this.props.children);
@@ -120,17 +127,18 @@ export class TestTooltip extends Component {
         verticalAttachments: ["top", "bottom"]
     };
 
-    _onMouseEnter = (e) => {
+    _onMouseEnter = e => {
         this.setState({ isOpen: true, isHovered: true });
-    }
+    };
 
-    _onMouseLeave = (e) => {
+    _onMouseLeave = e => {
         this.setState({ isOpen: false, isHovered: false });
-    }
+    };
 
     render() {
         const { isEnabled, tooltip } = this.props;
-        const isOpen = this.props.isOpen != null ? this.props.isOpen : this.state.isOpen;
+        const isOpen =
+            this.props.isOpen != null ? this.props.isOpen : this.state.isOpen;
 
         return (
             <div>
@@ -141,20 +149,34 @@ export class TestTooltip extends Component {
                     {this.props.children}
                 </TestTooltipTarget>
 
-                { tooltip && isEnabled && isOpen &&
-                    <TestTooltipContent>
-                        <TooltipPopover isOpen={true} target={this} {...this.props} children={this.props.tooltip} />
-                        {this.props.tooltip}
-                    </TestTooltipContent>
-                }
+                {tooltip &&
+                    isEnabled &&
+                    isOpen && (
+                        <TestTooltipContent>
+                            <TooltipPopover
+                                isOpen={true}
+                                target={this}
+                                {...this.props}
+                                children={this.props.tooltip}
+                            />
+                            {this.props.tooltip}
+                        </TestTooltipContent>
+                    )}
             </div>
-        )
+        );
     }
 }
 
-export const TestTooltipTarget = ({ children, onMouseEnter, onMouseLeave }) =>
-    <div className="test-tooltip-hover-area" onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+export const TestTooltipTarget = ({ children, onMouseEnter, onMouseLeave }) => (
+    <div
+        className="test-tooltip-hover-area"
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+    >
         {children}
     </div>
+);
 
-export const TestTooltipContent = ({ children }) => <div className="test-tooltip-content">{children}</div>
+export const TestTooltipContent = ({ children }) => (
+    <div className="test-tooltip-content">{children}</div>
+);

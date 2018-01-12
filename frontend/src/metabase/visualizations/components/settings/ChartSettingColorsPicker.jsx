@@ -7,7 +7,7 @@ export default class ChartSettingColorsPicker extends Component {
         const { value, onChange, seriesTitles } = this.props;
         return (
             <div>
-                { seriesTitles.map((title, index) =>
+                {seriesTitles.map((title, index) => (
                     <ChartSettingColorPicker
                         key={index}
                         onChange={color =>
@@ -20,7 +20,7 @@ export default class ChartSettingColorsPicker extends Component {
                         title={title}
                         value={value[index]}
                     />
-                )}
+                ))}
             </div>
         );
     }

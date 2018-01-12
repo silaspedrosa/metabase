@@ -5,7 +5,7 @@ import ChartSettings from "metabase/visualizations/components/ChartSettings";
 import { TableCard } from "../__support__/visualizations";
 
 import { mount } from "enzyme";
-import { click } from "__support__/enzyme_utils"
+import { click } from "__support__/enzyme_utils";
 
 function renderChartSettings(enabled = true) {
     const props = {
@@ -13,29 +13,33 @@ function renderChartSettings(enabled = true) {
             TableCard("Foo", {
                 card: {
                     visualization_settings: {
-                        "table.columns": [{name: "Foo_col0", enabled: enabled}]
+                        "table.columns": [
+                            { name: "Foo_col0", enabled: enabled }
+                        ]
                     }
                 }
-            }
-        )]
+            })
+        ]
     };
-    return mount(<ChartSettings {...props} onChange={(() => {})}/>);
+    return mount(<ChartSettings {...props} onChange={() => {}} />);
 }
 
 // The ExplicitSize component uses the matchMedia DOM API
 // which does not exist in jest's JSDOM
 Object.defineProperty(window, "matchMedia", {
-    value: jest.fn(() => { return {
-        matches: true,
-        addListener: (() => {}),
-        removeListener: (() => {}),
-    } })
+    value: jest.fn(() => {
+        return {
+            matches: true,
+            addListener: () => {},
+            removeListener: () => {}
+        };
+    })
 });
 
 // We have to do some mocking here to avoid calls to GA and to Metabase settings
-jest.mock('metabase/lib/settings', () => ({
-    get: () => 'v'
-}))
+jest.mock("metabase/lib/settings", () => ({
+    get: () => "v"
+}));
 
 describe("ChartSettings", () => {
     describe("toggling fields", () => {
@@ -43,14 +47,22 @@ describe("ChartSettings", () => {
             it("should show null state", () => {
                 const chartSettings = renderChartSettings();
 
-                expect(chartSettings.find(".list-item [data-id=0] .Icon-check").length).toEqual(1);
+                expect(
+                    chartSettings.find(".list-item [data-id=0] .Icon-check")
+                        .length
+                ).toEqual(1);
                 expect(chartSettings.find("table").length).toEqual(1);
 
-                click(chartSettings.find('.toggle-all .cursor-pointer'));
+                click(chartSettings.find(".toggle-all .cursor-pointer"));
 
-                expect(chartSettings.find(".list-item [data-id=0] .Icon-check").length).toEqual(0);
+                expect(
+                    chartSettings.find(".list-item [data-id=0] .Icon-check")
+                        .length
+                ).toEqual(0);
                 expect(chartSettings.find("table").length).toEqual(0);
-                expect(chartSettings.text()).toContain("Every field is hidden right now");
+                expect(chartSettings.text()).toContain(
+                    "Every field is hidden right now"
+                );
             });
         });
 
@@ -58,15 +70,25 @@ describe("ChartSettings", () => {
             it("should show all columns", () => {
                 const chartSettings = renderChartSettings(false);
 
-                expect(chartSettings.find(".list-item [data-id=0] .Icon-check").length).toEqual(0);
+                expect(
+                    chartSettings.find(".list-item [data-id=0] .Icon-check")
+                        .length
+                ).toEqual(0);
                 expect(chartSettings.find("table").length).toEqual(0);
-                expect(chartSettings.text()).toContain("Every field is hidden right now");
+                expect(chartSettings.text()).toContain(
+                    "Every field is hidden right now"
+                );
 
-                click(chartSettings.find('.toggle-all .cursor-pointer'));
+                click(chartSettings.find(".toggle-all .cursor-pointer"));
 
-                expect(chartSettings.find(".list-item [data-id=0] .Icon-check").length).toEqual(1);
+                expect(
+                    chartSettings.find(".list-item [data-id=0] .Icon-check")
+                        .length
+                ).toEqual(1);
                 expect(chartSettings.find("table").length).toEqual(1);
-                expect(chartSettings.text()).not.toContain("Every field is hidden right now");
+                expect(chartSettings.text()).not.toContain(
+                    "Every field is hidden right now"
+                );
             });
         });
     });

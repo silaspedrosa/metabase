@@ -1,7 +1,7 @@
-import React from 'react'
-import Icon from 'metabase/components/Icon'
+import React from "react";
+import Icon from "metabase/components/Icon";
 
-const DirectionalButton = ({ direction = "back", onClick }) =>
+const DirectionalButton = ({ direction = "back", onClick }) => (
     <div
         className="shadowed cursor-pointer text-brand-hover text-grey-4 flex align-center circle p2 bg-white transition-background transition-color"
         onClick={onClick}
@@ -12,5 +12,6 @@ const DirectionalButton = ({ direction = "back", onClick }) =>
     >
         <Icon name={`${direction}Arrow`} />
     </div>
+);
 
-export default DirectionalButton
+export default DirectionalButton;

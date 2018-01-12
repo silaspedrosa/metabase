@@ -2,21 +2,21 @@
 
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import TextPicker from "./TextPicker.jsx";
 
 type Props = {
-    values: Array<number|null>,
+    values: Array<number | null>,
     onValuesChange: (values: any[]) => void,
     placeholder?: string,
-    multi?: bool,
-    onCommit: () => void,
-}
+    multi?: boolean,
+    onCommit: () => void
+};
 
 type State = {
     stringValues: Array<string>,
-    validations: bool[]
-}
+    validations: boolean[]
+};
 
 export default class NumberPicker extends Component {
     props: Props;
@@ -26,14 +26,14 @@ export default class NumberPicker extends Component {
         super(props);
         this.state = {
             stringValues: props.values.map(v => {
-                if(typeof v === 'number') {
-                    return String(v)
+                if (typeof v === "number") {
+                    return String(v);
                 } else {
-                    return String(v || "")
+                    return String(v || "");
                 }
             }),
             validations: this._validate(props.values)
-        }
+        };
     }
 
     static propTypes = {
@@ -47,13 +47,13 @@ export default class NumberPicker extends Component {
         placeholder: t`Enter desired number`
     };
 
-    _validate(values: Array<number|null>) {
+    _validate(values: Array<number | null>) {
         return values.map(v => v === undefined || !isNaN(v));
     }
 
     onValuesChange(stringValues: string[]) {
-        let values = stringValues.map(v => parseFloat(v))
-        this.props.onValuesChange(values.map(v => isNaN(v) ? null : v));
+        let values = stringValues.map(v => parseFloat(v));
+        this.props.onValuesChange(values.map(v => (isNaN(v) ? null : v)));
         this.setState({
             stringValues: stringValues,
             validations: this._validate(values)
@@ -62,13 +62,16 @@ export default class NumberPicker extends Component {
 
     render() {
         // $FlowFixMe
-        const values: Array<string|null> = this.state.stringValues.slice(0, this.props.values.length);
+        const values: Array<string | null> = this.state.stringValues.slice(
+            0,
+            this.props.values.length
+        );
         return (
             <TextPicker
                 {...this.props}
                 values={values}
                 validations={this.state.validations}
-                onValuesChange={(values) => this.onValuesChange(values)}
+                onValuesChange={values => this.onValuesChange(values)}
             />
         );
     }

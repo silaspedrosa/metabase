@@ -9,7 +9,7 @@ export type CardId = number;
 
 export type VisualizationSettings = {
     [key: string]: any
-}
+};
 
 export type UnsavedCard = {
     dataset_query: DatasetQuery,
@@ -17,7 +17,7 @@ export type UnsavedCard = {
     visualization_settings: VisualizationSettings,
     parameters?: Array<Parameter>,
     original_card_id?: CardId
-}
+};
 
 export type Card = {
     id: CardId,
@@ -31,7 +31,7 @@ export type Card = {
     public_uuid: string,
 
     // Not part of the card API contract, a field used by query builder for showing lineage
-    original_card_id?: CardId,
+    original_card_id?: CardId
 };
 
 export type StructuredDatasetQuery = {

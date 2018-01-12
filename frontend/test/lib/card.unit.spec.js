@@ -7,7 +7,7 @@ import {
     isCardDirty,
     serializeCardForUrl,
     deserializeCardFromUrl
-} from '../../src/metabase/lib/card';
+} from "../../src/metabase/lib/card";
 
 const CARD_ID = 31;
 
@@ -19,8 +19,8 @@ const getCard = ({
     database = 1,
     display = "table",
     queryFields = {},
-    table = undefined,
- }) => {
+    table = undefined
+}) => {
     const savedCardFields = {
         name: "Example Saved Question",
         description: "For satisfying your craving for information",
@@ -29,24 +29,28 @@ const getCard = ({
     };
 
     return {
-        "name": null,
-        "display": display,
-        "visualization_settings": {},
-        "dataset_query": {
-            "database": database,
-            "type": isNative ? "native" : "query",
-            ...(!isNative ? {
-                query: {
-                    ...(table ? {"source_table": table} : {}),
-                    ...queryFields
-                }
-            } : {}),
-            ...(isNative ? {
-                native: { query: "SELECT * FROM ORDERS"}
-            } : {})
+        name: null,
+        display: display,
+        visualization_settings: {},
+        dataset_query: {
+            database: database,
+            type: isNative ? "native" : "query",
+            ...(!isNative
+                ? {
+                      query: {
+                          ...(table ? { source_table: table } : {}),
+                          ...queryFields
+                      }
+                  }
+                : {}),
+            ...(isNative
+                ? {
+                      native: { query: "SELECT * FROM ORDERS" }
+                  }
+                : {})
         },
         ...(newCard ? {} : savedCardFields),
-        ...(hasOriginalCard ? {"original_card_id": CARD_ID} : {})
+        ...(hasOriginalCard ? { original_card_id: CARD_ID } : {})
     };
 };
 
@@ -57,7 +61,7 @@ describe("lib/card", () => {
                 name: null,
                 display: "table",
                 visualization_settings: {},
-                dataset_query: {},
+                dataset_query: {}
             });
         });
 
@@ -66,75 +70,80 @@ describe("lib/card", () => {
                 name: "something",
                 display: "table",
                 visualization_settings: {},
-                dataset_query: {},
+                dataset_query: {}
             });
         });
     });
 
-    describe('utf8_to_b64', () => {
-        it('should encode with non-URL-safe characters', () => {
+    describe("utf8_to_b64", () => {
+        it("should encode with non-URL-safe characters", () => {
             expect(utf8_to_b64("  ?").indexOf("/")).toEqual(3);
             expect(utf8_to_b64("  ?")).toEqual("ICA/");
         });
     });
 
-    describe('b64_to_utf8', () => {
-        it('should decode corretly', () => {
+    describe("b64_to_utf8", () => {
+        it("should decode corretly", () => {
             expect(b64_to_utf8("ICA/")).toEqual("  ?");
         });
     });
 
-    describe('utf8_to_b64url', () => {
-        it('should encode with URL-safe characters', () => {
+    describe("utf8_to_b64url", () => {
+        it("should encode with URL-safe characters", () => {
             expect(utf8_to_b64url("  ?").indexOf("/")).toEqual(-1);
             expect(utf8_to_b64url("  ?")).toEqual("ICA_");
         });
     });
 
-    describe('b64url_to_utf8', () => {
-        it('should decode corretly', () => {
+    describe("b64url_to_utf8", () => {
+        it("should decode corretly", () => {
             expect(b64url_to_utf8("ICA_")).toEqual("  ?");
         });
     });
 
     describe("isCardDirty", () => {
         it("should consider a new card clean if no db table or native query is defined", () => {
-            expect(isCardDirty(
-                getCard({newCard: true}),
-                null
-            )).toBe(false);
+            expect(isCardDirty(getCard({ newCard: true }), null)).toBe(false);
         });
         it("should consider a new card dirty if a db table is chosen", () => {
-            expect(isCardDirty(
-                getCard({newCard: true, table: 5}),
-                null
-            )).toBe(true);
+            expect(
+                isCardDirty(getCard({ newCard: true, table: 5 }), null)
+            ).toBe(true);
         });
         it("should consider a new card dirty if there is any content on the native query", () => {
-            expect(isCardDirty(
-                getCard({newCard: true, table: 5}),
-                null
-            )).toBe(true);
+            expect(
+                isCardDirty(getCard({ newCard: true, table: 5 }), null)
+            ).toBe(true);
         });
         it("should consider a saved card and a matching original card identical", () => {
-            expect(isCardDirty(
-                getCard({hasOriginalCard: true}),
-                getCard({hasOriginalCard: false})
-            )).toBe(false);
+            expect(
+                isCardDirty(
+                    getCard({ hasOriginalCard: true }),
+                    getCard({ hasOriginalCard: false })
+                )
+            ).toBe(false);
         });
         it("should consider a saved card dirty if the current card doesn't match the last saved version", () => {
-            expect(isCardDirty(
-                getCard({hasOriginalCard: true, queryFields: [["field-id", 21]]}),
-                getCard({hasOriginalCard: false})
-            )).toBe(true);
+            expect(
+                isCardDirty(
+                    getCard({
+                        hasOriginalCard: true,
+                        queryFields: [["field-id", 21]]
+                    }),
+                    getCard({ hasOriginalCard: false })
+                )
+            ).toBe(true);
         });
     });
     describe("serializeCardForUrl", () => {
         it("should include `original_card_id` property to the serialized URL", () => {
-            const cardAfterSerialization =
-                deserializeCardFromUrl(serializeCardForUrl(getCard({hasOriginalCard: true})));
-            expect(cardAfterSerialization).toHaveProperty("original_card_id", CARD_ID)
-
-        })
-    })
+            const cardAfterSerialization = deserializeCardFromUrl(
+                serializeCardForUrl(getCard({ hasOriginalCard: true }))
+            );
+            expect(cardAfterSerialization).toHaveProperty(
+                "original_card_id",
+                CARD_ID
+            );
+        });
+    });
 });

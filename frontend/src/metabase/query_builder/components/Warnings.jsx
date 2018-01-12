@@ -9,11 +9,11 @@ const Warnings = ({ warnings, className, size = 16 }) => {
     }
     const tooltip = (
         <ul className="px2 pt2 pb1" style={{ maxWidth: 350 }}>
-            {warnings.map((warning) =>
+            {warnings.map(warning => (
                 <li className="pb1" key={warning}>
                     {warning}
                 </li>
-            )}
+            ))}
         </ul>
     );
 
@@ -21,8 +21,7 @@ const Warnings = ({ warnings, className, size = 16 }) => {
         <Tooltip tooltip={tooltip}>
             <Icon className={className} name="warning2" size={size} />
         </Tooltip>
-    )
-}
-
+    );
+};
 
 export default Warnings;

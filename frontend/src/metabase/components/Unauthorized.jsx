@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import Icon from "metabase/components/Icon.jsx";
 
 export default class Unauthorized extends Component {

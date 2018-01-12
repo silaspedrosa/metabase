@@ -5,4 +5,6 @@ const req = require.context(
     /^(.*\.info\.(js$))[^.]*$/im
 );
 
-export default req.keys().map(key => Object.assign({}, req(key), { showExample: true }));
+export default req
+    .keys()
+    .map(key => Object.assign({}, req(key), { showExample: true }));

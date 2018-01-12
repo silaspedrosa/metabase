@@ -5,14 +5,14 @@ import React from "react";
 import Input from "metabase/components/Input.jsx";
 
 type Props = {
-    value: ?(number|string);
+    value: ?(number | string),
     onChange: (value: ?number) => void
-}
+};
 
-const NumericInput = ({ value, onChange, ...props }: Props) =>
+const NumericInput = ({ value, onChange, ...props }: Props) => (
     <Input
         value={value == null ? "" : String(value)}
-        onBlurChange={({ target: { value }}) => {
+        onBlurChange={({ target: { value } }) => {
             value = value ? parseInt(value, 10) : null;
             if (!isNaN(value)) {
                 onChange(value);
@@ -20,5 +20,6 @@ const NumericInput = ({ value, onChange, ...props }: Props) =>
         }}
         {...props}
     />
+);
 
 export default NumericInput;

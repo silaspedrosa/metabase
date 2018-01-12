@@ -1,20 +1,20 @@
-import React, { Component } from 'react'
+import React, { Component } from "react";
 import { connect } from "react-redux";
 
 import * as metadataActions from "metabase/redux/metadata";
 
 import { getMetadata } from "metabase/selectors/metadata";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import Breadcrumbs from "metabase/components/Breadcrumbs";
 import LoadingAndErrorWrapper from "metabase/components/LoadingAndErrorWrapper";
-import { BackButton, Section, SectionHeader } from "metabase/admin/datamodel/containers/FieldApp";
+import {
+    BackButton,
+    Section,
+    SectionHeader
+} from "metabase/admin/datamodel/containers/FieldApp";
 import ActionButton from "metabase/components/ActionButton.jsx";
 
-import {
-    rescanTableFieldValues,
-    discardTableFieldValues
-} from "../table";
-
+import { rescanTableFieldValues, discardTableFieldValues } from "../table";
 
 const mapStateToProps = (state, props) => {
     return {
@@ -33,9 +33,13 @@ const mapDispatchToProps = {
 
 @connect(mapStateToProps, mapDispatchToProps)
 export default class TableSettingsApp extends Component {
-
     async componentWillMount() {
-        const {databaseId, tableId, fetchDatabaseMetadata, fetchTableMetadata} = this.props;
+        const {
+            databaseId,
+            tableId,
+            fetchDatabaseMetadata,
+            fetchTableMetadata
+        } = this.props;
 
         await fetchDatabaseMetadata(databaseId);
         await fetchTableMetadata(tableId, true);
@@ -50,24 +54,28 @@ export default class TableSettingsApp extends Component {
 
         return (
             <LoadingAndErrorWrapper loading={isLoading} error={null} noWrapper>
-                { () =>
+                {() => (
                     <div className="relative">
                         <div className="wrapper wrapper--trim">
                             <Nav db={db} table={table} />
                             <UpdateFieldValues
-                                rescanTableFieldValues={() => this.props.rescanTableFieldValues(table.id)}
-                                discardTableFieldValues={() => this.props.discardTableFieldValues(table.id)}
+                                rescanTableFieldValues={() =>
+                                    this.props.rescanTableFieldValues(table.id)
+                                }
+                                discardTableFieldValues={() =>
+                                    this.props.discardTableFieldValues(table.id)
+                                }
                             />
                         </div>
                     </div>
-                }
+                )}
             </LoadingAndErrorWrapper>
         );
     }
 }
 
 class Nav extends Component {
-    render () {
+    render() {
         const { db, table } = this.props;
         return (
             <div>
@@ -75,8 +83,16 @@ class Nav extends Component {
                 <div className="my4 py1 ml-auto mr-auto">
                     <Breadcrumbs
                         crumbs={[
-                            db && [db.name, `/admin/datamodel/database/${db.id}`],
-                            table && [table.display_name, `/admin/datamodel/database/${db.id}/table/${table.id}`],
+                            db && [
+                                db.name,
+                                `/admin/datamodel/database/${db.id}`
+                            ],
+                            table && [
+                                table.display_name,
+                                `/admin/datamodel/database/${db.id}/table/${
+                                    table.id
+                                }`
+                            ],
                             t`Settings`
                         ]}
                     />
@@ -87,7 +103,7 @@ class Nav extends Component {
 }
 
 class UpdateFieldValues extends Component {
-    render () {
+    render() {
         return (
             <Section>
                 <SectionHeader

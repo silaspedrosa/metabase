@@ -1,12 +1,12 @@
 /* eslint "react/prop-types": "warn" */
 
-import React, { Component } from "react"
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 
 import PopoverWithTrigger from "metabase/components/PopoverWithTrigger.jsx";
 import Icon from "metabase/components/Icon.jsx";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import DateSingleWidget from "./widgets/DateSingleWidget.jsx";
 import DateRangeWidget from "./widgets/DateRangeWidget.jsx";
 import DateRelativeWidget from "./widgets/DateRelativeWidget.jsx";
@@ -19,7 +19,7 @@ import TextWidget from "./widgets/TextWidget.jsx";
 import S from "./ParameterWidget.css";
 
 import cx from "classnames";
-import _ from "underscore"
+import _ from "underscore";
 
 const DATE_WIDGETS = {
     "date/single": DateSingleWidget,
@@ -28,7 +28,7 @@ const DATE_WIDGETS = {
     "date/month-year": DateMonthYearWidget,
     "date/quarter-year": DateQuarterYearWidget,
     "date/all-options": DateAllOptionsWidget
-}
+};
 
 import { fetchFieldValues } from "metabase/redux/metadata";
 import { makeGetMergedParameterFieldValues } from "metabase/selectors/metadata";
@@ -36,18 +36,17 @@ import { makeGetMergedParameterFieldValues } from "metabase/selectors/metadata";
 const makeMapStateToProps = () => {
     const getMergedParameterFieldValues = makeGetMergedParameterFieldValues();
     const mapStateToProps = (state, props) => ({
-        values: getMergedParameterFieldValues(state, props),
-    })
+        values: getMergedParameterFieldValues(state, props)
+    });
     return mapStateToProps;
-}
+};
 
 const mapDispatchToProps = {
     fetchFieldValues
-}
+};
 
 @connect(makeMapStateToProps, mapDispatchToProps)
 export default class ParameterValueWidget extends Component {
-
     static propTypes = {
         parameter: PropTypes.object.isRequired,
         name: PropTypes.string,
@@ -99,35 +98,57 @@ export default class ParameterValueWidget extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.parameter.field_id != null && nextProps.parameter.field_id !== this.props.parameter.field_id) {
+        if (
+            nextProps.parameter.field_id != null &&
+            nextProps.parameter.field_id !== this.props.parameter.field_id
+        ) {
             this.updateFieldValues(nextProps);
         }
     }
 
     updateFieldValues(props) {
         if (props.parameter.field_id != null) {
-            props.fetchFieldValues(props.parameter.field_id)
+            props.fetchFieldValues(props.parameter.field_id);
         }
     }
 
     render() {
-        const {parameter, value, values, setValue, isEditing, placeholder, isFullscreen,
-               noReset, commitImmediately, className, focusChanged: parentFocusChanged} = this.props;
+        const {
+            parameter,
+            value,
+            values,
+            setValue,
+            isEditing,
+            placeholder,
+            isFullscreen,
+            noReset,
+            commitImmediately,
+            className,
+            focusChanged: parentFocusChanged
+        } = this.props;
 
         let hasValue = value != null;
 
         let Widget = ParameterValueWidget.getWidget(parameter, values);
 
-        const focusChanged = (isFocused) => {
+        const focusChanged = isFocused => {
             if (parentFocusChanged) {
                 parentFocusChanged(isFocused);
             }
-            this.setState({isFocused})
+            this.setState({ isFocused });
         };
 
         const getParameterTypeIcon = () => {
             if (!isEditing && !hasValue && !this.state.isFocused) {
-                return <Icon name={ParameterValueWidget.getParameterIconName(parameter.type)} className="flex-align-left mr1 flex-no-shrink" size={14} />
+                return (
+                    <Icon
+                        name={ParameterValueWidget.getParameterIconName(
+                            parameter.type
+                        )}
+                        className="flex-align-left mr1 flex-no-shrink"
+                        size={14}
+                    />
+                );
             } else {
                 return null;
             }
@@ -137,52 +158,103 @@ export default class ParameterValueWidget extends Component {
             if (isFullscreen) return null;
 
             if (hasValue && !noReset) {
-                return <Icon name="close" className="flex-align-right cursor-pointer flex-no-shrink" size={12} onClick={(e) => {
+                return (
+                    <Icon
+                        name="close"
+                        className="flex-align-right cursor-pointer flex-no-shrink"
+                        size={12}
+                        onClick={e => {
                             if (hasValue) {
                                 e.stopPropagation();
                                 setValue(null);
                             }
-                        }}/>
+                        }}
+                    />
+                );
             } else if (Widget.noPopover && this.state.isFocused) {
-                return <Icon name="enterorreturn" className="flex-align-right flex-no-shrink" size={12}/>
+                return (
+                    <Icon
+                        name="enterorreturn"
+                        className="flex-align-right flex-no-shrink"
+                        size={12}
+                    />
+                );
             } else if (Widget.noPopover) {
-                return <Icon name="empty" className="flex-align-right cursor-pointer flex-no-shrink" size={12}/>
+                return (
+                    <Icon
+                        name="empty"
+                        className="flex-align-right cursor-pointer flex-no-shrink"
+                        size={12}
+                    />
+                );
             } else if (!Widget.noPopover) {
-                return <Icon name="chevrondown" className="flex-align-right flex-no-shrink" size={12}/>
+                return (
+                    <Icon
+                        name="chevrondown"
+                        className="flex-align-right flex-no-shrink"
+                        size={12}
+                    />
+                );
             }
         };
 
         if (Widget.noPopover) {
             return (
-                <div className={cx(S.parameter, S.noPopover, className, { [S.selected]: hasValue, [S.isEditing]: isEditing})}>
-                    { getParameterTypeIcon() }
-                    <Widget placeholder={placeholder} value={value} values={values} setValue={setValue}
-                            isEditing={isEditing} commitImmediately={commitImmediately} focusChanged={focusChanged}/>
-                    { getWidgetStatusIcon() }
+                <div
+                    className={cx(S.parameter, S.noPopover, className, {
+                        [S.selected]: hasValue,
+                        [S.isEditing]: isEditing
+                    })}
+                >
+                    {getParameterTypeIcon()}
+                    <Widget
+                        placeholder={placeholder}
+                        value={value}
+                        values={values}
+                        setValue={setValue}
+                        isEditing={isEditing}
+                        commitImmediately={commitImmediately}
+                        focusChanged={focusChanged}
+                    />
+                    {getWidgetStatusIcon()}
                 </div>
             );
         } else {
-            let placeholderText = isEditing ? t`Select a default value…` : (placeholder || t`Select…`);
+            let placeholderText = isEditing
+                ? t`Select a default value…`
+                : placeholder || t`Select…`;
 
             return (
                 <PopoverWithTrigger
                     ref="valuePopover"
                     triggerElement={
-                        <div ref="trigger" className={cx(S.parameter, className, { [S.selected]: hasValue })}>
-                            { getParameterTypeIcon() }
-                            <div className="mr1 text-nowrap">{ hasValue ? Widget.format(value, values) : placeholderText }</div>
-                            { getWidgetStatusIcon() }
+                        <div
+                            ref="trigger"
+                            className={cx(S.parameter, className, {
+                                [S.selected]: hasValue
+                            })}
+                        >
+                            {getParameterTypeIcon()}
+                            <div className="mr1 text-nowrap">
+                                {hasValue
+                                    ? Widget.format(value, values)
+                                    : placeholderText}
+                            </div>
+                            {getWidgetStatusIcon()}
                         </div>
                     }
                     target={() => this.refs.trigger} // not sure why this is necessary
                     // make sure the full date picker will expand to fit the dual calendars
                     autoWidth={parameter.type === "date/all-options"}
                 >
-                    <Widget value={value} values={values} setValue={setValue}
-                            onClose={() => this.refs.valuePopover.close()}/>
+                    <Widget
+                        value={value}
+                        values={values}
+                        setValue={setValue}
+                        onClose={() => this.refs.valuePopover.close()}
+                    />
                 </PopoverWithTrigger>
             );
         }
     }
-
 }

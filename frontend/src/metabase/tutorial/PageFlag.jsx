@@ -19,14 +19,27 @@ export default class PageFlag extends Component {
             top: position.top + position.height / 2 - (isLarge ? 21 : 12)
         };
         return (
-            <div key="flag" className={cx("PageFlag", { "PageFlag--large": isLarge, "bounce-left": this.props.bounce })} style={style}>{this.props.text}</div>
+            <div
+                key="flag"
+                className={cx("PageFlag", {
+                    "PageFlag--large": isLarge,
+                    "bounce-left": this.props.bounce
+                })}
+                style={style}
+            >
+                {this.props.text}
+            </div>
         );
     }
 
     render() {
         return (
-            <ReactCSSTransitionGroup transitionName="PageFlag" transitionEnterTimeout={250} transitionLeaveTimeout={250}>
-                { this.props.target ? [this.renderPageFlag()] : [] }
+            <ReactCSSTransitionGroup
+                transitionName="PageFlag"
+                transitionEnterTimeout={250}
+                transitionLeaveTimeout={250}
+            >
+                {this.props.target ? [this.renderPageFlag()] : []}
             </ReactCSSTransitionGroup>
         );
     }

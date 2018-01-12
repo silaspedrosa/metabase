@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import moment from "moment";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import visualizations from "metabase/visualizations";
 import { isQueryable } from "metabase/lib/table";
 import * as Urls from "metabase/lib/urls";
@@ -18,9 +18,7 @@ import LoadingAndErrorWrapper from "metabase/components/LoadingAndErrorWrapper.j
 
 import ReferenceHeader from "../components/ReferenceHeader.jsx";
 
-import {
-    getQuestionUrl
-} from '../utils';
+import { getQuestionUrl } from "../utils";
 
 import {
     getMetricQuestions,
@@ -43,8 +41,7 @@ const emptyStateData = (table, metric) => {
             metricId: metric.id
         })
     };
-    }
-
+};
 
 const mapStateToProps = (state, props) => ({
     metric: getMetric(state, props),
@@ -58,7 +55,6 @@ const mapDispatchToProps = {
     ...metadataActions
 };
 
-
 @connect(mapStateToProps, mapDispatchToProps)
 export default class MetricQuestions extends Component {
     static propTypes = {
@@ -71,48 +67,74 @@ export default class MetricQuestions extends Component {
     };
 
     render() {
-        const {
-            entities,
-            style,
-            loadingError,
-            loading
-        } = this.props;
+        const { entities, style, loadingError, loading } = this.props;
 
         return (
             <div style={style} className="full">
-                <ReferenceHeader 
+                <ReferenceHeader
                     name={t`Questions about ${this.props.metric.name}`}
                     type="questions"
                     headerIcon="ruler"
                 />
-                <LoadingAndErrorWrapper loading={!loadingError && loading} error={loadingError}>
-                { () => Object.keys(entities).length > 0 ?
-                    <div className="wrapper wrapper--trim">
-                        <List>
-                            { 
-                                Object.values(entities).filter(isQueryable).map((entity, index) =>
-                                    entity && entity.id && entity.name &&
-                                        <li className="relative" key={entity.id}>
-                                            <ListItem
-                                                id={entity.id}
-                                                index={index}
-                                                name={entity.display_name || entity.name}
-                                                description={ t`Created ${moment(entity.created_at).fromNow()} by ${entity.creator.common_name}` }
-                                                url={ Urls.question(entity.id) }
-                                                icon={ visualizations.get(entity.display).iconName }
-                                            />
-                                        </li>
-                                )
-                            }
-                        </List>
-                    </div>
-                    :
-                    <div className={S.empty}>
-                        <AdminAwareEmptyState {...emptyStateData(this.props.table, this.props.metric)}/>
-                    </div>
-                }
+                <LoadingAndErrorWrapper
+                    loading={!loadingError && loading}
+                    error={loadingError}
+                >
+                    {() =>
+                        Object.keys(entities).length > 0 ? (
+                            <div className="wrapper wrapper--trim">
+                                <List>
+                                    {Object.values(entities)
+                                        .filter(isQueryable)
+                                        .map(
+                                            (entity, index) =>
+                                                entity &&
+                                                entity.id &&
+                                                entity.name && (
+                                                    <li
+                                                        className="relative"
+                                                        key={entity.id}
+                                                    >
+                                                        <ListItem
+                                                            id={entity.id}
+                                                            index={index}
+                                                            name={
+                                                                entity.display_name ||
+                                                                entity.name
+                                                            }
+                                                            description={t`Created ${moment(
+                                                                entity.created_at
+                                                            ).fromNow()} by ${
+                                                                entity.creator
+                                                                    .common_name
+                                                            }`}
+                                                            url={Urls.question(
+                                                                entity.id
+                                                            )}
+                                                            icon={
+                                                                visualizations.get(
+                                                                    entity.display
+                                                                ).iconName
+                                                            }
+                                                        />
+                                                    </li>
+                                                )
+                                        )}
+                                </List>
+                            </div>
+                        ) : (
+                            <div className={S.empty}>
+                                <AdminAwareEmptyState
+                                    {...emptyStateData(
+                                        this.props.table,
+                                        this.props.metric
+                                    )}
+                                />
+                            </div>
+                        )
+                    }
                 </LoadingAndErrorWrapper>
             </div>
-        )
+        );
     }
 }

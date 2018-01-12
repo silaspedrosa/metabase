@@ -3,13 +3,16 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import styles from "./PieChart.css";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import ChartTooltip from "../components/ChartTooltip.jsx";
 import ChartWithLegend from "../components/ChartWithLegend.jsx";
 
 import { ChartSettingsError } from "metabase/visualizations/lib/errors";
 import { getFriendlyName } from "metabase/visualizations/lib/utils";
-import { metricSetting, dimensionSetting } from "metabase/visualizations/lib/settings";
+import {
+    metricSetting,
+    dimensionSetting
+} from "metabase/visualizations/lib/settings";
 
 import { formatValue } from "metabase/lib/formatting";
 
@@ -23,7 +26,7 @@ import _ from "underscore";
 const OUTER_RADIUS = 50; // within 100px canvas
 const INNER_RADIUS_RATIO = 3 / 5;
 
-const PAD_ANGLE = (Math.PI / 180) * 1; // 1 degree in radians
+const PAD_ANGLE = Math.PI / 180 * 1; // 1 degree in radians
 const SLICE_THRESHOLD = 1 / 360; // 1 degree in percentage
 const OTHER_SLICE_MIN_PERCENTAGE = 0.003;
 
@@ -44,9 +47,12 @@ export default class PieChart extends Component {
         return cols.length === 2;
     }
 
-    static checkRenderable([{ data: { cols, rows} }], settings) {
+    static checkRenderable([{ data: { cols, rows } }], settings) {
         if (!settings["pie.dimension"] || !settings["pie.metric"]) {
-            throw new ChartSettingsError(t`Which columns do you want to use?`, t`Data`);
+            throw new ChartSettingsError(
+                t`Which columns do you want to use?`,
+                t`Data`
+            );
         }
     }
 
@@ -76,8 +82,8 @@ export default class PieChart extends Component {
             section: "Display",
             title: t`Minimum slice percentage`,
             widget: "number"
-        },
-    }
+        }
+    };
 
     componentDidUpdate() {
         let groupElement = ReactDOM.findDOMNode(this.refs.group);
@@ -90,24 +96,59 @@ export default class PieChart extends Component {
     }
 
     render() {
-        const { series, hovered, onHoverChange, visualizationIsClickable, onVisualizationClick, className, gridSize, settings } = this.props;
+        const {
+            series,
+            hovered,
+            onHoverChange,
+            visualizationIsClickable,
+            onVisualizationClick,
+            className,
+            gridSize,
+            settings
+        } = this.props;
 
-        const [{ data: { cols, rows }}] = series;
-        const dimensionIndex = _.findIndex(cols, (col) => col.name === settings["pie.dimension"]);
-        const metricIndex = _.findIndex(cols, (col) => col.name === settings["pie.metric"]);
+        const [{ data: { cols, rows } }] = series;
+        const dimensionIndex = _.findIndex(
+            cols,
+            col => col.name === settings["pie.dimension"]
+        );
+        const metricIndex = _.findIndex(
+            cols,
+            col => col.name === settings["pie.metric"]
+        );
 
-        const formatDimension = (dimension, jsx = true) => formatValue(dimension, { column: cols[dimensionIndex], jsx, majorWidth: 0 })
-        const formatMetric    =    (metric, jsx = true) => formatValue(metric, { column: cols[metricIndex], jsx, majorWidth: 0 })
-        const formatPercent   =               (percent) => (100 * percent).toFixed(2) + "%"
+        const formatDimension = (dimension, jsx = true) =>
+            formatValue(dimension, {
+                column: cols[dimensionIndex],
+                jsx,
+                majorWidth: 0
+            });
+        const formatMetric = (metric, jsx = true) =>
+            formatValue(metric, {
+                column: cols[metricIndex],
+                jsx,
+                majorWidth: 0
+            });
+        const formatPercent = percent => (100 * percent).toFixed(2) + "%";
 
-        const showPercentInTooltip = !PERCENT_REGEX.test(cols[metricIndex].name) && !PERCENT_REGEX.test(cols[metricIndex].display_name);
+        const showPercentInTooltip =
+            !PERCENT_REGEX.test(cols[metricIndex].name) &&
+            !PERCENT_REGEX.test(cols[metricIndex].display_name);
 
         // $FlowFixMe
-        let total: number = rows.reduce((sum, row) => sum + row[metricIndex], 0);
+        let total: number = rows.reduce(
+            (sum, row) => sum + row[metricIndex],
+            0
+        );
 
         // use standard colors for up to 5 values otherwise use color harmony to help differentiate slices
-        let sliceColors = Object.values(rows.length > 5 ? colors.harmony : colors.normal);
-        let sliceThreshold = typeof settings["pie.slice_threshold"] === "number" ? settings["pie.slice_threshold"] / 100 : SLICE_THRESHOLD;
+        let sliceColors = Object.values(
+            rows.length > 5 ? colors.harmony : colors.normal
+        );
+        let sliceThreshold =
+            typeof settings["pie.slice_threshold"] === "number"
+                ? settings["pie.slice_threshold"] / 100
+                : SLICE_THRESHOLD;
 
         let [slices, others] = _.chain(rows)
             .map((row, index) => ({
@@ -116,7 +157,7 @@ export default class PieChart extends Component {
                 percentage: row[metricIndex] / total,
                 color: sliceColors[index % sliceColors.length]
             }))
-            .partition((d) => d.percentage > sliceThreshold)
+            .partition(d => d.percentage > sliceThreshold)
             .value();
 
         let otherSlice;
@@ -141,35 +182,63 @@ export default class PieChart extends Component {
         }
 
         let legendTitles = slices.map(slice => [
-            slice.key === "Other" ? slice.key : formatDimension(slice.key, true),
-            settings["pie.show_legend_perecent"] ? formatPercent(slice.percentage) : undefined
+            slice.key === "Other"
+                ? slice.key
+                : formatDimension(slice.key, true),
+            settings["pie.show_legend_perecent"]
+                ? formatPercent(slice.percentage)
+                : undefined
         ]);
         let legendColors = slices.map(slice => slice.color);
 
-        const pie = d3.layout.pie()
+        const pie = d3.layout
+            .pie()
             .sort(null)
             .padAngle(PAD_ANGLE)
             .value(d => d.value);
-        const arc = d3.svg.arc()
+        const arc = d3.svg
+            .arc()
             .outerRadius(OUTER_RADIUS)
             .innerRadius(OUTER_RADIUS * INNER_RADIUS_RATIO);
 
         const hoverForIndex = (index, event) => ({
             index,
             event: event && event.nativeEvent,
-            data: slices[index] === otherSlice ?
-                others.map(o => ({
-                    key: formatDimension(o.key, false),
-                    value: formatMetric(o.value, false)
-                }))
-            : [
-                { key: getFriendlyName(cols[dimensionIndex]), value: formatDimension(slices[index].key) },
-                { key: getFriendlyName(cols[metricIndex]), value: formatMetric(slices[index].value) },
-            ].concat(showPercentInTooltip ? [{ key: "Percentage", value: formatPercent(slices[index].percentage) }] : [])
+            data:
+                slices[index] === otherSlice
+                    ? others.map(o => ({
+                          key: formatDimension(o.key, false),
+                          value: formatMetric(o.value, false)
+                      }))
+                    : [
+                          {
+                              key: getFriendlyName(cols[dimensionIndex]),
+                              value: formatDimension(slices[index].key)
+                          },
+                          {
+                              key: getFriendlyName(cols[metricIndex]),
+                              value: formatMetric(slices[index].value)
+                          }
+                      ].concat(
+                          showPercentInTooltip
+                              ? [
+                                    {
+                                        key: "Percentage",
+                                        value: formatPercent(
+                                            slices[index].percentage
+                                        )
+                                    }
+                                ]
+                              : []
+                      )
         });
 
         let value, title;
-        if (hovered && hovered.index != null && slices[hovered.index] !== otherSlice) {
+        if (
+            hovered &&
+            hovered.index != null &&
+            slices[hovered.index] !== otherSlice
+        ) {
             title = formatDimension(slices[hovered.index].key);
             value = formatMetric(slices[hovered.index].value);
         } else {
@@ -177,51 +246,92 @@ export default class PieChart extends Component {
             value = formatMetric(total);
         }
 
-        const getSliceClickObject = (index) => ({
-            value:      slices[index].value,
-            column:     cols[metricIndex],
-            dimensions: [{
-                value: slices[index].key,
-                column: cols[dimensionIndex],
-            }]
-        })
+        const getSliceClickObject = index => ({
+            value: slices[index].value,
+            column: cols[metricIndex],
+            dimensions: [
+                {
+                    value: slices[index].key,
+                    column: cols[dimensionIndex]
+                }
+            ]
+        });
 
-        const isClickable = onVisualizationClick && visualizationIsClickable(getSliceClickObject(0));
-        const getSliceIsClickable = (index) => isClickable && slices[index] !== otherSlice;
+        const isClickable =
+            onVisualizationClick &&
+            visualizationIsClickable(getSliceClickObject(0));
+        const getSliceIsClickable = index =>
+            isClickable && slices[index] !== otherSlice;
 
         return (
             <ChartWithLegend
                 className={className}
-                legendTitles={legendTitles} legendColors={legendColors}
+                legendTitles={legendTitles}
+                legendColors={legendColors}
                 gridSize={gridSize}
-                hovered={hovered} onHoverChange={(d) => onHoverChange && onHoverChange(d && { ...d, ...hoverForIndex(d.index) })}
+                hovered={hovered}
+                onHoverChange={d =>
+                    onHoverChange &&
+                    onHoverChange(d && { ...d, ...hoverForIndex(d.index) })
+                }
                 showLegend={settings["pie.show_legend"]}
             >
                 <div className={styles.ChartAndDetail}>
                     <div ref="detail" className={styles.Detail}>
-                        <div className={cx(styles.Value, "fullscreen-normal-text fullscreen-night-text")}>{value}</div>
+                        <div
+                            className={cx(
+                                styles.Value,
+                                "fullscreen-normal-text fullscreen-night-text"
+                            )}
+                        >
+                            {value}
+                        </div>
                         <div className={styles.Title}>{title}</div>
                     </div>
                     <div className={styles.Chart}>
-                        <svg className={styles.Donut+ " m1"} viewBox="0 0 100 100">
+                        <svg
+                            className={styles.Donut + " m1"}
+                            viewBox="0 0 100 100"
+                        >
                             <g ref="group" transform={`translate(50,50)`}>
-                                {pie(slices).map((slice, index) =>
+                                {pie(slices).map((slice, index) => (
                                     <path
                                         key={index}
                                         d={arc(slice)}
                                         fill={slices[index].color}
-                                        opacity={(hovered && hovered.index != null && hovered.index !== index) ? 0.3 : 1}
-                                        onMouseMove={(e) => onHoverChange && onHoverChange(hoverForIndex(index, e))}
-                                        onMouseLeave={() => onHoverChange && onHoverChange(null)}
-                                        className={cx({ "cursor-pointer": getSliceIsClickable(index) })}
-                                        onClick={getSliceIsClickable(index) && ((e) =>
-                                            onVisualizationClick({
-                                                ...getSliceClickObject(index),
-                                                event: e.nativeEvent
-                                            })
-                                        )}
+                                        opacity={
+                                            hovered &&
+                                            hovered.index != null &&
+                                            hovered.index !== index
+                                                ? 0.3
+                                                : 1
+                                        }
+                                        onMouseMove={e =>
+                                            onHoverChange &&
+                                            onHoverChange(
+                                                hoverForIndex(index, e)
+                                            )
+                                        }
+                                        onMouseLeave={() =>
+                                            onHoverChange && onHoverChange(null)
+                                        }
+                                        className={cx({
+                                            "cursor-pointer": getSliceIsClickable(
+                                                index
+                                            )
+                                        })}
+                                        onClick={
+                                            getSliceIsClickable(index) &&
+                                            (e =>
+                                                onVisualizationClick({
+                                                    ...getSliceClickObject(
+                                                        index
+                                                    ),
+                                                    event: e.nativeEvent
+                                                }))
+                                        }
                                     />
-                                )}
+                                ))}
                             </g>
                         </svg>
                     </div>

@@ -4,15 +4,20 @@ import _ from "underscore";
 export function createMultiwordSearchRegex(input) {
     if (input) {
         return new RegExp(
-            _.map(input.split(/\s+/), (word) => {
+            _.map(input.split(/\s+/), word => {
                 return RegExp.escape(word);
             }).join(".*"),
-            "i");
+            "i"
+        );
     }
 }
 
-export const countLines = (str) => str.split(/\n/g).length
+export const countLines = str => str.split(/\n/g).length;
 
 export function caseInsensitiveSearch(haystack, needle) {
-    return !needle || (haystack != null && haystack.toLowerCase().indexOf(needle.toLowerCase()) >= 0);
+    return (
+        !needle ||
+        (haystack != null &&
+            haystack.toLowerCase().indexOf(needle.toLowerCase()) >= 0)
+    );
 }

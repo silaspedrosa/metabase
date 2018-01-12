@@ -1,10 +1,9 @@
 import React, { Component } from "react";
 
 import Modal from "metabase/components/Modal.jsx";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 
 export default class SavedQuestionIntroModal extends Component {
-
     render() {
         return (
             <Modal small isOpen={this.props.isShowingNewbModal}>
@@ -16,7 +15,11 @@ export default class SavedQuestionIntroModal extends Component {
                     </div>
 
                     <div className="Form-actions flex justify-center py1">
-                        <button data-metabase-event={"QueryBuilder;IntroModal"} className="Button Button--primary" onClick={() => this.props.onClose()}>{t`Okay`}</button>
+                        <button
+                            data-metabase-event={"QueryBuilder;IntroModal"}
+                            className="Button Button--primary"
+                            onClick={() => this.props.onClose()}
+                        >{t`Okay`}</button>
                     </div>
                 </div>
             </Modal>

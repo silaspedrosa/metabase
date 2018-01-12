@@ -4,7 +4,6 @@ import PropTypes from "prop-types";
 import MetabaseAnalytics from "metabase/lib/analytics";
 import AddToDashboard from "metabase/questions/containers/AddToDashboard.jsx";
 
-
 export default class AddToDashSelectQuestionModal extends Component {
     constructor(props, context) {
         super(props, context);
@@ -35,7 +34,10 @@ export default class AddToDashSelectQuestionModal extends Component {
     }
 
     onAdd(card) {
-        this.props.addCardToDashboard({ dashId: this.props.dashboard.id, cardId: card.id });
+        this.props.addCardToDashboard({
+            dashId: this.props.dashboard.id,
+            cardId: card.id
+        });
         this.props.onEditingChange(true);
         this.props.onClose();
         MetabaseAnalytics.trackEvent("Dashboard", "Add Card");
@@ -44,9 +46,9 @@ export default class AddToDashSelectQuestionModal extends Component {
     render() {
         return (
             <AddToDashboard
-                onAdd={(card) => this.onAdd(card)}
+                onAdd={card => this.onAdd(card)}
                 onClose={this.props.onClose}
             />
-        )
+        );
     }
 }

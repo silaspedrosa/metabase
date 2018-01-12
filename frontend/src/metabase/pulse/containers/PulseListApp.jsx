@@ -6,16 +6,15 @@ import { push } from "react-router-redux";
 import PulseList from "../components/PulseList.jsx";
 import { listPulseSelectors } from "../selectors";
 
-
 import { fetchPulses, fetchPulseFormInput, savePulse } from "../actions";
 
 const mapStateToProps = (state, props) => {
     return {
         ...listPulseSelectors(state, props),
-        user: state.currentUser,
+        user: state.currentUser
         // onChangeLocation: onChangeLocation
-    }
-}
+    };
+};
 
 const mapDispatchToProps = {
     fetchPulses,
@@ -27,8 +26,6 @@ const mapDispatchToProps = {
 @connect(mapStateToProps, mapDispatchToProps)
 export default class PulseListApp extends Component {
     render() {
-        return (
-            <PulseList { ...this.props } />
-        );
+        return <PulseList {...this.props} />;
     }
 }

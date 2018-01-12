@@ -10,7 +10,7 @@ describe("metabase/meta/Card", () => {
                     base_type: "type/Integer"
                 }
             }
-        }
+        };
 
         const parameters = [
             {
@@ -107,7 +107,7 @@ describe("metabase/meta/Card", () => {
                     card_id: 1,
                     parameter_id: 4,
                     target: ["dimension", ["fk->", 4, 5]]
-                },
+                }
             ];
             it("should return question URL with no parameters", () => {
                 const url = Card.questionUrlWithParameters(card, metadata, []);
@@ -136,7 +136,11 @@ describe("metabase/meta/Card", () => {
                 });
             });
             it("should return question URL even if only original_card_id is present", () => {
-                const cardWithOnlyOriginalCardId = { ...card, id: undefined, original_card_id: card.id };
+                const cardWithOnlyOriginalCardId = {
+                    ...card,
+                    id: undefined,
+                    original_card_id: card.id
+                };
 
                 const url = Card.questionUrlWithParameters(
                     cardWithOnlyOriginalCardId,
@@ -188,7 +192,14 @@ describe("metabase/meta/Card", () => {
                     card: assocIn(
                         dissoc(card, "id"),
                         ["dataset_query", "query", "filter"],
-                        ["AND", ["=", ["datetime-field", ["field-id", 3], "month"], "2017-05-01"]]
+                        [
+                            "AND",
+                            [
+                                "=",
+                                ["datetime-field", ["field-id", 3], "month"],
+                                "2017-05-01"
+                            ]
+                        ]
                     )
                 });
             });
@@ -206,7 +217,14 @@ describe("metabase/meta/Card", () => {
                     card: assocIn(
                         dissoc(card, "id"),
                         ["dataset_query", "query", "filter"],
-                        ["AND", ["=", ["datetime-field", ["fk->", 4, 5], "month"], "2017-05-01"]]
+                        [
+                            "AND",
+                            [
+                                "=",
+                                ["datetime-field", ["fk->", 4, 5], "month"],
+                                "2017-05-01"
+                            ]
+                        ]
                     )
                 });
             });

@@ -25,7 +25,7 @@ export default class PublicApp extends Component {
             if (errorPage.status === 404) {
                 return <PublicNotFound />;
             } else {
-                return <PublicError />
+                return <PublicError />;
             }
         } else {
             return children;

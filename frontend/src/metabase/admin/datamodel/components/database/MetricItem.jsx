@@ -14,16 +14,16 @@ export default class MetricItem extends Component {
     render() {
         let { metric, tableMetadata } = this.props;
 
-        let description = Query.generateQueryDescription(tableMetadata, metric.definition, { sections: ["aggregation", "filter"], jsx: true });
+        let description = Query.generateQueryDescription(
+            tableMetadata,
+            metric.definition,
+            { sections: ["aggregation", "filter"], jsx: true }
+        );
 
         return (
             <tr className="mt1 mb3">
-                <td className="px1">
-                    {metric.name}
-                </td>
-                <td className="px1 text-ellipsis">
-                    {description}
-                </td>
+                <td className="px1">{metric.name}</td>
+                <td className="px1 text-ellipsis">{description}</td>
                 <td className="px1 text-centered">
                     <ObjectActionSelect
                         object={metric}
@@ -32,6 +32,6 @@ export default class MetricItem extends Component {
                     />
                 </td>
             </tr>
-        )
+        );
     }
 }

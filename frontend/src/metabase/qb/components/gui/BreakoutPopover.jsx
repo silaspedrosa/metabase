@@ -16,16 +16,14 @@ type Props = {
     onClose?: () => void
 };
 
-const BreakoutPopover = (
-    {
-        breakout,
-        tableMetadata,
-        fieldOptions,
-        onCommitBreakout,
-        onClose,
-        maxHeight
-    }: Props
-) => (
+const BreakoutPopover = ({
+    breakout,
+    tableMetadata,
+    fieldOptions,
+    onCommitBreakout,
+    onClose,
+    maxHeight
+}: Props) => (
     <FieldList
         className="text-green"
         maxHeight={maxHeight}

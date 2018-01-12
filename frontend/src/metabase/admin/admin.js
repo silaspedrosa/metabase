@@ -16,4 +16,4 @@ export default combineReducers({
     people,
     permissions,
     settings
-})
+});

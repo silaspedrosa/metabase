@@ -1,16 +1,27 @@
 import { Lexer, Parser, getImage } from "chevrotain";
 
 import _ from "underscore";
-import { t } from 'c-3po';
-import { formatFieldName, formatExpressionName, formatAggregationName, getAggregationFromName } from "../expressions";
+import { t } from "c-3po";
+import {
+    formatFieldName,
+    formatExpressionName,
+    formatAggregationName,
+    getAggregationFromName
+} from "../expressions";
 import { isNumeric } from "metabase/lib/schema_metadata";
 
 import {
     allTokens,
-    LParen, RParen,
-    AdditiveOperator, MultiplicativeOperator,
-    Aggregation, NullaryAggregation, UnaryAggregation,
-    StringLiteral, NumberLiteral, Minus,
+    LParen,
+    RParen,
+    AdditiveOperator,
+    MultiplicativeOperator,
+    Aggregation,
+    NullaryAggregation,
+    UnaryAggregation,
+    StringLiteral,
+    NumberLiteral,
+    Minus,
     Identifier
 } from "./tokens";
 
@@ -32,33 +43,39 @@ class ExpressionsParser extends Parser {
         this._options = options;
 
         // an expression without aggregations in it
-        $.RULE("expression", function (outsideAggregation = false) {
-            return $.SUBRULE($.additionExpression, [outsideAggregation])
+        $.RULE("expression", function(outsideAggregation = false) {
+            return $.SUBRULE($.additionExpression, [outsideAggregation]);
         });
 
         // an expression with aggregations in it
-        $.RULE("aggregation", function () {
-            return $.SUBRULE($.additionExpression, [true])
+        $.RULE("aggregation", function() {
+            return $.SUBRULE($.additionExpression, [true]);
         });
 
         // Lowest precedence thus it is first in the rule chain
         // The precedence of binary expressions is determined by
         // how far down the Parse Tree the binary expression appears.
-        $.RULE("additionExpression", (outsideAggregation) => {
-            let initial = $.SUBRULE($.multiplicationExpression, [outsideAggregation]);
+        $.RULE("additionExpression", outsideAggregation => {
+            let initial = $.SUBRULE($.multiplicationExpression, [
+                outsideAggregation
+            ]);
             let operations = $.MANY(() => {
                 const op = $.CONSUME(AdditiveOperator);
-                const rhsVal = $.SUBRULE2($.multiplicationExpression, [outsideAggregation]);
+                const rhsVal = $.SUBRULE2($.multiplicationExpression, [
+                    outsideAggregation
+                ]);
                 return [op, rhsVal];
             });
             return this._math(initial, operations);
         });
 
-        $.RULE("multiplicationExpression", (outsideAggregation) => {
+        $.RULE("multiplicationExpression", outsideAggregation => {
             let initial = $.SUBRULE($.atomicExpression, [outsideAggregation]);
             let operations = $.MANY(() => {
                 const op = $.CONSUME(MultiplicativeOperator);
-                const rhsVal = $.SUBRULE2($.atomicExpression, [outsideAggregation]);
+                const rhsVal = $.SUBRULE2($.atomicExpression, [
+                    outsideAggregation
+                ]);
                 return [op, rhsVal];
             });
             return this._math(initial, operations);
@@ -68,34 +85,38 @@ class ExpressionsParser extends Parser {
             return {
                 lParen: $.CONSUME(LParen),
                 rParen: $.CONSUME(RParen)
-            }
-        })
+            };
+        });
         $.RULE("unaryCall", () => {
             return {
                 lParen: $.CONSUME(LParen),
-                arg:    $.SUBRULE($.expression, [false]),
+                arg: $.SUBRULE($.expression, [false]),
                 rParen: $.CONSUME(RParen)
-            }
-        })
+            };
+        });
 
-        $.RULE("aggregationExpression", (outsideAggregation) => {
+        $.RULE("aggregationExpression", outsideAggregation => {
             const { aggregation, lParen, arg, rParen } = $.OR([
-                {ALT: () => ({
-                    aggregation: $.CONSUME(NullaryAggregation),
-                    ...$.OPTION(() => $.SUBRULE($.nullaryCall))
-                })},
-                {ALT: () => ({
-                    aggregation: $.CONSUME(UnaryAggregation),
-                    ...$.SUBRULE($.unaryCall)
-                })}
+                {
+                    ALT: () => ({
+                        aggregation: $.CONSUME(NullaryAggregation),
+                        ...$.OPTION(() => $.SUBRULE($.nullaryCall))
+                    })
+                },
+                {
+                    ALT: () => ({
+                        aggregation: $.CONSUME(UnaryAggregation),
+                        ...$.SUBRULE($.unaryCall)
+                    })
+                }
             ]);
             return this._aggregation(aggregation, lParen, arg, rParen);
         });
 
         $.RULE("metricExpression", () => {
             const metricName = $.OR([
-                {ALT: () => $.SUBRULE($.stringLiteral) },
-                {ALT: () => $.SUBRULE($.identifier) }
+                { ALT: () => $.SUBRULE($.stringLiteral) },
+                { ALT: () => $.SUBRULE($.identifier) }
             ]);
 
             const metric = this.getMetricForName(this._toString(metricName));
@@ -107,15 +128,17 @@ class ExpressionsParser extends Parser {
 
         $.RULE("fieldExpression", () => {
             const fieldName = $.OR([
-                {ALT: () => $.SUBRULE($.stringLiteral) },
-                {ALT: () => $.SUBRULE($.identifier) }
+                { ALT: () => $.SUBRULE($.stringLiteral) },
+                { ALT: () => $.SUBRULE($.identifier) }
             ]);
 
             const field = this.getFieldForName(this._toString(fieldName));
             if (field != null) {
                 return this._fieldReference(fieldName, field.id);
             }
-            const expression = this.getExpressionForName(this._toString(fieldName));
+            const expression = this.getExpressionForName(
+                this._toString(fieldName)
+            );
             if (expression != null) {
                 return this._expressionReference(fieldName, expression);
             }
@@ -125,36 +148,51 @@ class ExpressionsParser extends Parser {
         $.RULE("identifier", () => {
             const identifier = $.CONSUME(Identifier);
             return this._identifier(identifier);
-        })
+        });
 
         $.RULE("stringLiteral", () => {
             const stringLiteral = $.CONSUME(StringLiteral);
             return this._stringLiteral(stringLiteral);
-        })
+        });
 
         $.RULE("numberLiteral", () => {
             const minus = $.OPTION(() => $.CONSUME(Minus));
             const numberLiteral = $.CONSUME(NumberLiteral);
             return this._numberLiteral(minus, numberLiteral);
-        })
-
-        $.RULE("atomicExpression", (outsideAggregation) => {
-            return $.OR([
-                // aggregations are not allowed inside other aggregations
-                {GATE: () => outsideAggregation, ALT: () => $.SUBRULE($.aggregationExpression, [false]) },
-
-                // NOTE: DISABLE METRICS
-                // {GATE: () => outsideAggregation, ALT: () => $.SUBRULE($.metricExpression) },
-
-                // fields are not allowed outside aggregations
-                {GATE: () => !outsideAggregation, ALT: () => $.SUBRULE($.fieldExpression) },
-
-                {ALT: () => $.SUBRULE($.parenthesisExpression, [outsideAggregation]) },
-                {ALT: () => $.SUBRULE($.numberLiteral) }
-            ], (outsideAggregation ? "aggregation" : "field name") + ", number, or expression");
         });
 
-        $.RULE("parenthesisExpression", (outsideAggregation) => {
+        $.RULE("atomicExpression", outsideAggregation => {
+            return $.OR(
+                [
+                    // aggregations are not allowed inside other aggregations
+                    {
+                        GATE: () => outsideAggregation,
+                        ALT: () => $.SUBRULE($.aggregationExpression, [false])
+                    },
+
+                    // NOTE: DISABLE METRICS
+                    // {GATE: () => outsideAggregation, ALT: () => $.SUBRULE($.metricExpression) },
+
+                    // fields are not allowed outside aggregations
+                    {
+                        GATE: () => !outsideAggregation,
+                        ALT: () => $.SUBRULE($.fieldExpression)
+                    },
+
+                    {
+                        ALT: () =>
+                            $.SUBRULE($.parenthesisExpression, [
+                                outsideAggregation
+                            ])
+                    },
+                    { ALT: () => $.SUBRULE($.numberLiteral) }
+                ],
+                (outsideAggregation ? "aggregation" : "field name") +
+                    ", number, or expression"
+            );
+        });
+
+        $.RULE("parenthesisExpression", outsideAggregation => {
             let lParen = $.CONSUME(LParen);
             let expValue = $.SUBRULE($.expression, [outsideAggregation]);
             let rParen = $.CONSUME(RParen);
@@ -165,7 +203,8 @@ class ExpressionsParser extends Parser {
     }
 
     getFieldForName(fieldName) {
-        const fields = this._options.tableMetadata && this._options.tableMetadata.fields;
+        const fields =
+            this._options.tableMetadata && this._options.tableMetadata.fields;
         return _.findWhere(fields, { display_name: fieldName });
     }
 
@@ -175,8 +214,12 @@ class ExpressionsParser extends Parser {
     }
 
     getMetricForName(metricName) {
-        const metrics = this._options.tableMetadata && this._options.tableMetadata.metrics;
-        return _.find(metrics, (metric) => metric.name.toLowerCase() === metricName.toLowerCase());
+        const metrics =
+            this._options.tableMetadata && this._options.tableMetadata.metrics;
+        return _.find(
+            metrics,
+            metric => metric.name.toLowerCase() === metricName.toLowerCase()
+        );
     }
 }
 
@@ -187,7 +230,7 @@ class ExpressionsParserMBQL extends ExpressionsParser {
             if (Array.isArray(initial) && initial[0] === op.image) {
                 initial.push(rhsVal);
             } else {
-                initial = [op.image, initial, rhsVal]
+                initial = [op.image, initial, rhsVal];
             }
         }
         return initial;
@@ -206,10 +249,10 @@ class ExpressionsParserMBQL extends ExpressionsParser {
         return ["expression", fieldName];
     }
     _unknownField(fieldName) {
-        throw new Error("Unknown field \"" + fieldName + "\"");
+        throw new Error('Unknown field "' + fieldName + '"');
     }
     _unknownMetric(metricName) {
-        throw new Error("Unknown metric \"" + metricName + "\"");
+        throw new Error('Unknown metric "' + metricName + '"');
     }
 
     _identifier(identifier) {
@@ -232,20 +275,32 @@ class ExpressionsParserMBQL extends ExpressionsParser {
 const syntax = (type, ...children) => ({
     type: type,
     children: children.filter(child => child)
-})
-const token = (token) => token && ({
-    type: "token",
-    text: token.image,
-    start: token.startOffset,
-    end: token.endOffset,
 });
+const token = token =>
+    token && {
+        type: "token",
+        text: token.image,
+        start: token.startOffset,
+        end: token.endOffset
+    };
 
 class ExpressionsParserSyntax extends ExpressionsParser {
     _math(initial, operations) {
-        return syntax("math", ...[initial].concat(...operations.map(([op, arg]) => [token(op), arg])));
+        return syntax(
+            "math",
+            ...[initial].concat(
+                ...operations.map(([op, arg]) => [token(op), arg])
+            )
+        );
     }
     _aggregation(aggregation, lParen, arg, rParen) {
-        return syntax("aggregation", token(aggregation), token(lParen), arg, token(rParen));
+        return syntax(
+            "aggregation",
+            token(aggregation),
+            token(lParen),
+            arg,
+            token(rParen)
+        );
     }
     _metricReference(metricName, metricId) {
         return syntax("metric", metricName);
@@ -287,7 +342,9 @@ class ExpressionsParserSyntax extends ExpressionsParser {
 }
 
 function getSubTokenTypes(TokenClass) {
-    return TokenClass.extendingTokenTypes.map(tokenType => _.findWhere(allTokens, { tokenType }));
+    return TokenClass.extendingTokenTypes.map(tokenType =>
+        _.findWhere(allTokens, { tokenType })
+    );
 }
 
 function getTokenSource(TokenClass) {
@@ -300,16 +357,21 @@ function run(Parser, source, options) {
         return [];
     }
     const { startRule } = options;
-    const parser = new Parser(ExpressionsLexer.tokenize(source).tokens, options);
+    const parser = new Parser(
+        ExpressionsLexer.tokenize(source).tokens,
+        options
+    );
     const expression = parser[startRule]();
     if (parser.errors.length > 0) {
         for (const error of parser.errors) {
             // clean up error messages
-            error.message = error.message && error.message
-                .replace(/^Expecting:?\s+/, "Expected ")
-                .replace(/--> (.*?) <--/g, "$1")
-                .replace(/(\n|\s)*but found:?/, " but found ")
-                .replace(/\s*but found\s+''$/, "");
+            error.message =
+                error.message &&
+                error.message
+                    .replace(/^Expecting:?\s+/, "Expected ")
+                    .replace(/--> (.*?) <--/g, "$1")
+                    .replace(/(\n|\s)*but found:?/, " but found ")
+                    .replace(/\s*but found\s+''$/, "");
         }
         throw parser.errors;
     }
@@ -325,53 +387,65 @@ export function parse(source, options = {}) {
 }
 
 // No need for more than one instance.
-const parserInstance = new ExpressionsParser([])
-export function suggest(source, {
-    tableMetadata,
-    customFields,
-    startRule,
-    index = source.length
-} = {}) {
+const parserInstance = new ExpressionsParser([]);
+export function suggest(
+    source,
+    { tableMetadata, customFields, startRule, index = source.length } = {}
+) {
     const partialSource = source.slice(0, index);
     const lexResult = ExpressionsLexer.tokenize(partialSource);
     if (lexResult.errors.length > 0) {
         throw new Error(t`sad sad panda, lexing errors detected`);
     }
 
-    const lastInputToken = _.last(lexResult.tokens)
-    let partialSuggestionMode = false
-    let assistanceTokenVector = lexResult.tokens
+    const lastInputToken = _.last(lexResult.tokens);
+    let partialSuggestionMode = false;
+    let assistanceTokenVector = lexResult.tokens;
 
     // we have requested assistance while inside an Identifier
-    if ((lastInputToken instanceof Identifier) &&
-        /\w/.test(partialSource[partialSource.length - 1])) {
+    if (
+        lastInputToken instanceof Identifier &&
+        /\w/.test(partialSource[partialSource.length - 1])
+    ) {
         assistanceTokenVector = assistanceTokenVector.slice(0, -1);
-        partialSuggestionMode = true
+        partialSuggestionMode = true;
     }
 
-
-    let finalSuggestions = []
+    let finalSuggestions = [];
 
     // TODO: is there a better way to figure out which aggregation we're inside of?
-    const currentAggregationToken = _.find(assistanceTokenVector.slice().reverse(), (t) => t instanceof Aggregation);
+    const currentAggregationToken = _.find(
+        assistanceTokenVector.slice().reverse(),
+        t => t instanceof Aggregation
+    );
 
-    const syntacticSuggestions = parserInstance.computeContentAssist(startRule, assistanceTokenVector)
+    const syntacticSuggestions = parserInstance.computeContentAssist(
+        startRule,
+        assistanceTokenVector
+    );
     for (const suggestion of syntacticSuggestions) {
         const { nextTokenType, ruleStack } = suggestion;
         // no nesting of aggregations or field references outside of aggregations
         // we have a predicate in the grammar to prevent nested aggregations but chevrotain
         // doesn't support predicates in content-assist mode, so we need this extra check
-        const outsideAggregation = startRule === "aggregation" && ruleStack.slice(0, -1).indexOf("aggregationExpression") < 0;
+        const outsideAggregation =
+            startRule === "aggregation" &&
+            ruleStack.slice(0, -1).indexOf("aggregationExpression") < 0;
 
-        if (nextTokenType === MultiplicativeOperator || nextTokenType === AdditiveOperator) {
+        if (
+            nextTokenType === MultiplicativeOperator ||
+            nextTokenType === AdditiveOperator
+        ) {
             let tokens = getSubTokenTypes(nextTokenType);
-            finalSuggestions.push(...tokens.map(token => ({
-                type: "operators",
-                name: getTokenSource(token),
-                text: " " + getTokenSource(token) + " ",
-                prefixTrim: /\s*$/,
-                postfixTrim: /^\s*[*/+-]?\s*/
-            })))
+            finalSuggestions.push(
+                ...tokens.map(token => ({
+                    type: "operators",
+                    name: getTokenSource(token),
+                    text: " " + getTokenSource(token) + " ",
+                    prefixTrim: /\s*$/,
+                    postfixTrim: /^\s*[*/+-]?\s*/
+                }))
+            );
         } else if (nextTokenType === LParen) {
             finalSuggestions.push({
                 type: "other",
@@ -389,44 +463,73 @@ export function suggest(source, {
                 prefixTrim: /\s*$/,
                 postfixTrim: /^\s*\)?\s*/
             });
-        } else if (nextTokenType === Identifier || nextTokenType === StringLiteral) {
+        } else if (
+            nextTokenType === Identifier ||
+            nextTokenType === StringLiteral
+        ) {
             if (!outsideAggregation) {
                 let fields = [];
                 if (startRule === "aggregation" && currentAggregationToken) {
-                    let aggregationShort = getAggregationFromName(getImage(currentAggregationToken));
-                    let aggregationOption = _.findWhere(tableMetadata.aggregation_options, { short: aggregationShort });
-                    fields = aggregationOption && aggregationOption.fields && aggregationOption.fields[0] || []
+                    let aggregationShort = getAggregationFromName(
+                        getImage(currentAggregationToken)
+                    );
+                    let aggregationOption = _.findWhere(
+                        tableMetadata.aggregation_options,
+                        { short: aggregationShort }
+                    );
+                    fields =
+                        (aggregationOption &&
+                            aggregationOption.fields &&
+                            aggregationOption.fields[0]) ||
+                        [];
                 } else if (startRule === "expression") {
                     fields = tableMetadata.fields.filter(isNumeric);
                 }
-                finalSuggestions.push(...fields.map(field => ({
-                    type: "fields",
-                    name: field.display_name,
-                    text: formatFieldName(field) + " ",
-                    prefixTrim: /\w+$/,
-                    postfixTrim: /^\w+\s*/
-                })));
-                finalSuggestions.push(...Object.keys(customFields || {}).map(expressionName => ({
-                    type: "fields",
-                    name: expressionName,
-                    text: formatExpressionName(expressionName) + " ",
-                    prefixTrim: /\w+$/,
-                    postfixTrim: /^\w+\s*/
-                })));
-            }
-        } else if (nextTokenType === Aggregation || nextTokenType === NullaryAggregation || nextTokenType === UnaryAggregation || nextTokenType === Identifier || nextTokenType === StringLiteral) {
-            if (outsideAggregation) {
-                finalSuggestions.push(...tableMetadata.aggregation_options.filter(a => formatAggregationName(a)).map(aggregationOption => {
-                    const arity = aggregationOption.fields.length;
-                    return {
-                        type: "aggregations",
-                        name: formatAggregationName(aggregationOption),
-                        text: formatAggregationName(aggregationOption) + (arity > 0 ? "(" : " "),
-                        postfixText: (arity > 0 ? ")" : " "),
+                finalSuggestions.push(
+                    ...fields.map(field => ({
+                        type: "fields",
+                        name: field.display_name,
+                        text: formatFieldName(field) + " ",
                         prefixTrim: /\w+$/,
-                        postfixTrim: (arity > 0 ? /^\w+(\(\)?|$)/ : /^\w+\s*/)
-                    };
-                }));
+                        postfixTrim: /^\w+\s*/
+                    }))
+                );
+                finalSuggestions.push(
+                    ...Object.keys(customFields || {}).map(expressionName => ({
+                        type: "fields",
+                        name: expressionName,
+                        text: formatExpressionName(expressionName) + " ",
+                        prefixTrim: /\w+$/,
+                        postfixTrim: /^\w+\s*/
+                    }))
+                );
+            }
+        } else if (
+            nextTokenType === Aggregation ||
+            nextTokenType === NullaryAggregation ||
+            nextTokenType === UnaryAggregation ||
+            nextTokenType === Identifier ||
+            nextTokenType === StringLiteral
+        ) {
+            if (outsideAggregation) {
+                finalSuggestions.push(
+                    ...tableMetadata.aggregation_options
+                        .filter(a => formatAggregationName(a))
+                        .map(aggregationOption => {
+                            const arity = aggregationOption.fields.length;
+                            return {
+                                type: "aggregations",
+                                name: formatAggregationName(aggregationOption),
+                                text:
+                                    formatAggregationName(aggregationOption) +
+                                    (arity > 0 ? "(" : " "),
+                                postfixText: arity > 0 ? ")" : " ",
+                                prefixTrim: /\w+$/,
+                                postfixTrim:
+                                    arity > 0 ? /^\w+(\(\)?|$)/ : /^\w+\s*/
+                            };
+                        })
+                );
                 // NOTE: DISABLE METRICS
                 // finalSuggestions.push(...tableMetadata.metrics.map(metric => ({
                 //     type: "metrics",
@@ -439,16 +542,24 @@ export function suggest(source, {
         } else if (nextTokenType === NumberLiteral) {
             // skip number literal
         } else {
-            console.warn("non exhaustive match", nextTokenType.name, suggestion)
+            console.warn(
+                "non exhaustive match",
+                nextTokenType.name,
+                suggestion
+            );
         }
     }
 
     // throw away any suggestion that is not a suffix of the last partialToken.
     if (partialSuggestionMode) {
         const partial = getImage(lastInputToken).toLowerCase();
-        finalSuggestions = _.filter(finalSuggestions, (suggestion) =>
-            (suggestion.text && suggestion.text.toLowerCase().startsWith(partial)) ||
-            (suggestion.name && suggestion.name.toLowerCase().startsWith(partial))
+        finalSuggestions = _.filter(
+            finalSuggestions,
+            suggestion =>
+                (suggestion.text &&
+                    suggestion.text.toLowerCase().startsWith(partial)) ||
+                (suggestion.name &&
+                    suggestion.name.toLowerCase().startsWith(partial))
         );
 
         let prefixLength = partial.length;

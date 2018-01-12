@@ -1,12 +1,12 @@
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import _ from 'underscore'
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import _ from "underscore";
 
 import {
     fetchSharedTypeComparisonXray,
     fetchTwoTypesComparisonXray,
     initialize
-} from 'metabase/xray/xray'
+} from "metabase/xray/xray";
 import {
     getComparison,
     getComparisonFields,
@@ -15,14 +15,14 @@ import {
     getLoadingStatus,
     getError,
     getTitle
-} from 'metabase/xray/selectors'
+} from "metabase/xray/selectors";
 
-import title from 'metabase/hoc/Title'
-import LoadingAndErrorWrapper from 'metabase/components/LoadingAndErrorWrapper'
-import XRayComparison from 'metabase/xray/components/XRayComparison'
-import LoadingAnimation from 'metabase/xray/components/LoadingAnimation'
+import title from "metabase/hoc/Title";
+import LoadingAndErrorWrapper from "metabase/components/LoadingAndErrorWrapper";
+import XRayComparison from "metabase/xray/components/XRayComparison";
+import LoadingAnimation from "metabase/xray/components/LoadingAnimation";
 
-import { hasComparison, comparisonLoadingMessages } from 'metabase/xray/utils'
+import { hasComparison, comparisonLoadingMessages } from "metabase/xray/utils";
 
 @connect(null, { fetchSharedTypeComparisonXray })
 export class SharedTypeComparisonXRay extends Component {
@@ -31,42 +31,59 @@ export class SharedTypeComparisonXRay extends Component {
 
         return (
             <TableLikeComparisonXRay
-                fetchTableLikeComparisonXray={
-                    () => this.props.fetchSharedTypeComparisonXray(modelTypePlural, modelId1, modelId2, cost)
+                fetchTableLikeComparisonXray={() =>
+                    this.props.fetchSharedTypeComparisonXray(
+                        modelTypePlural,
+                        modelId1,
+                        modelId2,
+                        cost
+                    )
                 }
             />
-        )
+        );
     }
 }
 
 @connect(null, { fetchTwoTypesComparisonXray })
 export class TwoTypesComparisonXRay extends Component {
     render() {
-        const { modelType1, modelId1, modelType2, modelId2, cost } = this.props.params;
+        const {
+            modelType1,
+            modelId1,
+            modelType2,
+            modelId2,
+            cost
+        } = this.props.params;
 
         return (
             <TableLikeComparisonXRay
-                fetchTableLikeComparisonXray={
-                    () => this.props.fetchTwoTypesComparisonXray(modelType1, modelId1, modelType2, modelId2, cost)
+                fetchTableLikeComparisonXray={() =>
+                    this.props.fetchTwoTypesComparisonXray(
+                        modelType1,
+                        modelId1,
+                        modelType2,
+                        modelId2,
+                        cost
+                    )
                 }
             />
-        )
+        );
     }
 }
 
-const mapStateToProps = (state) => ({
-    comparison:     getComparison(state),
-    fields:         getComparisonFields(state),
-    contributors:   getComparisonContributors(state),
-    itemA:          getModelItem(state, 0),
-    itemB:          getModelItem(state, 1),
-    isLoading:      getLoadingStatus(state),
-    error:          getError(state)
-})
+const mapStateToProps = state => ({
+    comparison: getComparison(state),
+    fields: getComparisonFields(state),
+    contributors: getComparisonContributors(state),
+    itemA: getModelItem(state, 0),
+    itemB: getModelItem(state, 1),
+    isLoading: getLoadingStatus(state),
+    error: getError(state)
+});
 
 const mapDispatchToProps = {
     initialize
-}
+};
 
 @connect(mapStateToProps, mapDispatchToProps)
 @title(props => getTitle(props))
@@ -74,11 +91,11 @@ export class TableLikeComparisonXRay extends Component {
     props: {
         initialize: () => void,
         fetchTableLikeComparisonXray: () => void
-    }
+    };
 
-    componentWillMount () {
-        this.props.initialize()
-        this.props.fetchTableLikeComparisonXray()
+    componentWillMount() {
+        this.props.initialize();
+        this.props.fetchTableLikeComparisonXray();
     }
 
     componentWillUnmount() {
@@ -88,7 +105,7 @@ export class TableLikeComparisonXRay extends Component {
         this.props.initialize();
     }
 
-    render () {
+    render() {
         const {
             comparison,
             contributors,
@@ -98,7 +115,7 @@ export class TableLikeComparisonXRay extends Component {
             itemA,
             itemB,
             cost
-        } = this.props
+        } = this.props;
 
         return (
             <LoadingAndErrorWrapper
@@ -108,16 +125,15 @@ export class TableLikeComparisonXRay extends Component {
                 loadingMessages={comparisonLoadingMessages}
                 loadingScenes={[<LoadingAnimation />]}
             >
-                { () =>
-
+                {() => (
                     <XRayComparison
                         cost={cost}
-                        fields={_.sortBy(fields, 'distance').reverse()}
+                        fields={_.sortBy(fields, "distance").reverse()}
                         comparisonFields={[
-                            'Difference',
-                            'Entropy',
-                            'Histogram',
-                            'Nil%',
+                            "Difference",
+                            "Entropy",
+                            "Histogram",
+                            "Nil%"
                         ]}
                         contributors={contributors}
                         comparables={comparison.comparables}
@@ -125,8 +141,8 @@ export class TableLikeComparisonXRay extends Component {
                         itemA={itemA}
                         itemB={itemB}
                     />
-                }
+                )}
             </LoadingAndErrorWrapper>
-        )
+        );
     }
 }

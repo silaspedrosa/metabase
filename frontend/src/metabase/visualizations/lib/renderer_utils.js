@@ -25,7 +25,7 @@ export function initChart(chart, element) {
 }
 
 export function makeIndexMap(values: Array<Value>): Map<Value, number> {
-    let indexMap = new Map()
+    let indexMap = new Map();
     for (const [index, key] of values.entries()) {
         indexMap.set(key, index);
     }
@@ -34,25 +34,33 @@ export function makeIndexMap(values: Array<Value>): Map<Value, number> {
 
 type CrossfilterGroup = {
     top: (n: number) => { key: any, value: any },
-    all: () => { key: any, value: any },
-}
+    all: () => { key: any, value: any }
+};
 
 // HACK: This ensures each group is sorted by the same order as xValues,
 // otherwise we can end up with line charts with x-axis labels in the correct order
 // but the points in the wrong order. There may be a more efficient way to do this.
-export function forceSortedGroup(group: CrossfilterGroup, indexMap: Map<Value, number>): void {
+export function forceSortedGroup(
+    group: CrossfilterGroup,
+    indexMap: Map<Value, number>
+): void {
     // $FlowFixMe
-    const sorted = group.top(Infinity).sort((a, b) => indexMap.get(a.key) - indexMap.get(b.key));
+    const sorted = group
+        .top(Infinity)
+        .sort((a, b) => indexMap.get(a.key) - indexMap.get(b.key));
     for (let i = 0; i < sorted.length; i++) {
         sorted[i].index = i;
     }
     group.all = () => sorted;
 }
 
-export function forceSortedGroupsOfGroups(groupsOfGroups: CrossfilterGroup[][], indexMap: Map<Value, number>): void {
+export function forceSortedGroupsOfGroups(
+    groupsOfGroups: CrossfilterGroup[][],
+    indexMap: Map<Value, number>
+): void {
     for (const groups of groupsOfGroups) {
         for (const group of groups) {
-            forceSortedGroup(group, indexMap)
+            forceSortedGroup(group, indexMap);
         }
     }
 }
@@ -71,7 +79,7 @@ export function reduceGroup(group, key, warnUnaggregated) {
                     warnUnaggregated();
                     return acc + (d[key] || 0);
                 } else {
-                    return (d[key] || 0);
+                    return d[key] || 0;
                 }
             }
         },
@@ -83,7 +91,7 @@ export function reduceGroup(group, key, warnUnaggregated) {
                     warnUnaggregated();
                     return acc - (d[key] || 0);
                 } else {
-                    return - (d[key] || 0);
+                    return -(d[key] || 0);
                 }
             }
         },
@@ -104,31 +112,42 @@ export function HACK_parseTimestamp(value, unit, warn) {
         return null;
     } else {
         let m = parseTimestamp(value, unit);
-        m.toString = moment_fast_toString
+        m.toString = moment_fast_toString;
         return m;
     }
 }
 
 /************************************************************ PROPERTIES ************************************************************/
 
-export const isTimeseries   = (settings) => settings["graph.x_axis.scale"] === "timeseries";
-export const isQuantitative = (settings) => ["linear", "log", "pow"].indexOf(settings["graph.x_axis.scale"]) >= 0;
-export const isHistogram    = (settings) => settings["graph.x_axis.scale"] === "histogram";
-export const isOrdinal      = (settings) => !isTimeseries(settings) && !isHistogram(settings);
+export const isTimeseries = settings =>
+    settings["graph.x_axis.scale"] === "timeseries";
+export const isQuantitative = settings =>
+    ["linear", "log", "pow"].indexOf(settings["graph.x_axis.scale"]) >= 0;
+export const isHistogram = settings =>
+    settings["graph.x_axis.scale"] === "histogram";
+export const isOrdinal = settings =>
+    !isTimeseries(settings) && !isHistogram(settings);
 
 // bar histograms have special tick formatting:
 // * aligned with beginning of bar to show bin boundaries
 // * label only shows beginning value of bin
 // * includes an extra tick at the end for the end of the last bin
-export const isHistogramBar = ({ settings, chartType }) => isHistogram(settings) && chartType === "bar";
+export const isHistogramBar = ({ settings, chartType }) =>
+    isHistogram(settings) && chartType === "bar";
 
-export const isStacked    = (settings, datas) => settings["stackable.stack_type"] && datas.length > 1;
-export const isNormalized = (settings, datas) => isStacked(settings, datas) && settings["stackable.stack_type"] === "normalized";
+export const isStacked = (settings, datas) =>
+    settings["stackable.stack_type"] && datas.length > 1;
+export const isNormalized = (settings, datas) =>
+    isStacked(settings, datas) &&
+    settings["stackable.stack_type"] === "normalized";
 
 // find the first nonempty single series
-export const getFirstNonEmptySeries = (series) => _.find(series, (s) => !datasetContainsNoResults(s.data));
-export const isDimensionTimeseries  = (series) => dimensionIsTimeseries(getFirstNonEmptySeries(series).data);
-export const isDimensionNumeric     = (series) => dimensionIsNumeric(getFirstNonEmptySeries(series).data);
+export const getFirstNonEmptySeries = series =>
+    _.find(series, s => !datasetContainsNoResults(s.data));
+export const isDimensionTimeseries = series =>
+    dimensionIsTimeseries(getFirstNonEmptySeries(series).data);
+export const isDimensionNumeric = series =>
+    dimensionIsNumeric(getFirstNonEmptySeries(series).data);
 
 function hasRemappingAndValuesAreStrings({ cols }, i = 0) {
     const column = cols[i];
@@ -138,14 +157,15 @@ function hasRemappingAndValuesAreStrings({ cols }, i = 0) {
         // ES6 Map makes the lookup of first value a little verbose
         return typeof column.remapping.values().next().value === "string";
     } else {
-        return false
+        return false;
     }
 }
 
-export const isRemappedToString = (series) => hasRemappingAndValuesAreStrings(getFirstNonEmptySeries(series).data);
+export const isRemappedToString = series =>
+    hasRemappingAndValuesAreStrings(getFirstNonEmptySeries(series).data);
 
 // is this a dashboard multiseries?
 // TODO: better way to detect this?
-export const isMultiCardSeries = (series) => (
-    series.length > 1 && getIn(series, [0, "card", "id"]) !== getIn(series, [1, "card", "id"])
-);
+export const isMultiCardSeries = series =>
+    series.length > 1 &&
+    getIn(series, [0, "card", "id"]) !== getIn(series, [1, "card", "id"]);

@@ -1,38 +1,51 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import MetabaseSettings from "metabase/lib/settings";
 import MetabaseUtils from "metabase/lib/utils";
 import SettingsSetting from "./SettingsSetting.jsx";
 
 import _ from "underscore";
 
-
 export default class SettingsUpdatesForm extends Component {
-
     static propTypes = {
         elements: PropTypes.array
     };
 
     removeVersionPrefixIfNeeded(versionLabel) {
-        return versionLabel.startsWith("v") ? versionLabel.substring(1) : versionLabel;
+        return versionLabel.startsWith("v")
+            ? versionLabel.substring(1)
+            : versionLabel;
     }
 
     renderVersion(version) {
         return (
             <div className="pb3">
-                <h3 className="text-grey-4">{this.removeVersionPrefixIfNeeded(version.version)} {version.patch ? "(patch release)" : null}</h3>
-                <ul style={{listStyleType: "disc", listStylePosition: "inside"}}>
-                    {version.highlights && version.highlights.map(highlight =>
-                        <li style={{lineHeight: "1.5"}} className="pl1">{highlight}</li>
-                    )}
+                <h3 className="text-grey-4">
+                    {this.removeVersionPrefixIfNeeded(version.version)}{" "}
+                    {version.patch ? "(patch release)" : null}
+                </h3>
+                <ul
+                    style={{
+                        listStyleType: "disc",
+                        listStylePosition: "inside"
+                    }}
+                >
+                    {version.highlights &&
+                        version.highlights.map(highlight => (
+                            <li style={{ lineHeight: "1.5" }} className="pl1">
+                                {highlight}
+                            </li>
+                        ))}
                 </ul>
             </div>
         );
     }
 
     renderVersionUpdateNotice() {
-        let versionInfo = _.findWhere(this.props.settings, {key: "version-info"}),
+        let versionInfo = _.findWhere(this.props.settings, {
+                key: "version-info"
+            }),
             currentVersion = MetabaseSettings.get("version").tag;
 
         if (versionInfo) versionInfo = versionInfo.value;
@@ -70,7 +83,13 @@ export default class SettingsUpdatesForm extends Component {
 
         */
 
-        if (!versionInfo || MetabaseUtils.compareVersions(currentVersion, versionInfo.latest.version) >= 0) {
+        if (
+            !versionInfo ||
+            MetabaseUtils.compareVersions(
+                currentVersion,
+                versionInfo.latest.version
+            ) >= 0
+        ) {
             return (
                 <div className="p2 bg-brand bordered rounded border-brand text-white text-bold">
                     {t`You're running Metabase {this.removeVersionPrefixIfNeeded(currentVersion)} which is the latest and greatest!`}
@@ -80,8 +99,18 @@ export default class SettingsUpdatesForm extends Component {
             return (
                 <div>
                     <div className="p2 bg-green bordered rounded border-green flex flex-row align-center justify-between">
-                        <span className="text-white text-bold">{t`Metabase ${this.removeVersionPrefixIfNeeded(versionInfo.latest.version)} is available.  You're running {this.removeVersionPrefixIfNeeded(currentVersion)}`}</span>
-                        <a data-metabase-event={"Updates Settings; Update link clicked; "+versionInfo.latest.version} className="Button Button--white Button--medium borderless" href="http://www.metabase.com/start" target="_blank">{t`Update`}</a>
+                        <span className="text-white text-bold">{t`Metabase ${this.removeVersionPrefixIfNeeded(
+                            versionInfo.latest.version
+                        )} is available.  You're running {this.removeVersionPrefixIfNeeded(currentVersion)}`}</span>
+                        <a
+                            data-metabase-event={
+                                "Updates Settings; Update link clicked; " +
+                                versionInfo.latest.version
+                            }
+                            className="Button Button--white Button--medium borderless"
+                            href="http://www.metabase.com/start"
+                            target="_blank"
+                        >{t`Update`}</a>
                     </div>
 
                     <div className="text-grey-3">
@@ -89,7 +118,10 @@ export default class SettingsUpdatesForm extends Component {
 
                         {this.renderVersion(versionInfo.latest)}
 
-                        {versionInfo.older && versionInfo.older.map(this.renderVersion.bind(this))}
+                        {versionInfo.older &&
+                            versionInfo.older.map(
+                                this.renderVersion.bind(this)
+                            )}
                     </div>
                 </div>
             );
@@ -99,20 +131,18 @@ export default class SettingsUpdatesForm extends Component {
     render() {
         let { elements, updateSetting } = this.props;
 
-        let settings = elements.map((setting, index) =>
+        let settings = elements.map((setting, index) => (
             <SettingsSetting
                 key={setting.key}
                 setting={setting}
-                onChange={(value) => updateSetting(setting, value)}
+                onChange={value => updateSetting(setting, value)}
                 autoFocus={index === 0}
             />
-        );
+        ));
 
         return (
-            <div style={{width: "585px"}}>
-                <ul>
-                    {settings}
-                </ul>
+            <div style={{ width: "585px" }}>
+                <ul>{settings}</ul>
 
                 <div className="px2">
                     <div className="pt3 border-top">

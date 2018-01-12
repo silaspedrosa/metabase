@@ -10,7 +10,7 @@ const mapStateToProps = function(state, props) {
     return {
         groups: getGroups(state, props)
     };
-}
+};
 
 const mapDispatchToProps = {
     loadGroups
@@ -23,8 +23,6 @@ export default class GroupsListingApp extends Component {
     }
 
     render() {
-        return (
-            <GroupsListing {...this.props} />
-        );
+        return <GroupsListing {...this.props} />;
     }
 }

@@ -27,50 +27,107 @@ export default class ParametersPopover extends Component {
         const { section } = this.state;
         const { onClose, onAddParameter } = this.props;
         if (section == null) {
-            return <ParameterOptionsSectionsPane sections={PARAMETER_SECTIONS} onSelectSection={(selectedSection) => {
-                let parameterSection = _.findWhere(PARAMETER_SECTIONS, { id: selectedSection.id });
-                if (parameterSection && parameterSection.options.length === 1) {
-                    onAddParameter(parameterSection.options[0]);
-                    onClose();
-                } else {
-                    this.setState({ section: selectedSection.id });
-                }
-            }} />
+            return (
+                <ParameterOptionsSectionsPane
+                    sections={PARAMETER_SECTIONS}
+                    onSelectSection={selectedSection => {
+                        let parameterSection = _.findWhere(PARAMETER_SECTIONS, {
+                            id: selectedSection.id
+                        });
+                        if (
+                            parameterSection &&
+                            parameterSection.options.length === 1
+                        ) {
+                            onAddParameter(parameterSection.options[0]);
+                            onClose();
+                        } else {
+                            this.setState({ section: selectedSection.id });
+                        }
+                    }}
+                />
+            );
         } else {
-            let parameterSection = _.findWhere(PARAMETER_SECTIONS, { id: section });
-            return <ParameterOptionsPane options={parameterSection && parameterSection.options} onSelectOption={(option) => { onAddParameter(option); onClose(); } }/>
+            let parameterSection = _.findWhere(PARAMETER_SECTIONS, {
+                id: section
+            });
+            return (
+                <ParameterOptionsPane
+                    options={parameterSection && parameterSection.options}
+                    onSelectOption={option => {
+                        onAddParameter(option);
+                        onClose();
+                    }}
+                />
+            );
         }
     }
 }
 
-export const ParameterOptionsSection = ({ section, onClick }: { section: ParameterSection, onClick: () => any}) =>
+export const ParameterOptionsSection = ({
+    section,
+    onClick
+}: {
+    section: ParameterSection,
+    onClick: () => any
+}) => (
     <li onClick={onClick} className="p1 px2 cursor-pointer brand-hover">
         <div className="text-brand text-bold">{section.name}</div>
         <div>{section.description}</div>
     </li>
+);
 
-export const ParameterOptionsSectionsPane = ({ sections, onSelectSection }: { sections: Array<ParameterSection>, onSelectSection: (ParameterSection) => any}) =>
+export const ParameterOptionsSectionsPane = ({
+    sections,
+    onSelectSection
+}: {
+    sections: Array<ParameterSection>,
+    onSelectSection: ParameterSection => any
+}) => (
     <div className="pb2">
         <h3 className="p2">What do you want to filter?</h3>
         <ul>
-            { sections.map(section =>
-                <ParameterOptionsSection section={section} onClick={() => onSelectSection(section) }/>
-            )}
+            {sections.map(section => (
+                <ParameterOptionsSection
+                    section={section}
+                    onClick={() => onSelectSection(section)}
+                />
+            ))}
         </ul>
     </div>
+);
 
-export const ParameterOptionItem = ({ option, onClick }: { option: ParameterOption, onClick: () => any}) =>
+export const ParameterOptionItem = ({
+    option,
+    onClick
+}: {
+    option: ParameterOption,
+    onClick: () => any
+}) => (
     <li onClick={onClick} className="p1 px2 cursor-pointer brand-hover">
-        <div className="text-brand text-bold">{option.menuName || option.name}</div>
+        <div className="text-brand text-bold">
+            {option.menuName || option.name}
+        </div>
         <div>{option.description}</div>
     </li>
+);
 
-export const ParameterOptionsPane = ({ options, onSelectOption }: { options: ?Array<ParameterOption>, onSelectOption: (ParameterOption) => any}) =>
+export const ParameterOptionsPane = ({
+    options,
+    onSelectOption
+}: {
+    options: ?Array<ParameterOption>,
+    onSelectOption: ParameterOption => any
+}) => (
     <div className="pb2">
         <h3 className="p2">What kind of filter?</h3>
         <ul>
-            { options && options.map(option =>
-                <ParameterOptionItem option={option} onClick={() => onSelectOption(option)} />
-            )}
+            {options &&
+                options.map(option => (
+                    <ParameterOptionItem
+                        option={option}
+                        onClick={() => onSelectOption(option)}
+                    />
+                ))}
         </ul>
     </div>
+);

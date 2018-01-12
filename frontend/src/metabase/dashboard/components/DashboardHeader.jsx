@@ -22,59 +22,79 @@ import MetabaseSettings from "metabase/lib/settings";
 
 import cx from "classnames";
 
-import type { LocationDescriptor, QueryParams, EntityType, EntityId } from "metabase/meta/types";
+import type {
+    LocationDescriptor,
+    QueryParams,
+    EntityType,
+    EntityId
+} from "metabase/meta/types";
 import type { Card, CardId } from "metabase/meta/types/Card";
-import type { Parameter, ParameterId, ParameterOption } from "metabase/meta/types/Parameter";
-import type { DashboardWithCards, DashboardId, DashCardId } from "metabase/meta/types/Dashboard";
+import type {
+    Parameter,
+    ParameterId,
+    ParameterOption
+} from "metabase/meta/types/Parameter";
+import type {
+    DashboardWithCards,
+    DashboardId,
+    DashCardId
+} from "metabase/meta/types/Dashboard";
 import type { Revision, RevisionId } from "metabase/meta/types/Revision";
 
 type Props = {
-    location:               LocationDescriptor,
+    location: LocationDescriptor,
 
-    dashboard:              DashboardWithCards,
-    cards:                  Card[],
-    revisions:              { [key: string]: Revision[] },
+    dashboard: DashboardWithCards,
+    cards: Card[],
+    revisions: { [key: string]: Revision[] },
 
-    isAdmin:                boolean,
-    isEditable:             boolean,
-    isEditing:              boolean,
-    isFullscreen:           boolean,
-    isNightMode:            boolean,
+    isAdmin: boolean,
+    isEditable: boolean,
+    isEditing: boolean,
+    isFullscreen: boolean,
+    isNightMode: boolean,
 
-    refreshPeriod:          ?number,
-    refreshElapsed:         ?number,
+    refreshPeriod: ?number,
+    refreshElapsed: ?number,
 
-    parametersWidget:       React$Element<*>,
+    parametersWidget: React$Element<*>,
 
-    addCardToDashboard:         ({ dashId: DashCardId, cardId: CardId }) => void,
+    addCardToDashboard: ({ dashId: DashCardId, cardId: CardId }) => void,
     addTextDashCardToDashboard: ({ dashId: DashCardId }) => void,
-    archiveDashboard:           (dashboardId: DashboardId) => void,
-    fetchCards:                 (filterMode?: string) => void,
-    fetchDashboard:             (dashboardId: DashboardId, queryParams: ?QueryParams) => void,
-    fetchRevisions:             ({ entity: string, id: number }) => void,
-    revertToRevision:           ({ entity: string, id: number, revision_id: RevisionId }) => void,
-    saveDashboardAndCards:      () => Promise<void>,
-    setDashboardAttribute:      (attribute: string, value: any) => void,
+    archiveDashboard: (dashboardId: DashboardId) => void,
+    fetchCards: (filterMode?: string) => void,
+    fetchDashboard: (
+        dashboardId: DashboardId,
+        queryParams: ?QueryParams
+    ) => void,
+    fetchRevisions: ({ entity: string, id: number }) => void,
+    revertToRevision: ({
+        entity: string,
+        id: number,
+        revision_id: RevisionId
+    }) => void,
+    saveDashboardAndCards: () => Promise<void>,
+    setDashboardAttribute: (attribute: string, value: any) => void,
 
-    addParameter:           (option: ParameterOption) => Promise<Parameter>,
-    setEditingParameter:    (parameterId: ?ParameterId) => void,
+    addParameter: (option: ParameterOption) => Promise<Parameter>,
+    setEditingParameter: (parameterId: ?ParameterId) => void,
 
-    onEditingChange:        (isEditing: boolean) => void,
-    onRefreshPeriodChange:  (?number) => void,
-    onNightModeChange:      (boolean) => void,
-    onFullscreenChange:     (boolean) => void,
+    onEditingChange: (isEditing: boolean) => void,
+    onRefreshPeriodChange: (?number) => void,
+    onNightModeChange: boolean => void,
+    onFullscreenChange: boolean => void,
 
-    onChangeLocation:       (string) => void,
-}
+    onChangeLocation: string => void
+};
 
 type State = {
-    modal: null|"parameters",
-}
+    modal: null | "parameters"
+};
 
 export default class DashboardHeader extends Component {
     props: Props;
     state: State = {
-        modal: null,
+        modal: null
     };
 
     static propTypes = {
@@ -109,7 +129,9 @@ export default class DashboardHeader extends Component {
     }
 
     onAddTextBox() {
-        this.props.addTextDashCardToDashboard({ dashId: this.props.dashboard.id });
+        this.props.addTextDashCardToDashboard({
+            dashId: this.props.dashboard.id
+        });
     }
 
     onDoneEditing() {
@@ -117,7 +139,10 @@ export default class DashboardHeader extends Component {
     }
 
     onRevert() {
-        this.props.fetchDashboard(this.props.dashboard.id, this.props.location.query);
+        this.props.fetchDashboard(
+            this.props.dashboard.id,
+            this.props.location.query
+        );
     }
 
     async onSave() {
@@ -141,19 +166,35 @@ export default class DashboardHeader extends Component {
     }
 
     // 2. revert to a revision
-    onRevertToRevision({ entity, id, revision_id }: { entity: EntityType, id: EntityId, revision_id: RevisionId }) {
+    onRevertToRevision({
+        entity,
+        id,
+        revision_id
+    }: {
+        entity: EntityType,
+        id: EntityId,
+        revision_id: RevisionId
+    }) {
         return this.props.revertToRevision({ entity, id, revision_id });
     }
 
     // 3. finished reverting to a revision
     onRevertedRevision() {
         this.refs.dashboardHistory.toggle();
-        this.props.fetchDashboard(this.props.dashboard.id, this.props.location.query);
+        this.props.fetchDashboard(
+            this.props.dashboard.id,
+            this.props.location.query
+        );
     }
 
     getEditingButtons() {
         return [
-            <a data-metabase-event="Dashboard;Cancel Edits" key="cancel" className="Button Button--small" onClick={() => this.onCancel()}>
+            <a
+                data-metabase-event="Dashboard;Cancel Edits"
+                key="cancel"
+                className="Button Button--small"
+                onClick={() => this.onCancel()}
+            >
                 Cancel
             </a>,
             <ModalWithTrigger
@@ -181,7 +222,14 @@ export default class DashboardHeader extends Component {
     }
 
     getHeaderButtons() {
-        const { dashboard, parametersWidget, isEditing, isFullscreen, isEditable, isAdmin } = this.props;
+        const {
+            dashboard,
+            parametersWidget,
+            isEditing,
+            isFullscreen,
+            isEditable,
+            isAdmin
+        } = this.props;
         const isEmpty = !dashboard || dashboard.ordered_cards.length === 0;
         const canEdit = isEditable && !!dashboard;
 
@@ -202,8 +250,20 @@ export default class DashboardHeader extends Component {
                     ref="addQuestionModal"
                     triggerElement={
                         <Tooltip tooltip="Add a question">
-                            <span data-metabase-event="Dashboard;Add Card Modal" title="Add a question to this dashboard">
-                                <Icon className={cx("text-brand-hover cursor-pointer", { "Icon--pulse": isEmpty })} name="add" size={16} />
+                            <span
+                                data-metabase-event="Dashboard;Add Card Modal"
+                                title="Add a question to this dashboard"
+                            >
+                                <Icon
+                                    className={cx(
+                                        "text-brand-hover cursor-pointer",
+                                        {
+                                            "Icon--pulse": isEmpty
+                                        }
+                                    )}
+                                    name="add"
+                                    size={16}
+                                />
                             </span>
                         </Tooltip>
                     }
@@ -226,30 +286,45 @@ export default class DashboardHeader extends Component {
                 <span>
                     <Tooltip tooltip="Add a filter">
                         <a
-                          key="parameters"
-                          className={cx("text-brand-hover", { "text-brand": this.state.modal == "parameters" })}
-                          title="Parameters"
-                          onClick={() => this.setState({ modal: "parameters" })}
+                            key="parameters"
+                            className={cx("text-brand-hover", {
+                                "text-brand": this.state.modal == "parameters"
+                            })}
+                            title="Parameters"
+                            onClick={() =>
+                                this.setState({ modal: "parameters" })
+                            }
                         >
                             <Icon name="funneladd" size={16} />
                         </a>
                     </Tooltip>
 
-                    {this.state.modal && this.state.modal === "parameters" &&
-                        <Popover onClose={() => this.setState({ modal: null })}>
-                            <ParametersPopover
-                                onAddParameter={this.props.addParameter}
+                    {this.state.modal &&
+                        this.state.modal === "parameters" && (
+                            <Popover
                                 onClose={() => this.setState({ modal: null })}
-                            />
-                        </Popover>
-                    }
+                            >
+                                <ParametersPopover
+                                    onAddParameter={this.props.addParameter}
+                                    onClose={() =>
+                                        this.setState({ modal: null })
+                                    }
+                                />
+                            </Popover>
+                        )}
                 </span>
             );
 
             // Add text card button
             buttons.push(
                 <Tooltip tooltip="Add a text box">
-                    <a data-metabase-event="Dashboard;Add Text Box" key="add-text" title="Add a text box" className="text-brand-hover cursor-pointer" onClick={() => this.onAddTextBox()}>
+                    <a
+                        data-metabase-event="Dashboard;Add Text Box"
+                        key="add-text"
+                        title="Add a text box"
+                        className="text-brand-hover cursor-pointer"
+                        onClick={() => this.onAddTextBox()}
+                    >
                         <Icon name="string" size={20} />
                     </a>
                 </Tooltip>
@@ -262,7 +337,11 @@ export default class DashboardHeader extends Component {
                     triggerElement={
                         <Tooltip tooltip="Revision history">
                             <span data-metabase-event={"Dashboard;Revisions"}>
-                                <Icon className="text-brand-hover" name="history" size={18} />
+                                <Icon
+                                    className="text-brand-hover"
+                                    name="history"
+                                    size={18}
+                                />
                             </span>
                         </Tooltip>
                     }
@@ -270,7 +349,9 @@ export default class DashboardHeader extends Component {
                     <HistoryModal
                         entityType="dashboard"
                         entityId={dashboard.id}
-                        revisions={this.props.revisions["dashboard-"+dashboard.id]}
+                        revisions={
+                            this.props.revisions["dashboard-" + dashboard.id]
+                        }
                         onFetchRevisions={this.onFetchRevisions.bind(this)}
                         onRevertToRevision={this.onRevertToRevision.bind(this)}
                         onClose={() => this.refs.dashboardHistory.toggle()}
@@ -283,20 +364,25 @@ export default class DashboardHeader extends Component {
         if (!isFullscreen && !isEditing && canEdit) {
             buttons.push(
                 <Tooltip tooltip="Edit dashboard">
-                    <a data-metabase-event="Dashboard;Edit" key="edit" title="Edit Dashboard Layout" className="text-brand-hover cursor-pointer" onClick={() => this.onEdit()}>
+                    <a
+                        data-metabase-event="Dashboard;Edit"
+                        key="edit"
+                        title="Edit Dashboard Layout"
+                        className="text-brand-hover cursor-pointer"
+                        onClick={() => this.onEdit()}
+                    >
                         <Icon name="pencil" size={16} />
                     </a>
                 </Tooltip>
             );
         }
 
-        if (!isFullscreen && (
-            (isPublicLinksEnabled && (isAdmin || dashboard.public_uuid)) ||
-            (isEmbeddingEnabled && isAdmin)
-        )) {
-            buttons.push(
-                <DashboardEmbedWidget dashboard={dashboard} />
-            )
+        if (
+            !isFullscreen &&
+            ((isPublicLinksEnabled && (isAdmin || dashboard.public_uuid)) ||
+                (isEmbeddingEnabled && isAdmin))
+        ) {
+            buttons.push(<DashboardEmbedWidget dashboard={dashboard} />);
         }
 
         buttons.push(...getDashboardActions(this.props));
@@ -318,11 +404,13 @@ export default class DashboardHeader extends Component {
                 editingTitle="You are editing a dashboard"
                 editingButtons={this.getEditingButtons()}
                 setItemAttributeFn={this.props.setDashboardAttribute}
-                headerModalMessage={this.props.isEditingParameter ?
-                    "Select the field that should be filtered for each card" : null}
+                headerModalMessage={
+                    this.props.isEditingParameter
+                        ? "Select the field that should be filtered for each card"
+                        : null
+                }
                 onHeaderModalDone={() => this.props.setEditingParameter(null)}
-            >
-            </Header>
+            />
         );
     }
 }

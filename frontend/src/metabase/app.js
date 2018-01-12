@@ -1,7 +1,7 @@
 /* @flow weak */
 
-import 'babel-polyfill';
-import 'number-to-locale-string';
+import "babel-polyfill";
+import "number-to-locale-string";
 
 // make the i18n function "t" global so we don't have to import it in basically every file
 import { t, jt } from "c-3po";
@@ -11,25 +11,27 @@ global.jt = jt;
 // set the locale before loading anything else
 import { setLocalization } from "metabase/lib/i18n";
 if (window.MetabaseLocalization) {
-    setLocalization(window.MetabaseLocalization)
+    setLocalization(window.MetabaseLocalization);
 }
 
-import React from 'react'
-import ReactDOM from 'react-dom'
-import { Provider } from 'react-redux'
+import React from "react";
+import ReactDOM from "react-dom";
+import { Provider } from "react-redux";
 
-import MetabaseAnalytics, { registerAnalyticsClickListener } from "metabase/lib/analytics";
+import MetabaseAnalytics, {
+    registerAnalyticsClickListener
+} from "metabase/lib/analytics";
 import MetabaseSettings from "metabase/lib/settings";
 
 import api from "metabase/lib/api";
 
-import { getStore } from './store'
+import { getStore } from "./store";
 
 import { refreshSiteSettings } from "metabase/redux/settings";
 
 import { Router, useRouterHistory } from "react-router";
-import { createHistory } from 'history'
-import { syncHistoryWithStore } from 'react-router-redux';
+import { createHistory } from "history";
+import { syncHistoryWithStore } from "react-router-redux";
 
 // remove trailing slash
 const BASENAME = window.MetabaseRoot.replace(/\/+$/, "");
@@ -47,11 +49,10 @@ function _init(reducers, getRoutes, callback) {
 
     ReactDOM.render(
         <Provider store={store}>
-          <Router history={history}>
-            {routes}
-          </Router>
-        </Provider>
-    , document.getElementById('root'));
+            <Router history={history}>{routes}</Router>
+        </Provider>,
+        document.getElementById("root")
+    );
 
     // listen for location changes and use that as a trigger for page view tracking
     history.listen(location => {
@@ -64,7 +65,9 @@ function _init(reducers, getRoutes, callback) {
 
     // enable / disable GA based on opt-out of anonymous tracking
     MetabaseSettings.on("anon_tracking_enabled", () => {
-        window['ga-disable-' + MetabaseSettings.get('ga_code')] = MetabaseSettings.isTrackingEnabled() ? null : true;
+        window[
+            "ga-disable-" + MetabaseSettings.get("ga_code")
+        ] = MetabaseSettings.isTrackingEnabled() ? null : true;
     });
 
     if (callback) {
@@ -73,9 +76,9 @@ function _init(reducers, getRoutes, callback) {
 }
 
 export function init(...args) {
-    if (document.readyState != 'loading') {
+    if (document.readyState != "loading") {
         _init(...args);
     } else {
-        document.addEventListener('DOMContentLoaded', () => _init(...args));
+        document.addEventListener("DOMContentLoaded", () => _init(...args));
     }
 }

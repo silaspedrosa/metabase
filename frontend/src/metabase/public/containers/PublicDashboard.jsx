@@ -3,7 +3,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { push } from "react-router-redux";
-import cx from 'classnames';
+import cx from "classnames";
 
 import { IFRAMED } from "metabase/lib/dom";
 
@@ -16,7 +16,13 @@ import EmbedFrame from "../components/EmbedFrame";
 import { fetchDatabaseMetadata } from "metabase/redux/metadata";
 import { setErrorPage } from "metabase/redux/app";
 
-import { getDashboardComplete, getCardData, getSlowCards, getParameters, getParameterValues } from "metabase/dashboard/selectors";
+import {
+    getDashboardComplete,
+    getCardData,
+    getSlowCards,
+    getParameters,
+    getParameterValues
+} from "metabase/dashboard/selectors";
 
 import * as dashboardActions from "metabase/dashboard/dashboard";
 
@@ -26,39 +32,46 @@ import type { Parameter } from "metabase/meta/types/Parameter";
 import _ from "underscore";
 
 const mapStateToProps = (state, props) => {
-  return {
-      dashboardId:          props.params.dashboardId || props.params.uuid || props.params.token,
-      dashboard:            getDashboardComplete(state, props),
-      dashcardData:         getCardData(state, props),
-      slowCards:            getSlowCards(state, props),
-      parameters:           getParameters(state, props),
-      parameterValues:      getParameterValues(state, props)
-  }
-}
+    return {
+        dashboardId:
+            props.params.dashboardId || props.params.uuid || props.params.token,
+        dashboard: getDashboardComplete(state, props),
+        dashcardData: getCardData(state, props),
+        slowCards: getSlowCards(state, props),
+        parameters: getParameters(state, props),
+        parameterValues: getParameterValues(state, props)
+    };
+};
 
 const mapDispatchToProps = {
     ...dashboardActions,
     fetchDatabaseMetadata,
     setErrorPage,
     onChangeLocation: push
-}
+};
 
 type Props = {
-    params:                 { uuid?: string, token?: string },
-    location:               { query: { [key:string]: string }},
-    dashboardId:            string,
+    params: { uuid?: string, token?: string },
+    location: { query: { [key: string]: string } },
+    dashboardId: string,
 
-    dashboard?:             Dashboard,
-    parameters:             Parameter[],
-    parameterValues:        {[key:string]: string},
+    dashboard?: Dashboard,
+    parameters: Parameter[],
+    parameterValues: { [key: string]: string },
 
-    initialize:             () => void,
-    isFullscreen:           boolean,
-    isNightMode:            boolean,
-    fetchDashboard:         (dashId: string, query: { [key:string]: string }) => Promise<void>,
-    fetchDashboardCardData: (options: { reload: bool, clear: bool }) => Promise<void>,
-    setParameterValue:      (id: string, value: string) => void,
-    setErrorPage:           (error: { status: number }) => void,
+    initialize: () => void,
+    isFullscreen: boolean,
+    isNightMode: boolean,
+    fetchDashboard: (
+        dashId: string,
+        query: { [key: string]: string }
+    ) => Promise<void>,
+    fetchDashboardCardData: (options: {
+        reload: boolean,
+        clear: boolean
+    }) => Promise<void>,
+    setParameterValue: (id: string, value: string) => void,
+    setErrorPage: (error: { status: number }) => void
 };
 
 @connect(mapStateToProps, mapDispatchToProps)
@@ -68,7 +81,14 @@ export default class PublicDashboard extends Component {
 
     // $FlowFixMe
     async componentWillMount() {
-        const { initialize, fetchDashboard, fetchDashboardCardData, setErrorPage, location, params: { uuid, token }}  = this.props;
+        const {
+            initialize,
+            fetchDashboard,
+            fetchDashboardCardData,
+            setErrorPage,
+            location,
+            params: { uuid, token }
+        } = this.props;
         initialize();
         try {
             // $FlowFixMe
@@ -86,7 +106,13 @@ export default class PublicDashboard extends Component {
     }
 
     render() {
-        const { dashboard, parameters, parameterValues, isFullscreen, isNightMode } = this.props;
+        const {
+            dashboard,
+            parameters,
+            parameterValues,
+            isFullscreen,
+            isNightMode
+        } = this.props;
         const buttons = !IFRAMED ? getDashboardActions(this.props) : [];
 
         return (
@@ -96,23 +122,33 @@ export default class PublicDashboard extends Component {
                 parameters={parameters}
                 parameterValues={parameterValues}
                 setParameterValue={this.props.setParameterValue}
-                actionButtons={buttons.length > 0 &&
-                    <div>
-                        {buttons.map((button, index) =>
-                            <span key={index} className="m1">{button}</span>
-                        )}
-                    </div>
+                actionButtons={
+                    buttons.length > 0 && (
+                        <div>
+                            {buttons.map((button, index) => (
+                                <span key={index} className="m1">
+                                    {button}
+                                </span>
+                            ))}
+                        </div>
+                    )
                 }
             >
-                <LoadingAndErrorWrapper className={cx("Dashboard p1 flex-full", { "Dashboard--fullscreen": isFullscreen, "Dashboard--night": isNightMode })} loading={!dashboard}>
-                { () =>
-                    <DashboardGrid
-                        {...this.props}
-                        className={"spread"}
-                        // Don't allow clicking titles on public dashboards
-                        navigateToNewCardFromDashboard={null}
-                    />
-                }
+                <LoadingAndErrorWrapper
+                    className={cx("Dashboard p1 flex-full", {
+                        "Dashboard--fullscreen": isFullscreen,
+                        "Dashboard--night": isNightMode
+                    })}
+                    loading={!dashboard}
+                >
+                    {() => (
+                        <DashboardGrid
+                            {...this.props}
+                            className={"spread"}
+                            // Don't allow clicking titles on public dashboards
+                            navigateToNewCardFromDashboard={null}
+                        />
+                    )}
                 </LoadingAndErrorWrapper>
             </EmbedFrame>
         );

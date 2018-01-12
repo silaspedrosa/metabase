@@ -1,5 +1,5 @@
 import { serializeCardForUrl } from "metabase/lib/card";
-import MetabaseSettings from "metabase/lib/settings"
+import MetabaseSettings from "metabase/lib/settings";
 import Question from "metabase-lib/lib/Question";
 
 // provides functions for building urls to things we care about
@@ -30,7 +30,7 @@ export function plainQuestion() {
     return Question.create({ metadata: null }).getUrl();
 }
 
-export function dashboard(dashboardId, {addCardWithId} = {}) {
+export function dashboard(dashboardId, { addCardWithId } = {}) {
     return addCardWithId != null
         ? `/dashboard/${dashboardId}#add=${addCardWithId}`
         : `/dashboard/${dashboardId}`;

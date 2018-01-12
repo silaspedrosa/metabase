@@ -48,17 +48,36 @@ export default class LegendHeader extends Component {
     }
 
     render() {
-        const { series, hovered, onRemoveSeries, actionButtons, onHoverChange, onChangeCardAndRun, settings, description, onVisualizationClick, visualizationIsClickable } = this.props;
-        const showDots     = series.length > 1;
-        const isNarrow     = this.state.width < 150;
-        const showTitles   = !showDots || !isNarrow;
-        const colors       = settings["graph.colors"] || DEFAULT_COLORS;
+        const {
+            series,
+            hovered,
+            onRemoveSeries,
+            actionButtons,
+            onHoverChange,
+            onChangeCardAndRun,
+            settings,
+            description,
+            onVisualizationClick,
+            visualizationIsClickable
+        } = this.props;
+        const showDots = series.length > 1;
+        const isNarrow = this.state.width < 150;
+        const showTitles = !showDots || !isNarrow;
+        const colors = settings["graph.colors"] || DEFAULT_COLORS;
         const customTitles = settings["graph.series_labels"];
-        const titles       = (customTitles && customTitles.length === series.length) ? customTitles : series.map((thisSeries) => thisSeries.card.name);
+        const titles =
+            customTitles && customTitles.length === series.length
+                ? customTitles
+                : series.map(thisSeries => thisSeries.card.name);
 
         return (
-            <div  className={cx(styles.LegendHeader, "Card-title mx1 flex flex-no-shrink flex-row align-center")}>
-                { series.map((s, index) => [
+            <div
+                className={cx(
+                    styles.LegendHeader,
+                    "Card-title mx1 flex flex-no-shrink flex-row align-center"
+                )}
+            >
+                {series.map((s, index) => [
                     <LegendItem
                         key={index}
                         title={titles[index]}
@@ -66,28 +85,49 @@ export default class LegendHeader extends Component {
                         color={colors[index % colors.length]}
                         showDot={showDots}
                         showTitle={showTitles}
-                        isMuted={hovered && hovered.index != null && index !== hovered.index}
-                        onMouseEnter={() => onHoverChange && onHoverChange({ index })}
-                        onMouseLeave={() => onHoverChange && onHoverChange(null) }
-                        onClick={s.clicked && visualizationIsClickable(s.clicked) ?
-                            ((e) => onVisualizationClick({ ...s.clicked, element: e.currentTarget }))
-                        : onChangeCardAndRun ?
-                            (() => onChangeCardAndRun({ nextCard: s.card, seriesIndex: index }))
-                        : null }
+                        isMuted={
+                            hovered &&
+                            hovered.index != null &&
+                            index !== hovered.index
+                        }
+                        onMouseEnter={() =>
+                            onHoverChange && onHoverChange({ index })
+                        }
+                        onMouseLeave={() =>
+                            onHoverChange && onHoverChange(null)
+                        }
+                        onClick={
+                            s.clicked && visualizationIsClickable(s.clicked)
+                                ? e =>
+                                      onVisualizationClick({
+                                          ...s.clicked,
+                                          element: e.currentTarget
+                                      })
+                                : onChangeCardAndRun
+                                  ? () =>
+                                        onChangeCardAndRun({
+                                            nextCard: s.card,
+                                            seriesIndex: index
+                                        })
+                                  : null
+                        }
                     />,
-                    onRemoveSeries && index > 0 &&
-                      <Icon
-                          name="close"
-                          className="text-grey-2 flex-no-shrink mr1 cursor-pointer"
-                          width={12} height={12}
-                          onClick={() => onRemoveSeries(s.card)}
-                      />
+                    onRemoveSeries &&
+                        index > 0 && (
+                            <Icon
+                                name="close"
+                                className="text-grey-2 flex-no-shrink mr1 cursor-pointer"
+                                width={12}
+                                height={12}
+                                onClick={() => onRemoveSeries(s.card)}
+                            />
+                        )
                 ])}
-                { actionButtons &&
-                  <span className="flex-no-shrink flex-align-right relative">
-                      {actionButtons}
-                  </span>
-                }
+                {actionButtons && (
+                    <span className="flex-no-shrink flex-align-right relative">
+                        {actionButtons}
+                    </span>
+                )}
             </div>
         );
     }

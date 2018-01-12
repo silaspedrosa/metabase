@@ -2,7 +2,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import ReactDOM from "react-dom";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 
 import Icon from "metabase/components/Icon.jsx";
 import Popover from "metabase/components/Popover.jsx";
@@ -15,9 +15,8 @@ export default class CardPicker extends Component {
         isOpen: false,
         inputValue: "",
         inputWidth: 300,
-        collectionId: undefined,
+        collectionId: undefined
     };
-
 
     static propTypes = {
         cardList: PropTypes.array.isRequired,
@@ -28,13 +27,13 @@ export default class CardPicker extends Component {
         clearTimeout(this._timer);
     }
 
-    onInputChange = ({target}) => {
+    onInputChange = ({ target }) => {
         this.setState({ inputValue: target.value });
-    }
+    };
 
     onInputFocus = () => {
         this.setState({ isOpen: true });
-    }
+    };
 
     onInputBlur = () => {
         // Without a timeout here isOpen gets set to false when an item is clicked
@@ -43,17 +42,17 @@ export default class CardPicker extends Component {
         clearTimeout(this._timer);
         this._timer = setTimeout(() => {
             if (!this.state.isClicking) {
-                this.setState({ isOpen: false })
+                this.setState({ isOpen: false });
             } else {
-                this.setState({ isClicking: false })
+                this.setState({ isClicking: false });
             }
         }, 250);
-    }
+    };
 
-    onChange = (id) => {
+    onChange = id => {
         this.props.onChange(id);
         ReactDOM.findDOMNode(this.refs.input).blur();
-    }
+    };
 
     renderItem(card) {
         let error;
@@ -62,7 +61,11 @@ export default class CardPicker extends Component {
                 error = t`Raw data cannot be included in pulses`;
             }
         } catch (e) {}
-        if (card.display === "pin_map" || card.display === "state" || card.display === "country") {
+        if (
+            card.display === "pin_map" ||
+            card.display === "state" ||
+            card.display === "country"
+        ) {
             error = t`Maps cannot be included in pulses`;
         }
 
@@ -72,10 +75,14 @@ export default class CardPicker extends Component {
                     <h4 className="text-grey-2">{card.name}</h4>
                     <h4 className="text-gold mt1">{error}</h4>
                 </li>
-            )
+            );
         } else {
             return (
-                <li key={card.id} className="List-item cursor-pointer" onClickCapture={this.onChange.bind(this, card.id)}>
+                <li
+                    key={card.id}
+                    className="List-item cursor-pointer"
+                    onClickCapture={this.onChange.bind(this, card.id)}
+                >
                     <h4 className="List-item-title px2 py1">{card.name}</h4>
                 </li>
             );
@@ -105,15 +112,18 @@ export default class CardPicker extends Component {
             .sortBy("name")
             // add "Everything else" as the last option for cards without a
             // collection
-            .concat([{ id: null, name: t`Everything else`}])
+            .concat([{ id: null, name: t`Everything else` }])
             .value();
 
         let visibleCardList;
         if (inputValue) {
             let searchString = inputValue.toLowerCase();
-            visibleCardList = cardList.filter((card) =>
-                ~(card.name || "").toLowerCase().indexOf(searchString) ||
-                ~(card.description || "").toLowerCase().indexOf(searchString)
+            visibleCardList = cardList.filter(
+                card =>
+                    ~(card.name || "").toLowerCase().indexOf(searchString) ||
+                    ~(card.description || "")
+                        .toLowerCase()
+                        .indexOf(searchString)
             );
         } else {
             if (collectionId !== undefined) {
@@ -144,28 +154,48 @@ export default class CardPicker extends Component {
                         targetOffset: "0 0"
                     }}
                 >
-                    <div className="rounded bordered scroll-y scroll-show" style={{ width: inputWidth + "px", maxHeight: "400px" }}>
-                    { visibleCardList && collectionIds.length > 1 &&
-                        <div className="flex align-center text-slate cursor-pointer border-bottom p2"  onClick={(e) => {
-                            this.setState({ collectionId: undefined, isClicking: true });
-                        }}>
-                            <Icon name="chevronleft" size={18} />
-                            <h3 className="ml1">{collection && collection.name}</h3>
-                        </div>
-                    }
-                    { visibleCardList ?
-                        <ul className="List text-brand">
-                            {visibleCardList.map((card) => this.renderItem(card))}
-                        </ul>
-                    : collections ?
-                        <CollectionList>
-                            {collections.map(collection =>
-                                <CollectionListItem collection={collection} onClick={(e) => {
-                                    this.setState({ collectionId: collection.id, isClicking: true });
-                                }}/>
+                    <div
+                        className="rounded bordered scroll-y scroll-show"
+                        style={{ width: inputWidth + "px", maxHeight: "400px" }}
+                    >
+                        {visibleCardList &&
+                            collectionIds.length > 1 && (
+                                <div
+                                    className="flex align-center text-slate cursor-pointer border-bottom p2"
+                                    onClick={e => {
+                                        this.setState({
+                                            collectionId: undefined,
+                                            isClicking: true
+                                        });
+                                    }}
+                                >
+                                    <Icon name="chevronleft" size={18} />
+                                    <h3 className="ml1">
+                                        {collection && collection.name}
+                                    </h3>
+                                </div>
                             )}
-                        </CollectionList>
-                    : null }
+                        {visibleCardList ? (
+                            <ul className="List text-brand">
+                                {visibleCardList.map(card =>
+                                    this.renderItem(card)
+                                )}
+                            </ul>
+                        ) : collections ? (
+                            <CollectionList>
+                                {collections.map(collection => (
+                                    <CollectionListItem
+                                        collection={collection}
+                                        onClick={e => {
+                                            this.setState({
+                                                collectionId: collection.id,
+                                                isClicking: true
+                                            });
+                                        }}
+                                    />
+                                ))}
+                            </CollectionList>
+                        ) : null}
                     </div>
                 </Popover>
             </div>
@@ -173,22 +203,30 @@ export default class CardPicker extends Component {
     }
 }
 
-const CollectionListItem = ({ collection, onClick }) =>
-    <li className="List-item cursor-pointer flex align-center py1 px2" onClick={onClick}>
-        <Icon name="collection" style={{ color: collection.color }} className="Icon mr2 text-default" size={18} />
+const CollectionListItem = ({ collection, onClick }) => (
+    <li
+        className="List-item cursor-pointer flex align-center py1 px2"
+        onClick={onClick}
+    >
+        <Icon
+            name="collection"
+            style={{ color: collection.color }}
+            className="Icon mr2 text-default"
+            size={18}
+        />
         <h4 className="List-item-title">{collection.name}</h4>
         <Icon name="chevronright" className="flex-align-right text-grey-2" />
     </li>
+);
 
 CollectionListItem.propTypes = {
     collection: PropTypes.object.isRequired,
     onClick: PropTypes.func.isRequired
 };
 
-const CollectionList = ({ children }) =>
-    <ul className="List text-brand">
-        {children}
-    </ul>
+const CollectionList = ({ children }) => (
+    <ul className="List text-brand">{children}</ul>
+);
 
 CollectionList.propTypes = {
     children: PropTypes.array.isRequired

@@ -17,8 +17,8 @@ export function stringifyHashOptions(options) {
 }
 
 export function updateQueryString(location, optionsUpdater) {
-    const currentOptions = parseHashOptions(location.search.substring(1))
-    const queryString = stringifyHashOptions(optionsUpdater(currentOptions))
+    const currentOptions = parseHashOptions(location.search.substring(1));
+    const queryString = stringifyHashOptions(optionsUpdater(currentOptions));
 
     return {
         pathname: location.pathname,

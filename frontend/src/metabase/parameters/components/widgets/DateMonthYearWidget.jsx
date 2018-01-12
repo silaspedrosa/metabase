@@ -27,15 +27,18 @@ export default class DateMonthYearWidget extends Component {
     static propTypes = {};
     static defaultProps = {};
 
-    static format = (value) => {
+    static format = value => {
         const m = moment(value, "YYYY-MM");
         return m.isValid() ? m.format("MMMM, YYYY") : "";
-    }
+    };
 
     componentWillUnmount() {
         const { month, year } = this.state;
         if (month != null && year != null) {
-            let value = moment().year(year).month(month).format("YYYY-MM");
+            let value = moment()
+                .year(year)
+                .month(month)
+                .format("YYYY-MM");
             if (this.props.value !== value) {
                 this.props.setValue(value);
             }
@@ -48,18 +51,35 @@ export default class DateMonthYearWidget extends Component {
         return (
             <div className="py2">
                 <div className="flex flex-column align-center px1">
-                    <YearPicker value={year} onChange={(year) => this.setState({ year: year })} />
+                    <YearPicker
+                        value={year}
+                        onChange={year => this.setState({ year: year })}
+                    />
                 </div>
                 <div className="flex">
                     <ol className="flex flex-column">
-                    { _.range(0,6).map(m =>
-                        <Month key={m} month={m} selected={m === month} onClick={() => this.setState({ month: m }, onClose)} />
-                    )}
+                        {_.range(0, 6).map(m => (
+                            <Month
+                                key={m}
+                                month={m}
+                                selected={m === month}
+                                onClick={() =>
+                                    this.setState({ month: m }, onClose)
+                                }
+                            />
+                        ))}
                     </ol>
                     <ol className="flex flex-column">
-                    { _.range(6,12).map(m =>
-                        <Month key={m} month={m} selected={m === month} onClick={() => this.setState({ month: m }, onClose)} />
-                    )}
+                        {_.range(6, 12).map(m => (
+                            <Month
+                                key={m}
+                                month={m}
+                                selected={m === month}
+                                onClick={() =>
+                                    this.setState({ month: m }, onClose)
+                                }
+                            />
+                        ))}
                     </ol>
                 </div>
             </div>
@@ -67,10 +87,15 @@ export default class DateMonthYearWidget extends Component {
     }
 }
 
-const Month = ({ month, selected, onClick}) =>
+const Month = ({ month, selected, onClick }) => (
     <li
-        className={cx("cursor-pointer px3 py1 text-bold text-brand-hover", { "text-brand": selected })}
+        className={cx("cursor-pointer px3 py1 text-bold text-brand-hover", {
+            "text-brand": selected
+        })}
         onClick={onClick}
     >
-        {moment().month(month).format("MMMM")}
+        {moment()
+            .month(month)
+            .format("MMMM")}
     </li>
+);

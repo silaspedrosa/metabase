@@ -1,14 +1,17 @@
 /* @flow */
 
 import React, { Component } from "react";
-import cx from 'classnames'
+import cx from "classnames";
 
 import Icon from "metabase/components/Icon";
 import Popover from "metabase/components/Popover";
 
 import MetabaseAnalytics from "metabase/lib/analytics";
 
-import type { ClickObject, ClickAction } from "metabase/meta/types/Visualization";
+import type {
+    ClickObject,
+    ClickAction
+} from "metabase/meta/types/Visualization";
 
 import _ from "underscore";
 
@@ -43,7 +46,7 @@ const SECTIONS = {
     distribution: {
         icon: "bar"
     }
-}
+};
 // give them indexes so we can sort the sections by the above ordering (JS objects are ordered)
 Object.values(SECTIONS).map((section, index) => {
     // $FlowFixMe
@@ -52,14 +55,14 @@ Object.values(SECTIONS).map((section, index) => {
 
 type Props = {
     clicked: ?ClickObject,
-    clickActions: ?ClickAction[],
-    onChangeCardAndRun: (Object) => void,
+    clickActions: ?(ClickAction[]),
+    onChangeCardAndRun: Object => void,
     onClose: () => void
 };
 
 type State = {
-    popoverAction: ?ClickAction;
-}
+    popoverAction: ?ClickAction
+};
 
 export default class ChartClickActions extends Component {
     props: Props;
@@ -72,7 +75,7 @@ export default class ChartClickActions extends Component {
         if (this.props.onClose) {
             this.props.onClose();
         }
-    }
+    };
 
     handleClickAction = (action: ClickAction) => {
         const { onChangeCardAndRun } = this.props;
@@ -81,7 +84,11 @@ export default class ChartClickActions extends Component {
         } else if (action.question) {
             const nextQuestion = action.question();
             if (nextQuestion) {
-                MetabaseAnalytics.trackEvent("Actions", "Executed Click Action", `${action.section||""}:${action.name||""}`);
+                MetabaseAnalytics.trackEvent(
+                    "Actions",
+                    "Executed Click Action",
+                    `${action.section || ""}:${action.name || ""}`
+                );
                 onChangeCardAndRun({ nextCard: nextQuestion.card() });
             }
             this.close();
@@ -103,12 +110,20 @@ export default class ChartClickActions extends Component {
                 <PopoverContent
                     onChangeCardAndRun={({ nextCard }) => {
                         if (popoverAction) {
-                            MetabaseAnalytics.trackEvent("Action", "Executed Click Action", `${popoverAction.section||""}:${popoverAction.name||""}`);
+                            MetabaseAnalytics.trackEvent(
+                                "Action",
+                                "Executed Click Action",
+                                `${popoverAction.section ||
+                                    ""}:${popoverAction.name || ""}`
+                            );
                         }
                         onChangeCardAndRun({ nextCard });
                     }}
                     onClose={() => {
-                        MetabaseAnalytics.trackEvent("Action", "Dismissed Click Action Menu");
+                        MetabaseAnalytics.trackEvent(
+                            "Action",
+                            "Dismissed Click Action Menu"
+                        );
                         this.close();
                     }}
                 />
@@ -118,7 +133,7 @@ export default class ChartClickActions extends Component {
         const sections = _.chain(clickActions)
             .groupBy("section")
             .pairs()
-            .sortBy(([key]) => SECTIONS[key] ? SECTIONS[key].index : 99)
+            .sortBy(([key]) => (SECTIONS[key] ? SECTIONS[key].index : 99))
             .value();
 
         return (
@@ -126,7 +141,10 @@ export default class ChartClickActions extends Component {
                 target={clicked.element}
                 targetEvent={clicked.event}
                 onClose={() => {
-                    MetabaseAnalytics.trackEvent("Action", "Dismissed Click Action Menu");
+                    MetabaseAnalytics.trackEvent(
+                        "Action",
+                        "Dismissed Click Action Menu"
+                    );
                     this.close();
                 }}
                 verticalAttachments={["top", "bottom"]}
@@ -134,26 +152,46 @@ export default class ChartClickActions extends Component {
                 sizeToFit
                 pinInitialAttachment
             >
-                { popover ?
+                {popover ? (
                     popover
-                :
+                ) : (
                     <div className="text-bold text-grey-3">
-                        {sections.map(([key, actions]) =>
-                            <div key={key} className="border-row-divider p2 flex align-center text-default-hover">
-                                <Icon name={SECTIONS[key] && SECTIONS[key].icon || "unknown"} className="mr3" size={16} />
-                                { actions.map((action, index) =>
+                        {sections.map(([key, actions]) => (
+                            <div
+                                key={key}
+                                className="border-row-divider p2 flex align-center text-default-hover"
+                            >
+                                <Icon
+                                    name={
+                                        (SECTIONS[key] && SECTIONS[key].icon) ||
+                                        "unknown"
+                                    }
+                                    className="mr3"
+                                    size={16}
+                                />
+                                {actions.map((action, index) => (
                                     <div
                                         key={index}
-                                        className={cx("text-brand-hover cursor-pointer", { "pr2": index === actions.length - 1, "pr4": index != actions.length - 1})}
-                                        onClick={() => this.handleClickAction(action)}
+                                        className={cx(
+                                            "text-brand-hover cursor-pointer",
+                                            {
+                                                pr2:
+                                                    index ===
+                                                    actions.length - 1,
+                                                pr4: index != actions.length - 1
+                                            }
+                                        )}
+                                        onClick={() =>
+                                            this.handleClickAction(action)
+                                        }
                                     >
                                         {action.title}
                                     </div>
-                                )}
+                                ))}
                             </div>
-                        )}
+                        ))}
                     </div>
-                }
+                )}
             </Popover>
         );
     }

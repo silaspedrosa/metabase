@@ -27,8 +27,8 @@ export default class LeafletHeatMap extends LeafletMap {
                 max: max,
                 maxZoom: settings["map.heat.max-zoom"],
                 minOpacity: settings["map.heat.min-opacity"],
-                radius:  settings["map.heat.radius"],
-                blur: settings["map.heat.blur"],
+                radius: settings["map.heat.radius"],
+                blur: settings["map.heat.blur"]
             });
             heatLayer.setLatLngs(points);
         } catch (err) {

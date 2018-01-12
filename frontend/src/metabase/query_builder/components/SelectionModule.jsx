@@ -3,8 +3,8 @@ import PropTypes from "prop-types";
 
 import Popover from "metabase/components/Popover.jsx";
 import Icon from "metabase/components/Icon.jsx";
-import SearchBar from './SearchBar.jsx';
-import { t } from 'c-3po';
+import SearchBar from "./SearchBar.jsx";
+import { t } from "c-3po";
 import _ from "underscore";
 import cx from "classnames";
 
@@ -85,7 +85,10 @@ export default class SelectionModule extends Component {
         // if an item that is normally in the expansion is selected then show the expansion
         for (var i = 0; i < this.props.items.length; i++) {
             var item = this.props.items[i];
-            if (this._itemIsSelected(item) && !this.props.expandFilter(item, i)) {
+            if (
+                this._itemIsSelected(item) &&
+                !this.props.expandFilter(item, i)
+            ) {
                 return true;
             }
         }
@@ -94,7 +97,7 @@ export default class SelectionModule extends Component {
 
     _displayCustom(values) {
         var custom = [];
-        this.props.children.forEach(function (element) {
+        this.props.children.forEach(function(element) {
             var newElement = element;
             newElement.props.children = values[newElement.props.content];
             custom.push(element);
@@ -111,14 +114,18 @@ export default class SelectionModule extends Component {
                 sourceItems = sourceItems.filter(this.props.expandFilter);
             }
 
-            var items = sourceItems.map(function (item, index) {
-                var display = (item) ? item[this.props.display] || item : item;
+            var items = sourceItems.map(function(item, index) {
+                var display = item ? item[this.props.display] || item : item;
                 var itemClassName = cx({
-                    'SelectionItem' : true,
-                    'SelectionItem--selected': selection === display
+                    SelectionItem: true,
+                    "SelectionItem--selected": selection === display
                 });
                 var description = null;
-                if (this.props.descriptionKey && item && item[this.props.descriptionKey]) {
+                if (
+                    this.props.descriptionKey &&
+                    item &&
+                    item[this.props.descriptionKey]
+                ) {
                     description = (
                         <div className="SelectionModule-description">
                             {item[this.props.descriptionKey]}
@@ -127,7 +134,11 @@ export default class SelectionModule extends Component {
                 }
                 // if children are provided, use the custom layout display
                 return (
-                    <li className={itemClassName} onClick={this._select.bind(null, item)} key={index}>
+                    <li
+                        className={itemClassName}
+                        onClick={this._select.bind(null, item)}
+                        key={index}
+                    >
                         <Icon name="check" size={12} />
                         <div className="flex-full">
                             <div className="SelectionModule-display">
@@ -141,7 +152,11 @@ export default class SelectionModule extends Component {
 
             if (!isExpanded && items.length !== this.props.items.length) {
                 items.push(
-                    <li className="SelectionItem border-top" onClick={this._expand} key="expand">
+                    <li
+                        className="SelectionItem border-top"
+                        onClick={this._expand}
+                        key="expand"
+                    >
                         <Icon name="chevrondown" size={12} />
                         <div>
                             <div className="SelectionModule-display">
@@ -164,7 +179,11 @@ export default class SelectionModule extends Component {
         if (this.props.action) {
             if (index !== undefined) {
                 if (this.props.parentIndex) {
-                    this.props.action(item[this.props.selectedKey], index, this.props.parentIndex);
+                    this.props.action(
+                        item[this.props.selectedKey],
+                        index,
+                        this.props.parentIndex
+                    );
                 } else {
                     this.props.action(item[this.props.selectedKey], index);
                 }
@@ -176,18 +195,21 @@ export default class SelectionModule extends Component {
     }
 
     _itemIsSelected(item) {
-        return item && _.isEqual(item[this.props.selectedKey], this.props.selectedValue);
+        return (
+            item &&
+            _.isEqual(item[this.props.selectedKey], this.props.selectedValue)
+        );
     }
 
     renderPopover(selection) {
-        if(this.state.open) {
+        if (this.state.open) {
             var itemListClasses = cx("SelectionItems", {
-                'SelectionItems--open': this.state.open,
-                'SelectionItems--expanded': this.state.expanded
+                "SelectionItems--open": this.state.open,
+                "SelectionItems--expanded": this.state.expanded
             });
 
             var searchBar;
-            if(this._enableSearch()) {
+            if (this._enableSearch()) {
                 searchBar = <SearchBar onFilter={this._filterSelections} />;
             }
 
@@ -209,7 +231,7 @@ export default class SelectionModule extends Component {
 
     render() {
         var selection;
-        this.props.items.forEach(function (item) {
+        this.props.items.forEach(function(item) {
             if (this._itemIsSelected(item)) {
                 selection = item[this.props.display];
             }
@@ -220,15 +242,18 @@ export default class SelectionModule extends Component {
             removeable = !!this.props.remove;
 
         var moduleClasses = cx({
-            'SelectionModule': true,
-            'selected': selection,
-            'removeable': removeable
+            SelectionModule: true,
+            selected: selection,
+            removeable: removeable
         });
 
-        if(this.props.remove) {
+        if (this.props.remove) {
             remove = (
-                <a className="text-grey-2 no-decoration pr1 flex align-center" onClick={this.props.remove.bind(null, this.props.index)}>
-                    <Icon name='close' size={14} />
+                <a
+                    className="text-grey-2 no-decoration pr1 flex align-center"
+                    onClick={this.props.remove.bind(null, this.props.index)}
+                >
+                    <Icon name="close" size={14} />
                 </a>
             );
         }
@@ -236,7 +261,10 @@ export default class SelectionModule extends Component {
         return (
             <div className={moduleClasses + " " + this.props.className}>
                 <div className="SelectionModule-trigger flex align-center">
-                    <a className="QueryOption p1 flex align-center" onClick={this._toggleOpen}>
+                    <a
+                        className="QueryOption p1 flex align-center"
+                        onClick={this._toggleOpen}
+                    >
                         {placeholder}
                     </a>
                     {remove}

@@ -1,14 +1,14 @@
 /* eslint "react/prop-types": "warn" */
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { connect } from 'react-redux';
+import { connect } from "react-redux";
 
-import SegmentSidebar from './SegmentSidebar.jsx';
-import SidebarLayout from 'metabase/components/SidebarLayout.jsx';
-import SegmentQuestions from "metabase/reference/segments/SegmentQuestions.jsx"
+import SegmentSidebar from "./SegmentSidebar.jsx";
+import SidebarLayout from "metabase/components/SidebarLayout.jsx";
+import SegmentQuestions from "metabase/reference/segments/SegmentQuestions.jsx";
 
-import * as metadataActions from 'metabase/redux/metadata';
-import * as actions from 'metabase/reference/reference';
+import * as metadataActions from "metabase/redux/metadata";
+import * as actions from "metabase/reference/reference";
 
 import {
     getUser,
@@ -16,12 +16,9 @@ import {
     getSegmentId,
     getDatabaseId,
     getIsEditing
-} from '../selectors';
+} from "../selectors";
 
-import {
-    loadEntities
-} from 'metabase/questions/questions';
-
+import { loadEntities } from "metabase/questions/questions";
 
 const mapStateToProps = (state, props) => ({
     user: getUser(state, props),
@@ -49,12 +46,15 @@ export default class SegmentQuestionsContainer extends Component {
         isEditing: PropTypes.bool
     };
 
-    async fetchContainerData(){
-        await actions.wrappedFetchSegmentQuestions(this.props, this.props.segmentId);
+    async fetchContainerData() {
+        await actions.wrappedFetchSegmentQuestions(
+            this.props,
+            this.props.segmentId
+        );
     }
 
     componentWillMount() {
-        this.fetchContainerData()
+        this.fetchContainerData();
     }
 
     componentWillReceiveProps(newProps) {
@@ -62,21 +62,17 @@ export default class SegmentQuestionsContainer extends Component {
             return;
         }
 
-        actions.clearState(newProps)
+        actions.clearState(newProps);
     }
 
     render() {
-        const {
-            user,
-            segment,
-            isEditing
-        } = this.props;
+        const { user, segment, isEditing } = this.props;
 
         return (
             <SidebarLayout
                 className="flex-full relative"
-                style={ isEditing ? { paddingTop: '43px' } : {}}
-                sidebar={<SegmentSidebar segment={segment} user={user}/>}
+                style={isEditing ? { paddingTop: "43px" } : {}}
+                sidebar={<SegmentSidebar segment={segment} user={user} />}
             >
                 <SegmentQuestions {...this.props} />
             </SidebarLayout>

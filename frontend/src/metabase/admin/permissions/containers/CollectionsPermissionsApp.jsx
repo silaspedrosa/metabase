@@ -6,8 +6,17 @@ import PermissionsApp from "./PermissionsApp.jsx";
 
 import { CollectionsApi } from "metabase/services";
 
-import { getCollectionsPermissionsGrid, getIsDirty, getSaveError, getDiff } from "../selectors";
-import { updatePermission, savePermissions, loadCollections } from "../permissions";
+import {
+    getCollectionsPermissionsGrid,
+    getIsDirty,
+    getSaveError,
+    getDiff
+} from "../selectors";
+import {
+    updatePermission,
+    savePermissions,
+    loadCollections
+} from "../permissions";
 import { goBack, push } from "react-router-redux";
 
 const mapStateToProps = (state, props) => {
@@ -16,13 +25,13 @@ const mapStateToProps = (state, props) => {
         isDirty: getIsDirty(state, props),
         saveError: getSaveError(state, props),
         diff: getDiff(state, props)
-    }
-}
+    };
+};
 
 const mapDispatchToProps = {
     onUpdatePermission: updatePermission,
     onSave: savePermissions,
-    onCancel: () => window.history.length > 1 ? goBack() : push("/questions")
+    onCancel: () => (window.history.length > 1 ? goBack() : push("/questions"))
 };
 
 const Editor = connect(mapStateToProps, mapDispatchToProps)(PermissionsEditor);
@@ -41,6 +50,6 @@ export default class CollectionsPermissionsApp extends Component {
             >
                 <Editor {...this.props} modal confirmCancel={false} />
             </PermissionsApp>
-        )
+        );
     }
 }

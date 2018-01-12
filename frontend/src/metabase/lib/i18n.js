@@ -1,4 +1,3 @@
-
 import { addLocale, useLocale } from "c-3po";
 import { I18NApi } from "metabase/services";
 

@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { Link } from "react-router";
 import cx from "classnames";
 import pure from "recompose/pure";
-import { t } from 'c-3po';
+import { t } from "c-3po";
 import S from "./ReferenceHeader.css";
 import L from "metabase/components/List.css";
 import E from "metabase/reference/components/EditButton.css";
@@ -13,7 +13,6 @@ import Icon from "metabase/components/Icon.jsx";
 import Input from "metabase/components/Input.jsx";
 import Ellipsified from "metabase/components/Ellipsified.jsx";
 import EditButton from "metabase/reference/components/EditButton.jsx";
-
 
 const EditableReferenceHeader = ({
     entity = {},
@@ -29,14 +28,17 @@ const EditableReferenceHeader = ({
     startEditing,
     displayNameFormField,
     nameFormField
-}) =>
+}) => (
     <div className="wrapper wrapper--trim">
-        <div className={cx("relative", L.header)} style={type === 'segment' ? {marginBottom: 0} : {}}>
+        <div
+            className={cx("relative", L.header)}
+            style={type === "segment" ? { marginBottom: 0 } : {}}
+        >
             <div className={L.leftIcons}>
-                { headerIcon &&
+                {headerIcon && (
                     <IconBorder
                         borderWidth="0"
-                        style={{backgroundColor: "#E9F4F8"}}
+                        style={{ backgroundColor: "#E9F4F8" }}
                     >
                         <Icon
                             className="text-brand"
@@ -45,47 +47,61 @@ const EditableReferenceHeader = ({
                             height={24}
                         />
                     </IconBorder>
-                }
+                )}
             </div>
-            { type === 'table' && !hasSingleSchema && !isEditing &&
-                <div className={S.headerSchema}>{entity.schema}</div>
-            }
+            {type === "table" &&
+                !hasSingleSchema &&
+                !isEditing && (
+                    <div className={S.headerSchema}>{entity.schema}</div>
+                )}
             <div
                 className={S.headerBody}
-                style={isEditing && name === 'Details' ? {alignItems: "flex-start"} : {}}
+                style={
+                    isEditing && name === "Details"
+                        ? { alignItems: "flex-start" }
+                        : {}
+                }
             >
-                { isEditing && name === 'Details' ?
-                        <Input
-                            className={S.headerTextInput}
-                            type="text"
-                            placeholder={entity.name}
-                            onChange={
-                                hasDisplayName ? displayNameFormField.onChange : nameFormField.onChange
-                            }
-                            defaultValue={
-                                hasDisplayName ? entity.display_name : entity.name
-                            }
-
-                        />
-                        :
+                {isEditing && name === "Details" ? (
+                    <Input
+                        className={S.headerTextInput}
+                        type="text"
+                        placeholder={entity.name}
+                        onChange={
+                            hasDisplayName
+                                ? displayNameFormField.onChange
+                                : nameFormField.onChange
+                        }
+                        defaultValue={
+                            hasDisplayName ? entity.display_name : entity.name
+                        }
+                    />
+                ) : (
                     [
                         <Ellipsified
                             key="1"
                             className={!headerLink && "flex-full"}
                             tooltipMaxWidth="100%"
                         >
-                            { name === 'Details' ?
-                                hasDisplayName ?
-                                    entity.display_name || entity.name :
-                                    entity.name :
-                                name
-                            }
+                            {name === "Details"
+                                ? hasDisplayName
+                                  ? entity.display_name || entity.name
+                                  : entity.name
+                                : name}
                         </Ellipsified>,
-                        headerLink &&
-                            <div key="2" className={cx("flex-full", S.headerButton)}>
+                        headerLink && (
+                            <div
+                                key="2"
+                                className={cx("flex-full", S.headerButton)}
+                            >
                                 <Link
                                     to={headerLink}
-                                    className={cx("Button", "Button--borderless", "ml3", E.editButton)}
+                                    className={cx(
+                                        "Button",
+                                        "Button--borderless",
+                                        "ml3",
+                                        E.editButton
+                                    )}
                                     data-metabase-event={`Data Reference;Entity -> QB click;${type}`}
                                 >
                                     <div className="flex align-center relative">
@@ -94,26 +110,37 @@ const EditableReferenceHeader = ({
                                     </div>
                                 </Link>
                             </div>
+                        )
                     ]
-                }
-                { user && user.is_superuser && !isEditing &&
-                    <EditButton className="ml1" startEditing={startEditing} />
-                }
+                )}
+                {user &&
+                    user.is_superuser &&
+                    !isEditing && (
+                        <EditButton
+                            className="ml1"
+                            startEditing={startEditing}
+                        />
+                    )}
             </div>
         </div>
-        { type === 'segment' && table &&
-            <div className={S.subheader}>
-                <div className={cx(S.subheaderBody)}>
-                    {t`A subset of`} <Link
-                        className={S.subheaderLink}
-                        to={`/reference/databases/${table.db_id}/tables/${table.id}`}
-                    >
-                        {table.display_name}
-                    </Link>
+        {type === "segment" &&
+            table && (
+                <div className={S.subheader}>
+                    <div className={cx(S.subheaderBody)}>
+                        {t`A subset of`}{" "}
+                        <Link
+                            className={S.subheaderLink}
+                            to={`/reference/databases/${table.db_id}/tables/${
+                                table.id
+                            }`}
+                        >
+                            {table.display_name}
+                        </Link>
+                    </div>
                 </div>
-            </div>
-        }
-    </div>;
+            )}
+    </div>
+);
 EditableReferenceHeader.propTypes = {
     entity: PropTypes.object,
     table: PropTypes.object,
