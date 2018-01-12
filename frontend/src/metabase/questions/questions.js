@@ -1,3 +1,5 @@
+/* eslint-disable react/display-name */
+
 import {
     createAction,
     createThunkAction,
@@ -120,7 +122,7 @@ function createUndo(type, actions, collection) {
         type: type,
         count: actions.length,
         message: (
-            undo // eslint-disable-line react/display-name
+            undo
         ) => (
             <div className="flex flex-column">
                 <div>

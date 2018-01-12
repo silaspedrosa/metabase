@@ -112,13 +112,11 @@ export default class ActionButton extends Component {
     };
 
     render() {
-        // eslint-disable-next-line no-unused-vars
         const {
             normalText,
             activeText,
             failedText,
             successText,
-            actionFn,
             className,
             forceActiveStyle,
             children,
