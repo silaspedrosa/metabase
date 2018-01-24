@@ -138,9 +138,13 @@ export default class TagEditorParam extends Component {
                         <DataSelector
                             ref="dataSection"
                             databases={databases}
+                            selectedDatabaseId={database.id}
                             selectedTableId={table ? table.id : null}
                             selectedFieldId={Array.isArray(tag.dimension) ? tag.dimension[1] : null}
                             setFieldFn={(fieldId) => this.setDimension(fieldId)}
+                            renderAsSelect={true}
+                            skipDatabaseSelection={true}
+                            className="AdminSelect flex align-center"
                         />
                     </div>
                 }
